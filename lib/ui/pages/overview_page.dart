@@ -1,13 +1,16 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
+import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/account_list_page.dart';
 import 'package:finman/ui/pages/exchange_page.dart';
-import 'package:finman/ui/pages/expenses_page.dart';
+import 'package:finman/ui/pages/expense_list_page.dart';
+import 'package:finman/ui/pages/saving_list_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
@@ -50,7 +53,13 @@ class OverviewPageState extends State<OverviewPage> {
           monthlyExpense.getRemainingPayment(DateTime.now());
     }
     _netBalance = bruteBalance - remainingMonthlyExpenses;
-    _netBalanceMinusSavings = _netBalance;
+
+    double remainingSavings = 0;
+    for (Saving saving in (await SavingService().fetchAll())) {
+      remainingSavings += saving.calculateRemainingAmount();
+    }
+    _netBalanceMinusSavings =
+        bruteBalance - remainingMonthlyExpenses - remainingSavings;
   }
 
   Widget _createBalanceOverviewWidget(double balance, String label) {
@@ -153,13 +162,13 @@ class OverviewPageState extends State<OverviewPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _createPageButton(const AccountsPage(), Icons.account_box_outlined,
+        _createPageButton(const AccountListPage(), Icons.account_box_outlined,
             getAppLocalizations(context)!.accounts),
-        _createPageButton(const ExpensesPage(), Icons.money_off,
+        _createPageButton(const ExpenseListPage(), Icons.money_off,
             getAppLocalizations(context)!.expenses),
-        _createPageButton(const AccountsPage(), Icons.question_mark,
-            getAppLocalizations(context)!.soon),
-        _createPageButton(const AccountsPage(), Icons.question_mark,
+        _createPageButton(const SavingListPage(), Icons.savings,
+            getAppLocalizations(context)!.savings),
+        _createPageButton(const AccountListPage(), Icons.question_mark,
             getAppLocalizations(context)!.soon),
       ],
     );

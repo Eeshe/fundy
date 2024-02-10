@@ -68,5 +68,15 @@
   "emptyStartingAccount": "You must select a starting account",
   "emptyFinalAccount": "You must select a final account",
   "emptyExchangeAmount": "You must enter an exchange amount",
-  "exchangeDescription": "{FROM}-{TO} Exchange"
+  "exchangeDescription": "{FROM}-{TO} Exchange",
+  "savings": "Savings",
+  "fetchingSavings": "Fetching your savings...",
+  "noSavingsFound": "No savings found",
+  "createSavingInstruction": "Try creating one with the button below",
+  "savingFetchingError": "There was an error fetching your savings",
+  "newSaving": "New Saving",
+  "savingDescriptionHint": "Enter saving description",
+  "emptySavingDescription": "Please enter a saving description",
+  "paidAmountHigherThanSavingAmount": "Paid amount can't be higher than the saving's amount",
+  "emptySavingAmount": "Please enter a saving amount"
 }
