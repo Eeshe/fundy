@@ -8,14 +8,14 @@ import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
-class ExpensesPage extends StatefulWidget {
-  const ExpensesPage({super.key});
+class ExpenseListPage extends StatefulWidget {
+  const ExpenseListPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => ExpensesPageState();
+  State<StatefulWidget> createState() => ExpenseListPageState();
 }
 
-class ExpensesPageState extends State<ExpensesPage> {
+class ExpenseListPageState extends State<ExpenseListPage> {
   DateTime _selectedDate = DateTime.now();
   List<MonthlyExpense>? _monthlyExpenses;
 

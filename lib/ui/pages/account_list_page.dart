@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import '../shared/widgets/account_icon_widget.dart';
 import 'account_view_page.dart';
 
-class AccountsPage extends StatefulWidget {
-  const AccountsPage({super.key});
+class AccountListPage extends StatefulWidget {
+  const AccountListPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => AccountsPageState();
+  State<StatefulWidget> createState() => AccountListPageState();
 }
 
-class AccountsPageState extends State<AccountsPage> {
+class AccountListPageState extends State<AccountListPage> {
   String? _filteredCurrency;
 
   Future<List<Account>> _fetchAccounts() async {

@@ -1,5 +1,6 @@
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
+import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
@@ -18,9 +19,10 @@ void main() async {
       await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDirectory.path);
   Hive.registerAdapter(AccountAdapter());
-  Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(CurrencyTypeAdapter());
+  Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(MonthlyExpenseAdapter());
+  Hive.registerAdapter(SavingAdapter());
 
   AccountService();
   ConversionService();
