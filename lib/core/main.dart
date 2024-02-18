@@ -1,4 +1,6 @@
 import 'package:finman/core/models/currency_type.dart';
+import 'package:finman/core/models/debt.dart';
+import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
@@ -23,6 +25,8 @@ void main() async {
   Hive.registerAdapter(TransactionAdapter());
   Hive.registerAdapter(MonthlyExpenseAdapter());
   Hive.registerAdapter(SavingAdapter());
+  Hive.registerAdapter(DebtAdapter());
+  Hive.registerAdapter(DebtTypeAdapter());
 
   AccountService();
   ConversionService();
