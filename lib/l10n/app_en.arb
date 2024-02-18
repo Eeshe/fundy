@@ -78,5 +78,19 @@
   "savingDescriptionHint": "Enter saving description",
   "emptySavingDescription": "Please enter a saving description",
   "paidAmountHigherThanSavingAmount": "Paid amount can't be higher than the saving's amount",
-  "emptySavingAmount": "Please enter a saving amount"
+  "emptySavingAmount": "Please enter a saving amount",
+  "debts": "Debts",
+  "ownDebt": "Own",
+  "otherDebt": "Other",
+  "fetchingDebts": "Fetching your debts...",
+  "noDebtsFound": "No debts found",
+  "createDebtInstruction": "Try creating one with the button below",
+  "debtFetchingError": "There was an error fetching your debts",
+  "newDebt": "New Debt",
+  "debtDescriptionHint": "Enter debt description",
+  "emptyDebtDescription": "Please enter a debt description",
+  "invalidDebtAmount": "Enter a valid debt amount",
+  "paidAmountHigherThanDebtAmount": "Paid amount can't be higher than the debt's amount",
+  "emptyDebtAmount": "Please enter a debt amount",
+  "debtType": "Debt Type"
 }
