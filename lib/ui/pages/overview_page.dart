@@ -1,6 +1,7 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/debt.dart';
+import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
@@ -58,6 +59,8 @@ class OverviewPageState extends State<OverviewPage> {
     // Subtract own debts
     double remainingDebts = 0;
     for (Debt debt in (await DebtService().fetchAll())) {
+      if (debt.debtType == DebtType.other) continue;
+
       remainingDebts += debt.calculateRemainingAmount();
     }
     _netBalance = bruteBalance - remainingMonthlyExpenses - remainingDebts;
