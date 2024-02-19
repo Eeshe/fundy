@@ -1,7 +1,5 @@
-import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/debt.dart';
 import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/models/saving.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +22,7 @@ class DebtFormState extends State<DebtFormPage> {
 
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
-  String _selectedDebtType = DebtType.own.toString();
+  String? _selectedDebtType;
 
   void _initializePaidAmountInput() {
     double paidAmount = widget._debt!.paidAmount;
@@ -210,6 +208,8 @@ class DebtFormState extends State<DebtFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    _selectedDebtType ??=
+        widget._debt == null ? DebtType.own.name : widget._debt!.debtType.name;
     return Scaffold(
       appBar: AppBar(
         title: Text(widget._debt == null
