@@ -46,6 +46,7 @@ dependencies:
   flutter_expandable_fab: ^2.0.0
   flutter_localizations:
     sdk: flutter
+  local_auth: ^2.1.8
 
 dev_dependencies:
   flutter_test:

@@ -7,7 +7,7 @@ import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/monthly_expense_service.dart';
-import 'package:finman/ui/pages/overview_page.dart';
+import 'package:finman/ui/pages/authentication_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -65,7 +65,7 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: const OverviewPage());
+        home: const AuthenticationPage());
   }
 }
 

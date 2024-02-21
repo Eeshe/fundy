@@ -326,6 +326,7 @@ class OverviewPageState extends State<OverviewPage> {
       appBar: AppBar(
         title: const Text("FinMan"),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       resizeToAvoidBottomInset: false,
       body: Column(

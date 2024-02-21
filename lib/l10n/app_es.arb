@@ -92,5 +92,7 @@
   "invalidDebtAmount": "Ingresa un monto de deuda válido",
   "paidAmountHigherThanDebtAmount": "El monto pagado no puede ser mayor que el monto de la deuda",
   "emptyDebtAmount": "Por favor ingresa un monto de deuda",
-  "debtType": "Tipo de Deuda"
+  "debtType": "Tipo de Deuda",
+  "authenticate": "Autenticar para usar la aplicación",
+  "authenticationRequired": "Autenticación necesaria"
 }
