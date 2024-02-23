@@ -94,5 +94,13 @@
   "emptyDebtAmount": "Por favor ingresa un monto de deuda",
   "debtType": "Tipo de Deuda",
   "authenticate": "Autenticar para usar la aplicación",
-  "authenticationRequired": "Autenticación necesaria"
+  "authenticationRequired": "Autenticación necesaria",
+  "styleSettings": "Estilo",
+  "themeSettings": "Tema",
+  "colorSettings": "Colores",
+  "backgroundColor": "Fondo",
+  "primaryColor": "Primario",
+  "accentColor": "Secundario",
+  "positiveColor": "Positivo",
+  "negativeColor": "Negativo"
 }

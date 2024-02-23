@@ -1,3 +1,4 @@
+import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/debt.dart';
 import 'package:finman/core/models/debt_type.dart';
@@ -7,13 +8,12 @@ import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/core/services/settings_service.dart';
 import 'package:finman/ui/pages/authentication_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
-
-import 'models/account.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,41 +31,56 @@ void main() async {
   AccountService();
   ConversionService();
   MonthlyExpenseService();
-  runApp(const MyApp());
+
+  SettingsService settingsService = SettingsService();
+  await settingsService.initializeSettings();
+
+  runApp(MyApp(settingsService: settingsService));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  static final ValueNotifier<ThemeMode> themeNotifier =
+      ValueNotifier(ThemeMode.light);
+  final SettingsService settingsService;
+
+  const MyApp({super.key, required this.settingsService});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'FinMan',
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('es'),
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          // This is the theme of your application.
-          //
-          // TRY THIS: Try running your application with "flutter run". You'll see
-          // the application has a blue toolbar. Then, without quitting the app,
-          // try changing the seedColor in the colorScheme below to Colors.green
-          // and then invoke "hot reload" (save your changes or press the "hot
-          // reload" button in a Flutter-supported IDE, or press "r" if you used
-          // the command line to start the app).
-          //
-          // Notice that the counter didn't reset back to zero; the application
-          // state is not lost during the reload. To reset the state, use hot
-          // restart instead.
-          //
-          // This works for code too, not just values: Most code changes can be
-          // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: const AuthenticationPage());
+    themeNotifier.value = settingsService.fetchThemeMode();
+    return ValueListenableBuilder(
+        valueListenable: themeNotifier,
+        builder: (context, value, child) {
+          ColorScheme lightColorScheme = ColorScheme.fromSeed(
+              seedColor: Colors.white,
+              brightness: Brightness.light,
+              background: settingsService.fetchBackgroundColor(ThemeMode.light),
+              primary: settingsService.fetchPrimaryColor(ThemeMode.light),
+              secondary: settingsService.fetchAccentColor(ThemeMode.light),
+              error: settingsService.fetchNegativeColor(ThemeMode.light),
+              tertiary: settingsService.fetchPositiveColor(ThemeMode.light));
+          ColorScheme darkColorScheme = ColorScheme.fromSeed(
+              seedColor: Colors.black,
+              brightness: Brightness.dark,
+              background: settingsService.fetchBackgroundColor(ThemeMode.dark),
+              primary: settingsService.fetchPrimaryColor(ThemeMode.dark),
+              secondary: settingsService.fetchAccentColor(ThemeMode.dark),
+              error: settingsService.fetchNegativeColor(ThemeMode.dark),
+              tertiary: settingsService.fetchPositiveColor(ThemeMode.dark));
+          return MaterialApp(
+              title: 'FinMan',
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
+              locale: const Locale('es'),
+              debugShowCheckedModeBanner: false,
+              themeMode: value,
+              theme:
+                  ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+              darkTheme:
+                  ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
+              home: const AuthenticationPage());
+        });
   }
 }
 

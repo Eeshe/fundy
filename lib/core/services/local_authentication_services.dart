@@ -22,7 +22,7 @@ class LocalAuthenticationService {
     } catch (e) {
       return false;
     }
-    _authentication.stopAuthentication();
+    await _authentication.stopAuthentication();
     return true;
   }
 
