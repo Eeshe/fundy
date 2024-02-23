@@ -15,6 +15,7 @@ import 'package:finman/ui/pages/debt_list_page.dart';
 import 'package:finman/ui/pages/exchange_page.dart';
 import 'package:finman/ui/pages/expense_list_page.dart';
 import 'package:finman/ui/pages/saving_list_page.dart';
+import 'package:finman/ui/pages/settings_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
@@ -36,6 +37,24 @@ class OverviewPageState extends State<OverviewPage> {
   double? _netBalance;
   double? _netBalanceMinusSavings;
   List<Transaction>? _recentTransactions;
+
+  AppBar _createAppBar() {
+    return AppBar(
+      title: const Text("FinMan"),
+      centerTitle: true,
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const SettingsPage()));
+            },
+            icon: const Icon(Icons.settings))
+      ],
+    );
+  }
 
   Future<void> _computeBalances() async {
     final ConversionService conversionService = ConversionService.getInstance();
@@ -323,11 +342,7 @@ class OverviewPageState extends State<OverviewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("FinMan"),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
-      ),
+      appBar: _createAppBar(),
       resizeToAvoidBottomInset: false,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,

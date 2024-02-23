@@ -94,5 +94,13 @@
   "emptyDebtAmount": "Please enter a debt amount",
   "debtType": "Debt Type",
   "authenticate": "Authenticate to use the app",
-  "authenticationRequired": "Authentication required"
+  "authenticationRequired": "Authentication required",
+  "styleSettings": "Style",
+  "themeSettings": "Theme",
+  "colorSettings": "Colors",
+  "backgroundColor": "Background",
+  "primaryColor": "Primary",
+  "accentColor": "Accent",
+  "positiveColor": "Positive",
+  "negativeColor": "Negative"
 }
