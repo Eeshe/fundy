@@ -2,6 +2,10 @@ import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
+import 'package:finman/ui/pages/account_view_page.dart';
+import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
+import 'package:finman/utils/double_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 part 'account.g.dart';
@@ -28,7 +32,7 @@ class Account {
 
   String formatBalance(bool convertCurrency) {
     if (!convertCurrency) {
-      return "${currencyType.symbol}${balance.toStringAsFixed(2)}";
+      return "${currencyType.symbol}${balance.format()}";
     }
     return formatUsdBalance();
   }
@@ -76,5 +80,38 @@ class Account {
 
   void _save() {
     AccountService().save(this);
+  }
+
+  Widget createListWidget(BuildContext context, Function() redrawCallback) {
+    return InkWell(
+        onTap: () async {
+          await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AccountViewPage(this),
+              ));
+          redrawCallback();
+        },
+        child: Row(
+          children: [
+            AccountIconWidget(iconPath, 50, 50),
+            const SizedBox(width: 10),
+            Expanded(
+                child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                    child: Text(
+                  id,
+                  style: const TextStyle(fontSize: 24),
+                )),
+                Text(
+                  formatBalance(false),
+                  style: const TextStyle(fontSize: 24),
+                )
+              ],
+            )),
+          ],
+        ));
   }
 }

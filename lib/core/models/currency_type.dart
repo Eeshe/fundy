@@ -5,13 +5,14 @@ part 'currency_type.g.dart';
 @HiveType(typeId: 1)
 enum CurrencyType {
   @HiveField(0)
-  bs(symbol: "Bs"),
+  bs("Bs", "Bs"),
   @HiveField(1)
-  usd(symbol: "\$"),
+  usd("\$", "USD"),
   @HiveField(2)
-  usdt(symbol: "USDT");
+  usdt("USDT", "USDT");
 
-  const CurrencyType({required this.symbol});
+  const CurrencyType(this.symbol, this.displayName);
 
   final String symbol;
+  final String displayName;
 }

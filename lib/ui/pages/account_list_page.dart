@@ -1,4 +1,5 @@
 import 'package:finman/core/models/account.dart';
+import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/ui/pages/create_account_page.dart';
 import 'package:finman/ui/shared/localization.dart';
@@ -28,6 +29,35 @@ class AccountListPageState extends State<AccountListPage> {
   void initState() {
     super.initState();
     _fetchAccounts();
+  }
+
+  Row _createCurrencyRadio(String value) {
+    return Row(
+      children: [
+        Radio(
+          value: value,
+          groupValue: _filteredCurrency,
+          onChanged: (value) {
+            setState(() {
+              _filteredCurrency = value;
+            });
+          },
+        ),
+        Text(value)
+      ],
+    );
+  }
+
+  Widget _createCurrencyRadios() {
+    List<Row> radios = [];
+    radios.add(_createCurrencyRadio(getAppLocalizations(context)!.all));
+    for (var element in CurrencyType.values) {
+      radios.add(_createCurrencyRadio(element.displayName));
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: radios,
+    );
   }
 
   Widget _createAccountWidget(Account account) {
@@ -80,38 +110,33 @@ class AccountListPageState extends State<AccountListPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(
+          Icon(
             Icons.search_off,
-            color: Colors.red,
+            color: Theme.of(context).colorScheme.error,
           ),
           Text(
             getAppLocalizations(context)!.noAccountsFound,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 36),
+            style: const TextStyle(fontSize: 30),
           ),
           Text(
             getAppLocalizations(context)!.createAccountInstruction,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 20),
           )
         ],
       );
     }
-    return Container(
-      decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black45,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(12.0)),
-      child: ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) =>
-              _createAccountWidget(accounts[index]),
-          separatorBuilder: (context, index) => const Divider(),
-          itemCount: accounts.length),
-    );
+    return Expanded(child: ListView.separated(
+      shrinkWrap: true,
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      itemBuilder: (context, index) =>
+          accounts[index].createListWidget(context, () => setState(() {})),
+      separatorBuilder: (context, index) => Divider(
+        color: Theme.of(context).colorScheme.primary,
+      ),
+      itemCount: accounts.length,
+    ));
   }
 
   Widget _createErrorWidget() {
@@ -144,6 +169,21 @@ class AccountListPageState extends State<AccountListPage> {
     );
   }
 
+  Widget _createFloatingActionButton() {
+    return FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      onPressed: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CreateAccountPage(),
+            ));
+        setState(() {});
+      },
+      child: const Icon(Icons.add),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _filteredCurrency ??= getAppLocalizations(context)!.all;
@@ -163,56 +203,18 @@ class AccountListPageState extends State<AccountListPage> {
           appBar: AppBar(
             title: Text(getAppLocalizations(context)!.yourAccounts),
             centerTitle: true,
+            scrolledUnderElevation: 0,
+            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
-          body: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: DropdownButton<String>(
-                      value: _filteredCurrency,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        color: Colors.black,
-                      ),
-                      items: [
-                        getAppLocalizations(context)!.all,
-                        'Bs',
-                        'USD',
-                        'USDT'
-                      ]
-                          .map(
-                              (e) => DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          _filteredCurrency = value!;
-                        });
-                      },
-                    ),
-                  ),
-                  listWidget
-                ],
-              ),
-            ),
+          resizeToAvoidBottomInset: true,
+          body: Column(
+            children: [
+              _createCurrencyRadios(),
+              listWidget,
+            ],
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateAccountPage(),
-                  ));
-              setState(() {});
-            },
-            child: const Icon(Icons.add),
-          ),
+          floatingActionButton: _createFloatingActionButton(),
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         );
       },
     );

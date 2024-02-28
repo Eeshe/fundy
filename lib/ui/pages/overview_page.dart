@@ -43,6 +43,7 @@ class OverviewPageState extends State<OverviewPage> {
       title: const Text("FinMan"),
       centerTitle: true,
       automaticallyImplyLeading: false,
+      scrolledUnderElevation: 0,
       actions: [
         IconButton(
             onPressed: () {
@@ -338,8 +339,7 @@ class OverviewPageState extends State<OverviewPage> {
         heroTag: "openFab",
           child: const Icon(Icons.add),
           fabSize: ExpandableFabSize.regular,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          shape: const CircleBorder()),
+          backgroundColor: Theme.of(context).colorScheme.primary),
       closeButtonBuilder: RotateFloatingActionButtonBuilder(
         heroTag: "closeFab",
           child: const Icon(Icons.close),

@@ -87,6 +87,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(getAppLocalizations(context)!.createAccount),
         centerTitle: true,
