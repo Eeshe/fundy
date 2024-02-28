@@ -214,7 +214,7 @@ class AccountListPageState extends State<AccountListPage> {
             ],
           ),
           floatingActionButton: _createFloatingActionButton(),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         );
       },
     );
