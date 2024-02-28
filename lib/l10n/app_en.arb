@@ -2,7 +2,7 @@
   "computingBalances": "Computing balances...",
   "bruteBalance": "Brute Balance",
   "netBalance": "Net Balance",
-  "netBalanceMinusSavings": "Net Balance - Savings",
+  "usableBalance": "Usable Balance",
   "accounts": "Accounts",
   "expenses": "Expenses",
   "soon": "Soon",

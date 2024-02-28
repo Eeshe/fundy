@@ -53,6 +53,7 @@ class OverviewPageState extends State<OverviewPage> {
             },
             icon: const Icon(Icons.settings))
       ],
+      backgroundColor: Theme.of(context).colorScheme.primary,
     );
   }
 
@@ -99,15 +100,15 @@ class OverviewPageState extends State<OverviewPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "\$${balance.toStringAsFixed(2)}",
+          label,
           style: const TextStyle(
-            fontSize: 25,
+            fontSize: 18,
           ),
         ),
         Text(
-          label,
+          "\$${balance.toStringAsFixed(2)}",
           style: const TextStyle(
-            fontSize: 15,
+            fontSize: 25,
           ),
         )
       ],
@@ -115,47 +116,36 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createBalancesOverviewWidget() {
-    return FractionallySizedBox(
-      widthFactor: 0.9,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black,
-          ),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: FutureBuilder(
-            future: _computeBalances(),
-            builder: (context, snapshot) {
-              if (_bruteBalance == null ||
-                  _netBalance == null ||
-                  _netBalanceMinusSavings == null) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 10),
-                    Text(getAppLocalizations(context)!.computingBalances)
-                  ],
-                );
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _createBalanceOverviewWidget(_bruteBalance!,
-                      getAppLocalizations(context)!.bruteBalance),
-                  _createBalanceOverviewWidget(
-                      _netBalance!, getAppLocalizations(context)!.netBalance),
-                  _createBalanceOverviewWidget(_netBalanceMinusSavings!,
-                      getAppLocalizations(context)!.netBalanceMinusSavings),
-                ],
-              );
-            },
-          ),
-        ),
+    return Container(
+      color: Theme.of(context).colorScheme.primary,
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 20, bottom: 20),
+      child: FutureBuilder(
+        future: _computeBalances(),
+        builder: (context, snapshot) {
+          if (_bruteBalance == null ||
+              _netBalance == null ||
+              _netBalanceMinusSavings == null) {
+            return Column(
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 10),
+                Text(getAppLocalizations(context)!.computingBalances)
+              ],
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _createBalanceOverviewWidget(
+                  _bruteBalance!, getAppLocalizations(context)!.bruteBalance),
+              _createBalanceOverviewWidget(
+                  _netBalance!, getAppLocalizations(context)!.netBalance),
+              _createBalanceOverviewWidget(_netBalanceMinusSavings!,
+                  getAppLocalizations(context)!.usableBalance),
+            ],
+          );
+        },
       ),
     );
   }
@@ -192,7 +182,7 @@ class OverviewPageState extends State<OverviewPage> {
 
   Widget _createPageButtons() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         _createPageButton(const AccountListPage(), Icons.account_box_outlined,
             getAppLocalizations(context)!.accounts),
@@ -200,7 +190,7 @@ class OverviewPageState extends State<OverviewPage> {
             getAppLocalizations(context)!.expenses),
         _createPageButton(const SavingListPage(), Icons.savings,
             getAppLocalizations(context)!.savings),
-        _createPageButton(const DebtListPage(), Icons.money_outlined,
+        _createPageButton(const DebtListPage(), Icons.account_balance_wallet,
             getAppLocalizations(context)!.debts),
       ],
     );
@@ -235,51 +225,49 @@ class OverviewPageState extends State<OverviewPage> {
                 ));
             setState(() {});
           },
-          child: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                    flex: 1,
-                    child: AccountIconWidget(account.iconPath, 50, 50)),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        transaction.description,
-                        style: const TextStyle(fontSize: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                  flex: 1, child: AccountIconWidget(account.iconPath, 50, 50)),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      transaction.description,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Text(
+                      account.id,
+                      style: const TextStyle(
+                        fontSize: 14,
                       ),
-                      Text(
-                        account.id,
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
+                    ),
+                    Text(
+                      DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
+                      style: const TextStyle(
+                        fontSize: 14,
                       ),
-                      Text(
-                        DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
+                    )
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  transaction.formatAmount(currencyType),
+                  textAlign: TextAlign.end,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: amount >= 0
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.error,
                   ),
                 ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    transaction.formatAmount(currencyType),
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: amount >= 0 ? Colors.green : Colors.red,
-                    ),
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         );
       },
@@ -287,55 +275,113 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createRecentTransactionsWidget() {
-    return FractionallySizedBox(
-      widthFactor: 0.9,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black,
+    return FutureBuilder(
+      future: _computeRecentTransactions(),
+      builder: (context, snapshot) {
+        if (_recentTransactions == null) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 10),
+              Text(getAppLocalizations(context)!.fetchingTransactions)
+            ],
+          );
+        }
+        if (_recentTransactions!.isEmpty) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.search_off,
+                size: 50,
+              ),
+              Text(
+                getAppLocalizations(context)!.noRecentTransactions,
+                textAlign: TextAlign.center,
+              )
+            ],
+          );
+        }
+        return Expanded(
+          child: Column(
+            children: [
+              Text(
+                getAppLocalizations(context)!.recentTransactions,
+                style: const TextStyle(
+                  fontSize: 26,
+                ),
+              ),
+              Expanded(
+                  child: ListView.separated(
+                      padding: const EdgeInsets.only(left: 10, right: 10),
+                      itemBuilder: (context, index) {
+                        return _createTransactionWidget(
+                            _recentTransactions![index]);
+                      },
+                      separatorBuilder: (context, index) => Divider(
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                      itemCount: _recentTransactions!.length))
+            ],
           ),
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: FutureBuilder(
-          future: _computeRecentTransactions(),
-          builder: (context, snapshot) {
-            if (_recentTransactions == null) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 10),
-                  Text(getAppLocalizations(context)!.fetchingTransactions)
-                ],
-              );
+        );
+      },
+    );
+  }
+
+  ExpandableFab _createFloatingActionButton() {
+    return ExpandableFab(
+      openButtonBuilder: RotateFloatingActionButtonBuilder(
+        heroTag: "openFab",
+          child: const Icon(Icons.add),
+          fabSize: ExpandableFabSize.regular,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          shape: const CircleBorder()),
+      closeButtonBuilder: RotateFloatingActionButtonBuilder(
+        heroTag: "closeFab",
+          child: const Icon(Icons.close),
+          fabSize: ExpandableFabSize.regular,
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          shape: const CircleBorder()),
+      children: [
+        FloatingActionButton.small(
+          heroTag: "newTransactionFab",
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: const Icon(Icons.attach_money),
+          onPressed: () async {
+            ExpandableFabState? fabState = _key.currentState;
+            if (fabState != null) {
+              fabState.toggle();
             }
-            if (_recentTransactions!.isEmpty) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.search_off,
-                    size: 50,
-                  ),
-                  Text(
-                    getAppLocalizations(context)!.noRecentTransactions,
-                    textAlign: TextAlign.center,
-                  )
-                ],
-              );
-            }
-            return ListView.separated(
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return _createTransactionWidget(_recentTransactions![index]);
-                },
-                separatorBuilder: (context, index) => const Divider(),
-                itemCount: _recentTransactions!.length);
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TransactionFormPage(null, null),
+                ));
+            setState(() {});
           },
         ),
-      ),
+        FloatingActionButton.small(
+          heroTag: "newExchangeFab",
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          child: const Icon(Icons.currency_exchange),
+          onPressed: () async {
+            ExpandableFabState? fabState = _key.currentState;
+            if (fabState != null) {
+              fabState.toggle();
+            }
+            await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ExchangePage(),
+                ));
+            setState(() {});
+          },
+        )
+      ],
     );
   }
 
@@ -345,58 +391,17 @@ class OverviewPageState extends State<OverviewPage> {
       appBar: _createAppBar(),
       resizeToAvoidBottomInset: false,
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(child: _createBalancesOverviewWidget()),
+          _createBalancesOverviewWidget(),
           const SizedBox(height: 10),
           _createPageButtons(),
-          Text(
-            getAppLocalizations(context)!.recentTransactions,
-            style: const TextStyle(
-              fontSize: 30,
-            ),
-          ),
-          Expanded(flex: 8, child: _createRecentTransactionsWidget()),
-          const Expanded(flex: 1, child: SizedBox()),
+          const SizedBox(height: 10),
+          _createRecentTransactionsWidget(),
         ],
       ),
       floatingActionButtonLocation: ExpandableFab.location,
-      floatingActionButton: ExpandableFab(
-        key: _key,
-        distance: 75,
-        children: [
-          FloatingActionButton.small(
-            child: const Icon(Icons.attach_money),
-            onPressed: () async {
-              ExpandableFabState? fabState = _key.currentState;
-              if (fabState != null) {
-                fabState.toggle();
-              }
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TransactionFormPage(null, null),
-                  ));
-              setState(() {});
-            },
-          ),
-          FloatingActionButton.small(
-            child: const Icon(Icons.currency_exchange),
-            onPressed: () async {
-              ExpandableFabState? fabState = _key.currentState;
-              if (fabState != null) {
-                fabState.toggle();
-              }
-              await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ExchangePage(),
-                  ));
-              setState(() {});
-            },
-          )
-        ],
-      ),
+      floatingActionButton: _createFloatingActionButton(),
     );
   }
 }

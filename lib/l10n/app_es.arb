@@ -2,7 +2,7 @@
   "computingBalances": "Cargando saldos...",
   "bruteBalance": "Saldo Bruto",
   "netBalance": "Saldo Neto",
-  "netBalanceMinusSavings": "Saldo Neto - Ahorros",
+  "usableBalance": "Saldo Usable",
   "accounts": "Cuentas",
   "expenses": "Gastos",
   "soon": "Próximamente",
