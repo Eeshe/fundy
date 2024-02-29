@@ -1,6 +1,10 @@
+import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/conversion_service.dart';
+import 'package:finman/ui/pages/transaction_form_page.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/intl.dart';
 
 part 'transaction.g.dart';
 
@@ -25,5 +29,52 @@ class Transaction {
     if (currencyType == CurrencyType.usd) return formatAmount(currencyType);
 
     return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(amount.abs(), currencyType.name).toStringAsFixed(2)}";
+  }
+
+  Widget createListWidget(BuildContext context, Account account,
+      bool convertCurrency, Function() redrawCallback) {
+    CurrencyType currencyType = account.currencyType;
+    return InkWell(
+      onTap: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TransactionFormPage(account, this),
+            ));
+        redrawCallback();
+      },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                description,
+                style: const TextStyle(fontSize: 20),
+              ),
+              Text(
+                DateFormat('dd/MM/yyyy kk:mm').format(date),
+                style: const TextStyle(
+                  fontSize: 14,
+                ),
+              )
+            ],
+          )),
+          Text(
+            convertCurrency
+                ? formatUsdAmount(currencyType)
+                : formatAmount(currencyType),
+            style: TextStyle(
+              fontSize: 20,
+              color: amount >= 0
+                  ? Theme.of(context).colorScheme.tertiary
+                  : Theme.of(context).colorScheme.error,
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

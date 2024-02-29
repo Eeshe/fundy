@@ -43,24 +43,25 @@ class Saving {
     return amount - paidAmount;
   }
 
-  Widget _createProgressBarWidget() {
+  Widget _createProgressBarWidget(BuildContext context) {
     return LinearPercentIndicator(
       animation: true,
       lineHeight: 20,
-      barRadius: const Radius.circular(10),
-      progressColor: Colors.deepPurple,
+      barRadius: const Radius.circular(5),
+      progressColor: Theme.of(context).colorScheme.primary,
       percent: paidAmount / amount,
       center: Text(
         "\$${paidAmount.toStringAsFixed(2)}/\$${amount.toStringAsFixed(2)}",
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16
-        ),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
     );
   }
 
-  Widget createDisplayWidget(Function() redrawCallback) {
+  void delete() {
+    SavingService().delete(this);
+  }
+
+  Widget createDisplayWidget(BuildContext context, Function() redrawCallback) {
     TextStyle labelStyle = const TextStyle(fontSize: 20);
     return FutureBuilder(
         future: AccountService().fetch(accountId),
@@ -74,7 +75,7 @@ class Saving {
               await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => SavingFormPage(this)));
+                      builder: (context) => SavingFormPage(this, null)));
               redrawCallback();
             },
             child: Container(
@@ -92,7 +93,7 @@ class Saving {
                   Text(id, style: labelStyle),
                   AccountIconWidget(account.iconPath, 50, 50),
                   Text(accountId, style: labelStyle),
-                  _createProgressBarWidget(),
+                  _createProgressBarWidget(context),
                   ElevatedButton(
                       onPressed: () {
                         if (!_isPaid()) {
@@ -117,7 +118,29 @@ class Saving {
         });
   }
 
-  void delete() {
-    SavingService().delete(this);
+  Widget createListWidget(
+      BuildContext context, Account account, Function() redrawCallback) {
+    return InkWell(
+      onTap: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SavingFormPage(this, account)));
+        redrawCallback();
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              id,
+              style: const TextStyle(fontSize: 20),
+            ),
+          ),
+          _createProgressBarWidget(context)
+        ],
+      ),
+    );
   }
 }

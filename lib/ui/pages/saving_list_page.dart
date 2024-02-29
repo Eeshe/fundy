@@ -82,8 +82,8 @@ class SavingListPageState extends State<SavingListPage> {
             child: ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                itemBuilder: (context, index) =>
-                    savings[index].createDisplayWidget(() => setState(() {})),
+                itemBuilder: (context, index) => savings[index]
+                    .createDisplayWidget(context, () => setState(() {})),
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 10),
                 itemCount: savings.length),
@@ -107,7 +107,7 @@ class SavingListPageState extends State<SavingListPage> {
           await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SavingFormPage(null),
+                builder: (context) => const SavingFormPage(null, null),
               ));
           setState(() {});
         },
