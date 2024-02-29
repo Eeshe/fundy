@@ -6,7 +6,7 @@ import 'package:finman/ui/shared/localization.dart';
 import 'package:flutter/material.dart';
 
 import '../shared/widgets/account_icon_widget.dart';
-import 'account_view_page.dart';
+import 'account_page.dart';
 
 class AccountListPage extends StatefulWidget {
   const AccountListPage({super.key});
@@ -66,7 +66,7 @@ class AccountListPageState extends State<AccountListPage> {
           await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => AccountViewPage(account),
+                builder: (context) => AccountPage(account),
               ));
           setState(() {});
         },

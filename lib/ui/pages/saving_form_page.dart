@@ -8,8 +8,9 @@ import 'package:flutter/material.dart';
 
 class SavingFormPage extends StatefulWidget {
   final Saving? _saving;
+  final Account? _account;
 
-  const SavingFormPage(this._saving, {super.key});
+  const SavingFormPage(this._saving, this._account, {super.key});
 
   @override
   State<StatefulWidget> createState() => SavingFormState();
@@ -27,6 +28,10 @@ class SavingFormState extends State<SavingFormPage> {
   Account? _selectedAccount;
 
   Future<void> _fetchSavingAccount() async {
+    if (widget._account != null) {
+      _selectedAccount = widget._account;
+      return;
+    }
     if (widget._saving == null) return;
     if (_selectedAccount != null) return;
 
