@@ -25,7 +25,7 @@ class TextInputState extends State<TextInputWidget> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         focusColor: Theme.of(context).colorScheme.primary,
-      ),
+        errorMaxLines: 2),
       keyboardType: widget.textInputType,
       validator: widget.validator,
     );

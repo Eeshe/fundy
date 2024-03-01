@@ -59,6 +59,7 @@
   "lessThanZeroPaidAmount": "Paid amount can't be lower than 0",
   "paidAmountHigherThanExpenseAmount": "Paid amount can't be higher than the Expense's amount",
   "newBalance": "New Balance",
+  "newBalanceInstructions": "Enter the updated balance",
   "emptyNewBalance": "Please enter a new balance",
   "lessThanZeroNewBalance": "New balance can't be lower than 0",
   "balanceUpdate": "Balance Update",

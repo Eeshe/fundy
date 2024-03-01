@@ -8,7 +8,7 @@ import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
-import 'package:finman/ui/pages/update_balance_page.dart';
+import 'package:finman/ui/pages/update_account_balance_dialog.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
@@ -276,10 +276,9 @@ class AccountPageState extends State<AccountPage> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           ),
           onPressed: () async {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UpdateBalancePage(widget._account)));
+            await showDialog(
+                context: context,
+                builder: (context) => UpdateBalanceDialog(widget._account));
             setState(() {});
           },
           child: Text(
