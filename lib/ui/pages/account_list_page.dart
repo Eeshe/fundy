@@ -1,7 +1,7 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/account_service.dart';
-import 'package:finman/ui/pages/create_account_page.dart';
+import 'package:finman/ui/pages/account_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:flutter/material.dart';
 
@@ -176,7 +176,7 @@ class AccountListPageState extends State<AccountListPage> {
         await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CreateAccountPage(),
+              builder: (context) => const AccountFormPage(),
             ));
         setState(() {});
       },
