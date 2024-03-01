@@ -135,8 +135,9 @@ class AccountPageState extends State<AccountPage> {
   }
 
   Widget _createConversionSwitch() {
-    if (widget._account.currencyType == CurrencyType.usd)
+    if (widget._account.currencyType == CurrencyType.usd) {
       return const SizedBox();
+    }
 
     return Switch(
       value: _convertCurrency,
