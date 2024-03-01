@@ -59,6 +59,7 @@
   "lessThanZeroPaidAmount": "El monto pagado no puede ser menor que 0",
   "paidAmountHigherThanExpenseAmount": "El monto pagado no puede ser mayor que el monto del gasto",
   "newBalance": "Nuevo Saldo",
+  "newBalanceInstructions": "Ingresa el nuevo saldo",
   "emptyNewBalance": "Por favor ingresa un nuevo saldo",
   "lessThanZeroNewBalance": "El nuevo saldo no puede ser menor que 0",
   "balanceUpdate": "Actualización de Saldo",
