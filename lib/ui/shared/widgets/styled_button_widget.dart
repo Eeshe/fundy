@@ -13,24 +13,19 @@ class StyledButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: !isNegativeButton
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.error,
-              foregroundColor: Theme.of(context).colorScheme.onBackground,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-            onPressed: onPressed,
-            child: Text(text),
-          ),
-        )
-      ],
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: !isNegativeButton
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.error,
+        foregroundColor: Theme.of(context).colorScheme.onBackground,
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+      ),
+      onPressed: onPressed,
+      child: Text(text),
     );
   }
 }

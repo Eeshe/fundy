@@ -151,31 +151,36 @@ class _AccountFormPageState extends State<AccountFormPage> {
   }
 
   Widget _createConfirmationButton() {
-    return StyledButtonWidget(
-      text: getAppLocalizations(context)!.confirm,
-      onPressed: () {
-        if (!_formKey.currentState!.validate()) return;
+    return Row(
+      children: [
+        Expanded(
+            child: StyledButtonWidget(
+          text: getAppLocalizations(context)!.confirm,
+          onPressed: () {
+            if (!_formKey.currentState!.validate()) return;
 
-        String accountName = _nameInputController.text;
-        String initialBalanceString = _initialBalanceInputController.text;
-        double initialBalance = initialBalanceString.isEmpty
-            ? 0
-            : double.parse(initialBalanceString);
+            String accountName = _nameInputController.text;
+            String initialBalanceString = _initialBalanceInputController.text;
+            double initialBalance = initialBalanceString.isEmpty
+                ? 0
+                : double.parse(initialBalanceString);
 
-        CurrencyType currencyType = CurrencyType.values
-            .firstWhere((element) => element.name == selectedCurrency);
-        List<Transaction> initialTransactions = [];
-        if (initialBalance > 0) {
-          initialTransactions.add(Transaction(
-              accountName,
-              getAppLocalizations(context)!.initialBalance,
-              DateTime.now(),
-              initialBalance));
-        }
-        AccountService().save(Account(accountName, initialBalance, currencyType,
-            selectedIconPath, initialTransactions));
-        Navigator.pop(context);
-      },
+            CurrencyType currencyType = CurrencyType.values
+                .firstWhere((element) => element.name == selectedCurrency);
+            List<Transaction> initialTransactions = [];
+            if (initialBalance > 0) {
+              initialTransactions.add(Transaction(
+                  accountName,
+                  getAppLocalizations(context)!.initialBalance,
+                  DateTime.now(),
+                  initialBalance));
+            }
+            AccountService().save(Account(accountName, initialBalance,
+                currencyType, selectedIconPath, initialTransactions));
+            Navigator.pop(context);
+          },
+        ))
+      ],
     );
   }
 

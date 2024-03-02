@@ -47,6 +47,8 @@
   "totalMonthlyExpenses": "Gastos Mensuales Totales",
   "fetchingMonthlyExpenses": "Obteniendo gastos mensuales...",
   "noMonthlyExpenses": "No se encontraron gastos mensuales",
+  "min": "Min",
+  "max": "Max",
   "clear": "Limpiar",
   "payAll": "Pagar Todo",
   "monthlyExpenses": "Gastos Mensuales",
