@@ -47,6 +47,8 @@
   "totalMonthlyExpenses": "Total Monthly Expenses",
   "fetchingMonthlyExpenses": "Fetching monthly expenses...",
   "noMonthlyExpenses": "No monthly expenses found",
+  "min": "Min",
+  "max": "Max",
   "clear": "Clear",
   "payAll": "Pay All",
   "monthlyExpenses": "Monthly Expenses",

@@ -1,4 +1,10 @@
+import 'dart:math';
+
 import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/ui/pages/expense_form_page.dart';
+import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
+import 'package:finman/utils/double_extension.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 
@@ -59,11 +65,54 @@ class MonthlyExpense {
   void addPayment(DateTime date, double amount) {
     double currentRecord = getPaymentRecord(date);
     currentRecord += amount;
-    paymentRecords[createRecordKey(date)] = currentRecord;
+    paymentRecords[createRecordKey(date)] =
+        min(this.amount, max(0, currentRecord));
     saveData();
   }
 
   void delete() {
     MonthlyExpenseService().delete(this);
+  }
+
+  Widget createListWidget(
+      BuildContext context, DateTime date, Function() redrawCallback) {
+    double paidAmount = getPaymentRecord(date);
+    double paidPercentage = paidAmount / amount;
+    return InkWell(
+      onTap: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExpenseFormPage(this, date),
+            ));
+        redrawCallback();
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            id,
+            style: const TextStyle(fontSize: 24),
+          ),
+          AdjustableProgressBarWidget(
+            filledPercentage: paidPercentage,
+            lineHeight: 20,
+            center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
+            onMin: () {
+              setUnpaid(date);
+              redrawCallback();
+            },
+            onMax: () {
+              setPaid(date);
+              redrawCallback();
+            },
+            onTweak: (value) {
+              addPayment(date, value);
+              redrawCallback();
+            },
+          )
+        ],
+      ),
+    );
   }
 }

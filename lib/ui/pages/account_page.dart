@@ -14,9 +14,6 @@ import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-import '../../core/models/transaction.dart';
 
 class AccountPage extends StatefulWidget {
   final Account _account;
@@ -33,55 +30,6 @@ class AccountPageState extends State<AccountPage> {
 
   bool _convertCurrency = false;
   late List<Saving> _accountSavings;
-
-  Widget _createTransactionWidget(Transaction transaction) {
-    CurrencyType currencyType = widget._account.currencyType;
-    double amount = transaction.amount;
-    return InkWell(
-      onTap: () async {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  TransactionFormPage(widget._account, transaction),
-            ));
-        setState(() {});
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  transaction.description,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                Text(
-                  DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
-                  style: const TextStyle(
-                    fontSize: 14,
-                  ),
-                )
-              ],
-            )),
-            Text(
-              _convertCurrency
-                  ? transaction.formatUsdAmount(currencyType)
-                  : transaction.formatAmount(currencyType),
-              style: TextStyle(
-                fontSize: 20,
-                color: amount >= 0 ? Colors.green : Colors.red,
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
 
   Future<void> _fetchAccountSavings() async {
     Account account = widget._account;
