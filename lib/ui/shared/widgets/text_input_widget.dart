@@ -6,6 +6,8 @@ class TextInputWidget extends StatefulWidget {
   final TextInputType? textInputType;
   final String? Function(String?)? validator;
   final String? Function(String?)? onChanged;
+  final TextAlign textAlign;
+  final TextStyle? textStyle;
 
   const TextInputWidget(
       {super.key,
@@ -13,7 +15,9 @@ class TextInputWidget extends StatefulWidget {
       required this.hintText,
       this.textInputType,
       required this.validator,
-      this.onChanged});
+      this.onChanged,
+      this.textAlign = TextAlign.start,
+      this.textStyle});
 
   @override
   State<StatefulWidget> createState() => TextInputState();
@@ -29,6 +33,8 @@ class TextInputState extends State<TextInputWidget> {
         focusColor: Theme.of(context).colorScheme.primary,
         errorMaxLines: 2),
       keyboardType: widget.textInputType,
+      textAlign: widget.textAlign,
+      style: widget.textStyle,
       validator: widget.validator,
       onChanged: widget.onChanged,
     );
