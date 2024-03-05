@@ -49,7 +49,7 @@ class AccountPageState extends State<AccountPage> {
     for (Saving saving in _accountSavings) {
       netBalance -= saving.calculateRemainingAmount();
     }
-    if (_convertCurrency) {
+    if (_convertCurrency && bruteBalance != netBalance) {
       netBalance = ConversionService.getInstance()
           .convert(netBalance, account.currencyType.name);
     }
@@ -263,13 +263,23 @@ class AccountPageState extends State<AccountPage> {
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },
-                      child: Text(getAppLocalizations(context)!.yes),
+                      child: Text(
+                        getAppLocalizations(context)!.yes,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
+                      ),
                     ),
                     TextButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text(getAppLocalizations(context)!.no),
+                      child: Text(
+                        getAppLocalizations(context)!.no,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onBackground,
+                        ),
+                      ),
                     )
                   ],
                 );
