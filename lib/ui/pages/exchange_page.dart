@@ -2,6 +2,9 @@ import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
+import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
+import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 
 class ExchangePage extends StatefulWidget {
@@ -23,10 +26,11 @@ class ExchangePageState extends State<ExchangePage> {
   Account? _startingAccount;
   Account? _finalAccount;
 
-  Widget _createStartingAccountInput() {
+  Widget _createStartingAccountInputWidgets() {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(
+        Flexible(
             child: AccountDropdownButtonWidget(
           _startingAccount,
           (account) {
@@ -35,12 +39,12 @@ class ExchangePageState extends State<ExchangePage> {
             });
           },
         )),
-        Expanded(
-          child: TextFormField(
-            controller: _startingAmountController,
-            decoration: const InputDecoration(
-              hintText: '0.00',
-            ),
+        const SizedBox(width: 20),
+        Flexible(
+          child: TextInputWidget(
+            inputController: _startingAmountController,
+            hintText: '0.00',
+            textInputType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
               if (_startingAccount == null) {
                 return getAppLocalizations(context)!.emptyStartingAccount;
@@ -60,7 +64,10 @@ class ExchangePageState extends State<ExchangePage> {
               }
               return null;
             },
-            onChanged: (value) => setState(() {}),
+            onChanged: (p0) {
+              setState(() {});
+              return null;
+            },
           ),
         )
       ],
@@ -82,13 +89,34 @@ class ExchangePageState extends State<ExchangePage> {
       double finalAmount = double.parse(finalAmountString);
       rate = finalAmount / startingAmount;
     }
-    return Text(rate.toStringAsFixed(2), style: const TextStyle(fontSize: 20));
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        Icon(
+          Icons.arrow_downward,
+          size: 25,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+        Flexible(
+          child: Text(
+            rate.format(),
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 24),
+          ),
+        ),
+        Icon(
+          Icons.arrow_downward,
+          size: 25,
+          color: Theme.of(context).colorScheme.primary,
+        )
+      ],
+    );
   }
 
   Widget _createFinalAccountInput() {
     return Row(
       children: [
-        Expanded(
+        Flexible(
             child: AccountDropdownButtonWidget(
           _finalAccount,
           (account) {
@@ -97,12 +125,12 @@ class ExchangePageState extends State<ExchangePage> {
             });
           },
         )),
-        Expanded(
-          child: TextFormField(
-            controller: _finalAmountController,
-            decoration: const InputDecoration(
-              hintText: '0.00',
-            ),
+        const SizedBox(width: 20),
+        Flexible(
+          child: TextInputWidget(
+            inputController: _finalAmountController,
+            hintText: '0.00',
+            textInputType: const TextInputType.numberWithOptions(decimal: true),
             validator: (value) {
               if (_finalAccount == null) {
                 return getAppLocalizations(context)!.emptyFinalAccount;
@@ -119,7 +147,10 @@ class ExchangePageState extends State<ExchangePage> {
               }
               return null;
             },
-            onChanged: (value) => setState(() {}),
+            onChanged: (p0) {
+              setState(() {});
+              return null;
+            },
           ),
         )
       ],
@@ -130,20 +161,20 @@ class ExchangePageState extends State<ExchangePage> {
     return Row(
       children: [
         Expanded(
-            child: ElevatedButton(
-                onPressed: () {
-                  if (!_formKey.currentState!.validate()) return;
-                  if (_startingAccount == _finalAccount) return;
+          child: StyledButtonWidget(
+            text: getAppLocalizations(context)!.save,
+            onPressed: () {
+              if (!_formKey.currentState!.validate()) return;
+              if (_startingAccount == _finalAccount) return;
 
-                  double startingAmount =
-                      double.parse(_startingAmountController.text);
-                  double finalAmount =
-                      double.parse(_finalAmountController.text);
+              double startingAmount =
+                  double.parse(_startingAmountController.text);
+              double finalAmount = double.parse(_finalAmountController.text);
 
-                  _startingAccount!.addTransaction(Transaction(
-                      _startingAccount!.id,
-                      getAppLocalizations(context)!.exchangeDescription(
-                          _startingAccount!.id, _finalAccount!.id),
+              _startingAccount!.addTransaction(Transaction(
+                  _startingAccount!.id,
+                  getAppLocalizations(context)!.exchangeDescription(
+                      _startingAccount!.id, _finalAccount!.id),
                       DateTime.now(),
                       -startingAmount));
                   _finalAccount!.addTransaction(Transaction(
@@ -155,8 +186,9 @@ class ExchangePageState extends State<ExchangePage> {
 
                   FocusManager.instance.primaryFocus?.unfocus();
                   Navigator.pop(context);
-                },
-                child: Text(getAppLocalizations(context)!.save)))
+            },
+          ),
+        )
       ],
     );
   }
@@ -165,12 +197,13 @@ class ExchangePageState extends State<ExchangePage> {
     return Row(
       children: [
         Expanded(
-            child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(getAppLocalizations(context)!.cancel),
-        ))
+          child: StyledButtonWidget(
+            text: getAppLocalizations(context)!.cancel,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        )
       ],
     );
   }
@@ -178,29 +211,24 @@ class ExchangePageState extends State<ExchangePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(getAppLocalizations(context)!.exchange),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      ),
       resizeToAvoidBottomInset: false,
       body: Form(
           key: _formKey,
           child: Padding(
-            padding: const EdgeInsets.all(25),
+            padding: const EdgeInsets.all(10),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  getAppLocalizations(context)!.fromExchange,
-                  style: _inputLabelStyle,
-                ),
-                _createStartingAccountInput(),
-                const SizedBox(height: 50),
-                const Icon(Icons.currency_exchange, size: 50),
+                _createStartingAccountInputWidgets(),
+                const SizedBox(height: 20),
                 _createRateCalculationWidget(),
-                const SizedBox(height: 50),
-                Text(
-                  getAppLocalizations(context)!.toExchange,
-                  style: _inputLabelStyle,
-                ),
+                const SizedBox(height: 20),
                 _createFinalAccountInput(),
+                const SizedBox(height: 10),
                 _createSaveButton(),
                 _createCancelButton()
               ],
