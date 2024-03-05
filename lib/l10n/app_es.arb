@@ -66,6 +66,7 @@
   "lessThanZeroNewBalance": "El nuevo saldo no puede ser menor que 0",
   "balanceUpdate": "Actualización de Saldo",
   "cancel": "Cancelar",
+  "exchange": "Cambio",
   "fromExchange": "De",
   "toExchange": "A",
   "emptyStartingAccount": "Debes seleccionar una cuenta inicial",

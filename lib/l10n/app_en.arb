@@ -66,6 +66,7 @@
   "lessThanZeroNewBalance": "New balance can't be lower than 0",
   "balanceUpdate": "Balance Update",
   "cancel": "Cancel",
+  "exchange": "Exchange",
   "fromExchange": "From",
   "toExchange": "To",
   "emptyStartingAccount": "You must select a starting account",
