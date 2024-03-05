@@ -35,20 +35,41 @@ class AccountDropdownButtonState extends State<AccountDropdownButtonWidget> {
           } else {
             accounts = snapshot.data!;
           }
-          return DropdownButton<Account>(
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primary,
+            border: Border.all(
+                color: Theme.of(context).colorScheme.primary, width: 3),
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: DropdownButton<Account>(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            isExpanded: true,
+            underline: const SizedBox(),
             value: widget.account,
             items: accounts
-                .map((e) => DropdownMenuItem(
+                .map(
+                  (e) => DropdownMenuItem(
                     value: e,
                     child: Row(
                       children: [
-                        AccountIconWidget(e.iconPath, 50, 50),
-                        Text(e.id)
+                        AccountIconWidget(e.iconPath, 30, 30),
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            e.id,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        )
                       ],
-                    )))
+                    ),
+                  ),
+                )
                 .toList(),
             onChanged: widget.onChanged,
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 }
