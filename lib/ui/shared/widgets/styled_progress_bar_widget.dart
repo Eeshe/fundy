@@ -5,21 +5,34 @@ class StyledProgressBarWidget extends StatelessWidget {
   final Widget? center;
   final double lineHeight;
   final double filledPercentage;
+  BoxDecoration? boxDecoration;
 
-  const StyledProgressBarWidget(
+  StyledProgressBarWidget(
       {super.key,
       required this.filledPercentage,
       required this.lineHeight,
-      this.center});
+      this.center,
+      this.boxDecoration});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border:
-            Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
-        borderRadius: BorderRadius.circular(2),
+    boxDecoration ??= BoxDecoration(
+      border: Border.all(
+        color: Theme.of(context).colorScheme.primary,
+        width: 1,
       ),
+      borderRadius: BorderRadius.circular(2),
+      boxShadow: [
+        BoxShadow(
+          color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: const Offset(0, 1),
+        )
+      ],
+    );
+    return Container(
+      decoration: boxDecoration,
       child: LinearPercentIndicator(
         padding: EdgeInsets.zero,
         animation: true,

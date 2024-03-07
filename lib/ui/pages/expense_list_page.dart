@@ -57,7 +57,15 @@ class ExpenseListPageState extends State<ExpenseListPage> {
                 ),
               ),
               filledPercentage: filledPercentage,
-              lineHeight: 25)
+            lineHeight: 25,
+            boxDecoration: BoxDecoration(
+              border: Border.all(
+                width: 2,
+                color: Theme.of(context).colorScheme.background,
+              ),
+              borderRadius: BorderRadius.circular(1),
+            ),
+          )
         ],
       ),
     );
@@ -166,26 +174,6 @@ class ExpenseListPageState extends State<ExpenseListPage> {
           ),
         );
       },
-    );
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Text(getAppLocalizations(context)!.monthlyExpenses),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(child: _createTotalMonthlyExpensesWidget()),
-            const SizedBox(height: 10),
-            _createDateSelectorWidget(),
-            Expanded(child: _createExpenseListWidget())
-          ],
-        ),
-      ),
     );
   }
 }
