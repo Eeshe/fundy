@@ -57,6 +57,8 @@ class SavingListPageState extends State<SavingListPage> {
     return FutureBuilder(
       future: _fetchSavings(),
       builder: (context, snapshot) {
+        if (_savingWidgets == null) return const SizedBox();
+
         return Scaffold(
           appBar: AppBar(
             title: Text(getAppLocalizations(context)!.savings),
@@ -64,7 +66,7 @@ class SavingListPageState extends State<SavingListPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           body: Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
