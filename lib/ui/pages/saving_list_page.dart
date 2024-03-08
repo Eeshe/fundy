@@ -1,7 +1,10 @@
+import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
+import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 
 class SavingListPage extends StatefulWidget {
@@ -12,107 +15,65 @@ class SavingListPage extends StatefulWidget {
 }
 
 class SavingListPageState extends State<SavingListPage> {
-  Widget _createErrorWidget() {
-    return Center(
-      child: Column(
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-          ),
-          Text(
-            getAppLocalizations(context)!.savingFetchingError,
-            style: const TextStyle(fontSize: 36),
-          )
-        ],
-      ),
-    );
+  List<Widget>? _savingWidgets;
+
+  Future<void> _fetchSavings() async {
+    _savingWidgets = [];
+    for (Saving saving in await SavingService().fetchAll()) {
+      Account? account = await AccountService().fetch(saving.accountId);
+      if (account == null) continue;
+      if (!context.mounted) continue;
+
+      _savingWidgets?.add(
+          saving.createDisplayWidget(context, account, () => setState(() {})));
+    }
   }
 
-  Widget _createLoadingWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const CircularProgressIndicator(),
-        Text(
-          getAppLocalizations(context)!.fetchingSavings,
-          style: const TextStyle(fontSize: 36),
-        )
-      ],
-    );
-  }
-
-  Widget _createNoSavingsWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Icon(
-          Icons.search_off,
-          color: Colors.red,
-        ),
-        Text(
-          getAppLocalizations(context)!.noSavingsFound,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 36),
-        ),
-        Text(
-          getAppLocalizations(context)!.createSavingInstruction,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 24),
-        )
-      ],
+  Widget _createNewSavingButton() {
+    return StyledButtonWidget(
+      text: getAppLocalizations(context)!.newText,
+      onPressed: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SavingFormPage(null, null),
+            ));
+        setState(() {});
+      },
     );
   }
 
   Widget _createSavingListWidget() {
-    return FutureBuilder(
-        future: SavingService().fetchAll(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return _createLoadingWidget();
-          } else if (snapshot.hasError) {
-            return _createErrorWidget();
-          }
-          List<Saving> savings = snapshot.data!;
-          if (savings.isEmpty) {
-            return _createNoSavingsWidget();
-          }
-          return SingleChildScrollView(
-            child: ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemBuilder: (context, index) => savings[index]
-                    .createDisplayWidget(context, () => setState(() {})),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
-                itemCount: savings.length),
-          );
-        });
+    return ListView.separated(
+        itemBuilder: (context, index) => _savingWidgets![index],
+        separatorBuilder: (context, index) => Divider(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+        itemCount: _savingWidgets!.length);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(getAppLocalizations(context)!.savings),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: _createSavingListWidget(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SavingFormPage(null, null),
-              ));
-          setState(() {});
-        },
-        child: const Icon(Icons.add),
-      ),
+    return FutureBuilder(
+      future: _fetchSavings(),
+      builder: (context, snapshot) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(getAppLocalizations(context)!.savings),
+            centerTitle: true,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+          body: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _createNewSavingButton(),
+                  Expanded(child: _createSavingListWidget()),
+                ],
+              )),
+        );
+      },
     );
   }
 }
