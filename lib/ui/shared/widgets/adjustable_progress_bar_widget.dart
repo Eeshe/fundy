@@ -47,7 +47,7 @@ class AdjustableProgressBarState extends State<AdjustableProgressBarWidget> {
             center: widget.center),
         const SizedBox(height: 5),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _createButton(getAppLocalizations(context)!.min, () {
               widget.onMin();
