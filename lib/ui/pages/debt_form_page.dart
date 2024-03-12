@@ -1,6 +1,10 @@
 import 'package:finman/core/models/debt.dart';
 import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
+import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
+import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
+import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 
@@ -44,19 +48,19 @@ class DebtFormState extends State<DebtFormPage> {
     _initializePaidAmountInput();
   }
 
-  Widget _createDescriptionInputWidget() {
-    return TextFormField(
-      controller: _idInputController,
-      decoration: InputDecoration(
-        hintText: getAppLocalizations(context)!.debtDescriptionHint,
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return getAppLocalizations(context)!.emptyDebtDescription;
-        }
-        return null;
-      },
-    );
+  List<Widget> _createDescriptionInputWidgets() {
+    return [
+      Text(getAppLocalizations(context)!.description, style: _inputLabelStyle),
+      TextInputWidget(
+          inputController: _idInputController,
+          hintText: getAppLocalizations(context)!.debtDescriptionHint,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return getAppLocalizations(context)!.emptyDebtDescription;
+            }
+            return null;
+          })
+    ];
   }
 
   Row _createDebtTypeRadios() {
@@ -82,127 +86,111 @@ class DebtFormState extends State<DebtFormPage> {
     return Row(children: radios);
   }
 
-  Widget _createPaidAmountInputWidget() {
-    return TextFormField(
-      controller: _paidAmountInputController,
-      decoration: const InputDecoration(
-        hintText: '0.00',
+  List<Widget> _createDebtTypeInputWidgets() {
+    return [
+      Text(getAppLocalizations(context)!.debtType, style: _inputLabelStyle),
+      _createDebtTypeRadios()
+    ];
+  }
+
+  List<Widget> _createAmountInputsWidgets() {
+    return [
+      Center(
+        child: Text(
+          getAppLocalizations(context)!.amount,
+          style: _inputLabelStyle,
+        ),
       ),
-      validator: (value) {
-        if (value != null && !value.isNumeric()) {
-          return getAppLocalizations(context)!.nonNumberAmount;
-        }
-        double expenseAmount;
-        if (widget._debt != null) {
-          expenseAmount = widget._debt!.amount;
-        } else {
-          String expenseAmountString = _amountInputController.text;
-          if (expenseAmountString.isEmpty || !expenseAmountString.isNumeric()) {
-            return getAppLocalizations(context)!.invalidDebtAmount;
+      SubmittedAmountWidget(
+        submittedAmountController: _paidAmountInputController,
+        submittedAmountHintText: '0.00',
+        submittedAmountValidator: (value) {
+          if (value != null && !value.isNumeric()) {
+            return getAppLocalizations(context)!.nonNumberAmount;
           }
-          expenseAmount = double.parse(expenseAmountString);
-        }
-        double paidAmount = value!.isEmpty ? 0 : double.parse(value);
-        if (paidAmount < 0) {
-          return getAppLocalizations(context)!.lessThanZeroPaidAmount;
-        }
-        if (paidAmount > expenseAmount) {
-          return getAppLocalizations(context)!.paidAmountHigherThanDebtAmount;
-        }
-        return null;
-      },
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    );
-  }
-
-  Widget _createAmountInputWidget() {
-    return TextFormField(
-      controller: _amountInputController,
-      decoration: const InputDecoration(
-        hintText: '0.00',
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return getAppLocalizations(context)!.emptyDebtAmount;
-        }
-        if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
-          return getAppLocalizations(context)!.nonNumberAmount;
-        }
-        if (double.parse(value) <= 0) {
-          return getAppLocalizations(context)!.lessThanZeroAmount;
-        }
-        return null;
-      },
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-    );
-  }
-
-  Widget _createAmountsWidget() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Expanded(flex: 5, child: _createPaidAmountInputWidget()),
-        const Expanded(
-            flex: 1,
-            child: Text(
-              "/",
-              style: TextStyle(fontSize: 50),
-              textAlign: TextAlign.center,
-            )),
-        Expanded(flex: 5, child: _createAmountInputWidget())
-      ],
-    );
+          double expenseAmount;
+          if (widget._debt != null) {
+            expenseAmount = widget._debt!.amount;
+          } else {
+            String expenseAmountString = _amountInputController.text;
+            if (expenseAmountString.isEmpty ||
+                !expenseAmountString.isNumeric()) {
+              return getAppLocalizations(context)!.invalidExpenseAmount;
+            }
+            expenseAmount = double.parse(expenseAmountString);
+          }
+          double paidAmount = value!.isEmpty ? 0 : double.parse(value);
+          if (paidAmount < 0) {
+            return getAppLocalizations(context)!.lessThanZeroPaidAmount;
+          }
+          if (paidAmount > expenseAmount) {
+            return getAppLocalizations(context)!
+                .paidAmountHigherThanSavingAmount;
+          }
+          return null;
+        },
+        totalAmountController: _amountInputController,
+        totalAmountHintText: '0.00',
+        totalAmountValidator: (value) {
+          if (value == null || value.isEmpty) {
+            return getAppLocalizations(context)!.emptySavingAmount;
+          }
+          if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+            return getAppLocalizations(context)!.nonNumberAmount;
+          }
+          if (double.parse(value) <= 0) {
+            return getAppLocalizations(context)!.lessThanZeroAmount;
+          }
+          return null;
+        },
+      )
+    ];
   }
 
   Widget _createConfirmButton() {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-          onPressed: () {
-            if (!_formKey.currentState!.validate()) return;
+      child: StyledButtonWidget(
+        text: getAppLocalizations(context)!.save,
+        onPressed: () {
+          if (!_formKey.currentState!.validate()) return;
 
-            String id = _idInputController.text;
-            DebtType debtType = DebtType.values
-                .firstWhere((element) => element.name == _selectedDebtType);
-            double amount = double.parse(_amountInputController.text);
-            double paidAmount = _paidAmountInputController.text.isEmpty
-                ? 0
-                : double.parse(_paidAmountInputController.text);
-            if (widget._debt != null) {
-              Debt debt = widget._debt!;
-              debt.id = id;
-              debt.debtType = debtType;
-              debt.amount = amount;
-              debt.paidAmount = paidAmount;
-              debt.saveData();
-            } else {
-              Debt(id, debtType, amount, paidAmount).saveData();
-            }
-            FocusManager.instance.primaryFocus?.unfocus();
-            Navigator.pop(context);
-          },
-          child: Text(getAppLocalizations(context)!.save)),
+          String id = _idInputController.text;
+          DebtType debtType = DebtType.values
+              .firstWhere((element) => element.name == _selectedDebtType);
+          double amount = double.parse(_amountInputController.text);
+          double paidAmount = _paidAmountInputController.text.isEmpty
+              ? 0
+              : double.parse(_paidAmountInputController.text);
+          if (widget._debt != null) {
+            Debt debt = widget._debt!;
+            debt.id = id;
+            debt.debtType = debtType;
+            debt.amount = amount;
+            debt.paidAmount = paidAmount;
+            debt.saveData();
+          } else {
+            Debt(id, debtType, amount, paidAmount).saveData();
+          }
+          FocusManager.instance.primaryFocus?.unfocus();
+          Navigator.pop(context);
+        },
+      ),
     );
   }
 
   Widget _createDeleteWidget() {
     if (widget._debt == null) return const SizedBox();
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () {
-              widget._debt!.delete();
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(getAppLocalizations(context)!.delete),
-          ),
-        )
-      ],
+
+    return SizedBox(
+      width: double.infinity,
+      child: StyledButtonWidget(
+          text: getAppLocalizations(context)!.delete,
+          isNegativeButton: true,
+          onPressed: () {
+            widget._debt!.delete();
+            Navigator.pop(context);
+          }),
     );
   }
 
@@ -216,28 +204,26 @@ class DebtFormState extends State<DebtFormPage> {
             ? getAppLocalizations(context)!.newDebt
             : widget._debt!.id),
         centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        scrolledUnderElevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
+      body: ScrollablePageWidget(
+        padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
         child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(getAppLocalizations(context)!.description,
-                    style: _inputLabelStyle),
-                _createDescriptionInputWidget(),
-                Text(getAppLocalizations(context)!.debtType,
-                    style: _inputLabelStyle),
-                _createDebtTypeRadios(),
-                Center(
-                    child: Text(getAppLocalizations(context)!.amount,
-                        style: _inputLabelStyle)),
-                _createAmountsWidget(),
-                _createConfirmButton(),
-                _createDeleteWidget()
-              ],
-            )),
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ..._createDescriptionInputWidgets(),
+              const SizedBox(height: 10),
+              ..._createDebtTypeInputWidgets(),
+              ..._createAmountInputsWidgets(),
+              const SizedBox(height: 10),
+              _createConfirmButton(),
+              _createDeleteWidget()
+            ],
+          ),
+        ),
       ),
     );
   }
