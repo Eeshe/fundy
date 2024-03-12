@@ -3,6 +3,7 @@ import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/services/debt_service.dart';
 import 'package:finman/ui/pages/debt_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 
 class DebtListPage extends StatefulWidget {
@@ -68,32 +69,46 @@ class DebtListState extends State<DebtListPage> {
     );
   }
 
-  Expanded _createDebtTypeRadio(String debtTypeName) {
-    return Expanded(
-      flex: 1,
-      child: Row(
-        children: [
-          Radio(
-              value: debtTypeName,
-              groupValue: _filteredDebtType,
-              onChanged: (value) =>
-                  setState(() => _filteredDebtType = value.toString())),
+  Widget _createDebtTypeRadio(String debtTypeName) {
+    return Row(
+      children: [
+        Radio(
+            value: debtTypeName,
+            groupValue: _filteredDebtType,
+            onChanged: (value) =>
+                setState(() => _filteredDebtType = value.toString())),
           Text(
             debtTypeName,
             style: const TextStyle(fontSize: 16),
           )
-        ],
-      ),
+      ],
     );
   }
 
   Row _createDebtTypeRadios() {
-    List<Expanded> radios = [];
+    List<Widget> radios = [];
     radios.add(_createDebtTypeRadio(getAppLocalizations(context)!.all));
     for (DebtType debtType in DebtType.values) {
       radios.add(_createDebtTypeRadio(debtType.localized(context)));
     }
-    return Row(children: radios);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: radios,
+    );
+  }
+
+  Widget _createNewDebtButton() {
+    return StyledButtonWidget(
+      text: getAppLocalizations(context)!.newText,
+      onPressed: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const DebtFormPage(null),
+            ));
+        setState(() {});
+      },
+    );
   }
 
   Widget _createDebtListWidget() {
@@ -113,14 +128,13 @@ class DebtListState extends State<DebtListPage> {
           if (debts.isEmpty) {
             return _createNoDebtsWidget();
           }
-          return SingleChildScrollView(
+          return Expanded(
             child: ListView.separated(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
                 itemBuilder: (context, index) => debts[index]
                     .createDisplayWidget(context, () => setState(() {})),
-                separatorBuilder: (context, index) =>
-                    const SizedBox(height: 10),
+                separatorBuilder: (context, index) => Divider(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                 itemCount: debts.length),
           );
         });
@@ -133,26 +147,19 @@ class DebtListState extends State<DebtListPage> {
       appBar: AppBar(
         title: Text(getAppLocalizations(context)!.debts),
         centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        scrolledUnderElevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _createDebtTypeRadios(),
+            _createNewDebtButton(),
             _createDebtListWidget(),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const DebtFormPage(null),
-              ));
-          setState(() {});
-        },
-        child: const Icon(Icons.add),
       ),
     );
   }

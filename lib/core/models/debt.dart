@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/services/debt_service.dart';
 import 'package:finman/ui/pages/debt_form_page.dart';
-import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -23,6 +26,10 @@ class Debt {
 
   void saveData() {
     DebtService().save(this);
+  }
+
+  void increasePaidAmount(double amount) {
+    paidAmount = max(0, min(this.amount, paidAmount + amount));
   }
 
   bool _isPaid() {
@@ -56,47 +63,46 @@ class Debt {
   }
 
   Widget createDisplayWidget(BuildContext context, Function() redrawCallback) {
-    TextStyle labelStyle = const TextStyle(fontSize: 20);
     return InkWell(
       onTap: () async {
         await Navigator.push(context,
             MaterialPageRoute(builder: (context) => DebtFormPage(this)));
         redrawCallback();
       },
-      child: Container(
-        padding: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black12,
-            width: 2,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(id, style: labelStyle),
-            _createProgressBarWidget(),
-            ElevatedButton(
-                onPressed: () {
-                  if (!_isPaid()) {
-                    _setPaid();
-                  } else {
-                    _clearPaid();
-                  }
-                  redrawCallback();
-                },
-                child: Text(
-                  _isPaid()
-                      ? getAppLocalizations(context)!.clear
-                      : getAppLocalizations(context)!.payAll,
-                  style: const TextStyle(
-                    fontSize: 16,
-                  ),
-                )),
-            Text(debtType.localized(context)),
-          ],
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            id,
+            style: const TextStyle(fontSize: 24),
+          ),
+          Text(
+            debtType.localized(context),
+            style: TextStyle(
+              fontSize: 16,
+              color: debtType == DebtType.own
+                  ? Theme.of(context).colorScheme.error
+                  : Theme.of(context).colorScheme.tertiary,
+            ),
+          ),
+          AdjustableProgressBarWidget(
+            filledPercentage: paidAmount / amount,
+            lineHeight: 20,
+            center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
+            onMin: () {
+              _clearPaid();
+              redrawCallback();
+            },
+            onMax: () {
+              _setPaid();
+              redrawCallback();
+            },
+            onTweak: (value) {
+              increasePaidAmount(value);
+              redrawCallback();
+            },
+          )
+        ],
       ),
     );
   }
