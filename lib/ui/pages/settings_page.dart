@@ -1,9 +1,10 @@
 import 'package:finman/core/services/settings_service.dart';
 import 'package:finman/main.dart';
+import 'package:finman/ui/pages/color_picker_dialog.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,7 +21,6 @@ class SettingsPageState extends State<SettingsPage> {
   ThemeMode? _themeMode;
   Color? _backgroundColor,
       _primaryColor,
-      _accentColor,
       _positiveColor,
       _negativeColor;
 
@@ -31,7 +31,6 @@ class SettingsPageState extends State<SettingsPage> {
     _themeMode = settingsService.fetchThemeMode();
     _backgroundColor = settingsService.fetchBackgroundColor(_themeMode!);
     _primaryColor = settingsService.fetchPrimaryColor(_themeMode!);
-    _accentColor = settingsService.fetchAccentColor(_themeMode!);
     _positiveColor = settingsService.fetchPositiveColor(_themeMode!);
     _negativeColor = settingsService.fetchNegativeColor(_themeMode!);
   }
@@ -39,6 +38,16 @@ class SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+  }
+
+  void _updateTheme() {
+    ThemeMode currentTheme = _themeMode!;
+    if (_themeMode == ThemeMode.light) {
+      MyApp.themeNotifier.value = ThemeMode.dark;
+    } else {
+      MyApp.themeNotifier.value = ThemeMode.light;
+    }
+    MyApp.themeNotifier.value = currentTheme;
   }
 
   Row _createAppThemeRadio(ThemeMode themeMode) {
@@ -59,12 +68,22 @@ class SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  List<Widget> _createAppThemeWidget() {
+  List<Widget> _createAppThemeWidgets() {
     List<Row> radios = [];
     for (var themeMode in ThemeMode.values) {
       radios.add(_createAppThemeRadio(themeMode));
     }
-    return radios;
+    return [
+      Text(
+        getAppLocalizations(context)!.styleSettings,
+        style: _mainSettingLabel,
+      ),
+      Text(
+        getAppLocalizations(context)!.themeSettings,
+        style: _subSettingLabel,
+      ),
+      ...radios
+    ];
   }
 
   Widget _createColorWidget(
@@ -74,38 +93,23 @@ class SettingsPageState extends State<SettingsPage> {
       children: [
         Text(label, style: _colorSettingLabel),
         InkWell(
-          onTap: () {
-            showDialog(
+          onTap: () async {
+            await showDialog(
                 context: context,
-                builder: (context) {
-                  return SingleChildScrollView(
-                    child: Material(
-                      child: HueRingPicker(
-                        pickerColor: color,
-                        enableAlpha: true,
-                        displayThumbColor: true,
-                        onColorChanged: onChanged,
-                      ),
-                    ),
-                  );
-                });
+                builder: (context) => ColorPickerDialog(color, onChanged));
+            _updateTheme();
           },
-          child: SizedBox(
-            height: 20,
-            width: 200,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: const Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-                color: color,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onBackground,
+                width: 0.5,
               ),
+            ),
+            child: CircleAvatar(
+              backgroundColor: color,
+              radius: 15,
             ),
           ),
         )
@@ -113,7 +117,7 @@ class SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  List<Widget> _createColorsWidget() {
+  List<Widget> _createColorsWidgets() {
     if (_themeMode == ThemeMode.system) return [const SizedBox()];
     return [
       Text(
@@ -124,39 +128,32 @@ class SettingsPageState extends State<SettingsPage> {
           getAppLocalizations(context)!.backgroundColor, _backgroundColor!,
           (color) {
         setState(() {
+          SettingsService().saveBackgroundColor(color, _themeMode!);
           _backgroundColor = color;
         });
-        SettingsService().saveBackgroundColor(color, _themeMode!);
       }),
       _createColorWidget(
           getAppLocalizations(context)!.primaryColor, _primaryColor!, (color) {
         setState(() {
+          SettingsService().savePrimaryColor(color, _themeMode!);
           _primaryColor = color;
         });
-        SettingsService().savePrimaryColor(color, _themeMode!);
-      }),
-      _createColorWidget(
-          getAppLocalizations(context)!.accentColor, _accentColor!, (color) {
-        setState(() {
-          _accentColor = color;
-        });
-        SettingsService().saveAccentColor(color, _themeMode!);
       }),
       _createColorWidget(
           getAppLocalizations(context)!.positiveColor, _positiveColor!,
           (color) {
         setState(() {
+          SettingsService().savePositiveColor(color, _themeMode!);
           _positiveColor = color;
         });
-        SettingsService().savePositiveColor(color, _themeMode!);
       }),
       _createColorWidget(
           getAppLocalizations(context)!.negativeColor, _negativeColor!,
           (color) {
         setState(() {
+          SettingsService().saveNegativeColor(color, _themeMode!);
           _negativeColor = color;
         });
-        SettingsService().saveNegativeColor(color, _themeMode!);
       })
     ];
   }
@@ -166,23 +163,22 @@ class SettingsPageState extends State<SettingsPage> {
     return FutureBuilder(
       future: _fetchStoredSettings(),
       builder: (context, snapshot) {
+        if (_negativeColor == null) return const SizedBox();
         return Scaffold(
-          appBar: AppBar(),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(20.0),
+          appBar: AppBar(
+            title: Text(getAppLocalizations(context)!.settings),
+            centerTitle: true,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            scrolledUnderElevation: 0,
+          ),
+          body: ScrollablePageWidget(
+            padding:
+                const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  getAppLocalizations(context)!.styleSettings,
-                  style: _mainSettingLabel,
-                ),
-                Text(
-                  getAppLocalizations(context)!.themeSettings,
-                  style: _subSettingLabel,
-                ),
-                ..._createAppThemeWidget(),
-                ..._createColorsWidget()
+                ..._createAppThemeWidgets(),
+                ..._createColorsWidgets()
               ],
             ),
           ),

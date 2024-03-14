@@ -46,11 +46,12 @@ class OverviewPageState extends State<OverviewPage> {
       scrolledUnderElevation: 0,
       actions: [
         IconButton(
-            onPressed: () {
-              Navigator.push(
+            onPressed: () async {
+              await Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const SettingsPage()));
+              setState(() {});
             },
             icon: const Icon(Icons.settings))
       ],
@@ -337,11 +338,12 @@ class OverviewPageState extends State<OverviewPage> {
     return ExpandableFab(
       openButtonBuilder: RotateFloatingActionButtonBuilder(
         heroTag: "openFab",
-          child: const Icon(Icons.add),
-          fabSize: ExpandableFabSize.regular,
-          backgroundColor: Theme.of(context).colorScheme.primary),
+        child: const Icon(Icons.add),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        fabSize: ExpandableFabSize.regular,
+      ),
       closeButtonBuilder: RotateFloatingActionButtonBuilder(
-        heroTag: "closeFab",
+          heroTag: "closeFab",
           child: const Icon(Icons.close),
           fabSize: ExpandableFabSize.regular,
           backgroundColor: Theme.of(context).colorScheme.primary,

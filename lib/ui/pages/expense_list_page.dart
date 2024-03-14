@@ -91,6 +91,10 @@ class ExpenseListPageState extends State<ExpenseListPage> {
               DateTime? pickedDate = await showMonthPicker(
                   selectedMonthTextColor:
                       Theme.of(context).colorScheme.onBackground,
+                  selectedMonthBackgroundColor:
+                      Theme.of(context).colorScheme.primary,
+                  currentMonthTextColor:
+                      Theme.of(context).colorScheme.onBackground,
                   context: context,
                   initialDate: _selectedDate);
               if (pickedDate == null) return;

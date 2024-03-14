@@ -99,6 +99,7 @@
   "debtType": "Tipo de Deuda",
   "authenticate": "Autenticar para usar la aplicación",
   "authenticationRequired": "Autenticación necesaria",
+  "settings": "Ajustes",
   "styleSettings": "Estilo",
   "themeSettings": "Tema",
   "colorSettings": "Colores",

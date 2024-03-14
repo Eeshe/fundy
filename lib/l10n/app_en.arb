@@ -99,6 +99,7 @@
   "debtType": "Debt Type",
   "authenticate": "Authenticate to use the app",
   "authenticationRequired": "Authentication required",
+  "settings": "Settings",
   "styleSettings": "Style",
   "themeSettings": "Theme",
   "colorSettings": "Colors",
