@@ -1,5 +1,7 @@
+import 'package:intl/intl.dart';
+
 extension DoubleExtension on double {
   String format() {
-    return toStringAsFixed(2);
+    return NumberFormat("#,###.##").format(this);
   }
 }

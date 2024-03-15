@@ -27,7 +27,7 @@ class Account {
       this.transactions);
 
   String formatUsdBalance() {
-    return "${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(balance, currencyType.name).toStringAsFixed(2)}";
+    return "${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(balance, currencyType.name).format()}";
   }
 
   String formatBalance(bool convertCurrency) {

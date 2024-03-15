@@ -2,6 +2,7 @@ import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -22,13 +23,13 @@ class Transaction {
   Transaction(this.accountId, this.description, this.date, this.amount);
 
   String formatAmount(CurrencyType currencyType) {
-    return "${amount > 0 ? '+' : '-'}${currencyType.symbol}${amount.abs().toStringAsFixed(2)}";
+    return "${amount > 0 ? '+' : '-'}${currencyType.symbol}${amount.abs().format()}";
   }
 
   String formatUsdAmount(CurrencyType currencyType) {
     if (currencyType == CurrencyType.usd) return formatAmount(currencyType);
 
-    return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(amount.abs(), currencyType.name).toStringAsFixed(2)}";
+    return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(amount.abs(), currencyType.name).format()}";
   }
 
   Widget createListWidget(BuildContext context, Account account,
