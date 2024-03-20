@@ -292,19 +292,19 @@ class OverviewPageState extends State<OverviewPage> {
           );
         }
         if (_recentTransactions!.isEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.search_off,
-                size: 50,
-              ),
-              Text(
-                getAppLocalizations(context)!.noRecentTransactions,
-                textAlign: TextAlign.center,
-              )
-            ],
+          return Center(
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.search_off,
+                  size: 50,
+                ),
+                Text(
+                  getAppLocalizations(context)!.noRecentTransactions,
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
           );
         }
         return Expanded(
