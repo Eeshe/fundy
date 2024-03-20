@@ -32,8 +32,8 @@ class SavingListPageState extends State<SavingListPage> {
   Widget _createNewSavingButton() {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
-      onPressed: () async {
-        await Navigator.push(
+      onPressed: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const SavingFormPage(null, null),
