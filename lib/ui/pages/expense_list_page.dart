@@ -2,6 +2,7 @@ import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/services/monthly_expense_service.dart';
 import 'package:finman/ui/pages/expense_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_progress_bar_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:finman/utils/string_extension.dart';
@@ -135,6 +136,12 @@ class ExpenseListPageState extends State<ExpenseListPage> {
   }
 
   Widget _createExpenseListWidget() {
+    if (_monthlyExpenses!.isEmpty) {
+      return EmptyListWidget(
+        title: getAppLocalizations(context)!.noMonthlyExpenses,
+        subtitle: getAppLocalizations(context)!.createSavingInstruction,
+      );
+    }
     return ListView.separated(
         itemBuilder: (context, index) => _monthlyExpenses![index]
             .createListWidget(context, _selectedDate, () => setState(() {})),

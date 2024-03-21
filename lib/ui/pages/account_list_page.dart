@@ -3,6 +3,7 @@ import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/ui/pages/account_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -78,29 +79,12 @@ class AccountListPageState extends State<AccountListPage> {
           element.currencyType.name != _filteredCurrency!.toLowerCase());
     }
     if (accounts.isEmpty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.search_off,
-            color: Theme.of(context).colorScheme.error,
-          ),
-          Text(
-            getAppLocalizations(context)!.noAccountsFound,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 30),
-          ),
-          Text(
-            getAppLocalizations(context)!.createAccountInstruction,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20),
-          )
-        ],
+      return EmptyListWidget(
+        title: getAppLocalizations(context)!.noAccountsFound,
+        subtitle: getAppLocalizations(context)!.createAccountInstruction,
       );
     }
-    return Expanded(child: ListView.separated(
-      shrinkWrap: true,
+    return ListView.separated(
       padding: const EdgeInsets.only(left: 10, right: 10),
       itemBuilder: (context, index) =>
           accounts[index].createListWidget(context, () => setState(() {})),
@@ -108,7 +92,7 @@ class AccountListPageState extends State<AccountListPage> {
         color: Theme.of(context).colorScheme.primary,
       ),
       itemCount: accounts.length,
-    ));
+    );
   }
 
   Widget _createErrorWidget() {
@@ -166,13 +150,15 @@ class AccountListPageState extends State<AccountListPage> {
           resizeToAvoidBottomInset: true,
           body: Padding(
             padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _createCurrencyRadios(),
-                _createNewAccountButtonWidget(),
-                Center(child: listWidget)
-              ],
+            child: Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _createCurrencyRadios(),
+                  _createNewAccountButtonWidget(),
+                  Expanded(child: listWidget),
+                ],
+              ),
             ),
           ),
         );

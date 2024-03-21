@@ -4,6 +4,7 @@ import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -44,6 +45,12 @@ class SavingListPageState extends State<SavingListPage> {
   }
 
   Widget _createSavingListWidget() {
+    if (_savingWidgets!.isEmpty) {
+      return EmptyListWidget(
+        title: getAppLocalizations(context)!.noSavingsFound,
+        subtitle: getAppLocalizations(context)!.createSavingInstruction,
+      );
+    }
     return ListView.separated(
         itemBuilder: (context, index) => _savingWidgets![index],
         separatorBuilder: (context, index) => Divider(

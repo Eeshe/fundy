@@ -3,6 +3,7 @@ import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/services/debt_service.dart';
 import 'package:finman/ui/pages/debt_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -41,29 +42,6 @@ class DebtListState extends State<DebtListPage> {
         Text(
           getAppLocalizations(context)!.fetchingDebts,
           style: const TextStyle(fontSize: 36),
-        )
-      ],
-    );
-  }
-
-  Widget _createNoDebtsWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const Icon(
-          Icons.search_off,
-          color: Colors.red,
-        ),
-        Text(
-          getAppLocalizations(context)!.noDebtsFound,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 36),
-        ),
-        Text(
-          getAppLocalizations(context)!.createDebtInstruction,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 24),
         )
       ],
     );
@@ -126,7 +104,10 @@ class DebtListState extends State<DebtListPage> {
                 element.debtType.localized(context) != _filteredDebtType!);
           }
           if (debts.isEmpty) {
-            return _createNoDebtsWidget();
+            return EmptyListWidget(
+              title: getAppLocalizations(context)!.noDebtsFound,
+              subtitle: getAppLocalizations(context)!.createDebtInstruction,
+            );
           }
           return Expanded(
             child: ListView.separated(
