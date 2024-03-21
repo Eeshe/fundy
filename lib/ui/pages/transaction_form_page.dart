@@ -6,6 +6,7 @@ import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -136,7 +137,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
           if (value == null || value.isEmpty) {
             return getAppLocalizations(context)!.emptyTransactionAmount;
           }
-          if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+          if (!value.isNumeric()) {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double amount = double.parse(value);

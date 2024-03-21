@@ -1,4 +1,3 @@
-import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:flutter/material.dart';
 

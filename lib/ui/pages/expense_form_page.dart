@@ -143,7 +143,7 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
           if (value == null || value.isEmpty) {
             return getAppLocalizations(context)!.emptyExpenseAmount;
           }
-          if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+          if (!value.isNumeric()) {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           if (double.parse(value) <= 0) {

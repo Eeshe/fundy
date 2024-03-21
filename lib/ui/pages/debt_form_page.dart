@@ -108,22 +108,22 @@ class DebtFormState extends State<DebtFormPage> {
           if (value != null && !value.isNumeric()) {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
-          double expenseAmount;
+          double submittedDebtAmount;
           if (widget._debt != null) {
-            expenseAmount = widget._debt!.amount;
+            submittedDebtAmount = widget._debt!.amount;
           } else {
             String expenseAmountString = _amountInputController.text;
             if (expenseAmountString.isEmpty ||
                 !expenseAmountString.isNumeric()) {
               return getAppLocalizations(context)!.invalidExpenseAmount;
             }
-            expenseAmount = double.parse(expenseAmountString);
+            submittedDebtAmount = double.parse(expenseAmountString);
           }
           double paidAmount = value!.isEmpty ? 0 : double.parse(value);
           if (paidAmount < 0) {
             return getAppLocalizations(context)!.lessThanZeroPaidAmount;
           }
-          if (paidAmount > expenseAmount) {
+          if (paidAmount > submittedDebtAmount) {
             return getAppLocalizations(context)!
                 .paidAmountHigherThanSavingAmount;
           }
@@ -135,7 +135,7 @@ class DebtFormState extends State<DebtFormPage> {
           if (value == null || value.isEmpty) {
             return getAppLocalizations(context)!.emptySavingAmount;
           }
-          if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+          if (!value.isNumeric()) {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           if (double.parse(value) <= 0) {

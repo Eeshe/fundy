@@ -3,6 +3,7 @@ import 'package:finman/core/models/transaction.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/double_extension.dart';
+import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 
 class UpdateBalanceDialog extends StatefulWidget {
@@ -39,7 +40,7 @@ class UpdateBalanceDialogStage extends State<UpdateBalanceDialog> {
                 if (value == null || value.isEmpty) {
                   return getAppLocalizations(context)!.emptyNewBalance;
                 }
-                if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+                if (!value.isNumeric()) {
                   return getAppLocalizations(context)!.nonNumberAmount;
                 }
                 if (double.parse(value) < 0) {

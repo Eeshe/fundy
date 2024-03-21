@@ -5,6 +5,7 @@ import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/double_extension.dart';
+import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 
 class ExchangePage extends StatefulWidget {
@@ -20,8 +21,6 @@ class ExchangePageState extends State<ExchangePage> {
   final TextEditingController _startingAmountController =
       TextEditingController();
   final TextEditingController _finalAmountController = TextEditingController();
-
-  final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
   Account? _startingAccount;
   Account? _finalAccount;
@@ -52,7 +51,7 @@ class ExchangePageState extends State<ExchangePage> {
               if (value == null || value.isEmpty) {
                 return getAppLocalizations(context)!.emptyExchangeAmount;
               }
-              if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+              if (!value.isNumeric()) {
                 return getAppLocalizations(context)!.nonNumberAmount;
               }
               double amount = double.parse(value);
@@ -75,20 +74,20 @@ class ExchangePageState extends State<ExchangePage> {
   }
 
   Widget _createRateCalculationWidget() {
-    RegExp regex = RegExp(r'[A-Za-z,]+');
     String startingAmountString = _startingAmountController.text;
     String finalAmountString = _finalAmountController.text;
     double rate;
     if (startingAmountString.isEmpty ||
         finalAmountString.isEmpty ||
-        regex.hasMatch(startingAmountString) ||
-        regex.hasMatch(finalAmountString)) {
+        !startingAmountString.isNumeric() ||
+        !finalAmountString.isNumeric()) {
       rate = 0;
     } else {
       double startingAmount = double.parse(startingAmountString);
       double finalAmount = double.parse(finalAmountString);
       rate = finalAmount / startingAmount;
     }
+    print("RATE: $rate");
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -138,7 +137,7 @@ class ExchangePageState extends State<ExchangePage> {
               if (value == null || value.isEmpty) {
                 return getAppLocalizations(context)!.emptyExchangeAmount;
               }
-              if (RegExp(r'[A-Za-z,]+').hasMatch(value.toString())) {
+              if (!value.isNumeric()) {
                 return getAppLocalizations(context)!.nonNumberAmount;
               }
               double amount = double.parse(value);
