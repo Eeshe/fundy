@@ -10,7 +10,7 @@
   "fetchingTransactions": "Fetching recent transactions...",
   "noRecentTransactions": "No recent transactions found",
   "noAccountsFound": "No accounts found",
-  "createAccountInstruction": "Try creating one with the button below",
+  "createAccountInstruction": "Try creating one with the button above",
   "accountFetchingError": "There was an error fetching your accounts",
   "fetchingAccounts": "Fetching your accounts...",
   "yourAccounts": "Your Accounts",

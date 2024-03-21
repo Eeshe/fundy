@@ -3,10 +3,8 @@ import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/ui/pages/account_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
+import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
-
-import '../shared/widgets/account_icon_widget.dart';
-import 'account_page.dart';
 
 class AccountListPage extends StatefulWidget {
   const AccountListPage({super.key});
@@ -60,44 +58,18 @@ class AccountListPageState extends State<AccountListPage> {
     );
   }
 
-  Widget _createAccountWidget(Account account) {
-    return InkWell(
-        onTap: () async {
-          await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AccountPage(account),
-              ));
-          setState(() {});
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 1,
-                child: AccountIconWidget(account.iconPath, 50, 50),
-              ),
-              Expanded(
-                flex: 4,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      account.id,
-                      style: const TextStyle(fontSize: 26),
-                    ),
-                    Text(
-                      account.formatBalance(false),
-                      style: const TextStyle(fontSize: 20),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        ));
+  Widget _createNewAccountButtonWidget() {
+    return StyledButtonWidget(
+      text: getAppLocalizations(context)!.newText,
+      onPressed: () async {
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AccountFormPage(),
+            ));
+        setState(() {});
+      },
+    );
   }
 
   Widget _createAccountListWidget(List<Account> accounts) {
@@ -169,21 +141,6 @@ class AccountListPageState extends State<AccountListPage> {
     );
   }
 
-  Widget _createFloatingActionButton() {
-    return FloatingActionButton(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      onPressed: () async {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AccountFormPage(),
-            ));
-        setState(() {});
-      },
-      child: const Icon(Icons.add),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     _filteredCurrency ??= getAppLocalizations(context)!.all;
@@ -207,14 +164,17 @@ class AccountListPageState extends State<AccountListPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           resizeToAvoidBottomInset: true,
-          body: Column(
-            children: [
-              _createCurrencyRadios(),
-              listWidget,
-            ],
+          body: Padding(
+            padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _createCurrencyRadios(),
+                _createNewAccountButtonWidget(),
+                Center(child: listWidget)
+              ],
+            ),
           ),
-          floatingActionButton: _createFloatingActionButton(),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         );
       },
     );
