@@ -88,11 +88,16 @@ class SavingFormState extends State<SavingFormPage> {
         future: _fetchSavingAccount(),
         builder: (context, snapshot) {
           return AccountDropdownButtonWidget(
-            _selectedAccount,
-            (account) {
+            account: _selectedAccount,
+            onChanged: (account) {
               setState(() {
                 _selectedAccount = account;
               });
+            },
+            validator: (account) {
+              if (account != null) return null;
+
+              return getAppLocalizations(context)!.emptySavingAccount;
             },
           );
         },

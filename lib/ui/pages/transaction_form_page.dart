@@ -28,6 +28,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
+  Account? _selectedAccount;
   DateTime _selectedDate = DateTime.now();
 
   Future<List<Account>> _fetchAccounts() async {
@@ -37,6 +38,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   @override
   void initState() {
     super.initState();
+    _selectedAccount = widget._account;
     _fetchAccounts();
 
     Transaction? transaction = widget._transaction;
@@ -53,11 +55,18 @@ class TransactionFormPageState extends State<TransactionFormPage> {
         getAppLocalizations(context)!.account,
         style: _inputLabelStyle,
       ),
-      AccountDropdownButtonWidget(widget._account, (account) {
-        setState(() {
-          widget._account = account!;
-        });
-      })
+      AccountDropdownButtonWidget(
+        account: widget._account,
+        onChanged: widget._account != null
+            ? null
+            : (account) {
+                setState(
+                  () {
+                    _selectedAccount = account!;
+                  },
+                );
+              },
+      )
     ];
   }
 
@@ -163,16 +172,16 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             text: getAppLocalizations(context)!.save,
             onPressed: () {
               if (!_formKey.currentState!.validate()) return;
-              if (widget._account == null) return;
+              if (_selectedAccount == null) return;
 
               String description = _descriptionInputController.text;
               double amount = double.parse(_amountInputController.text);
               Transaction transaction = Transaction(
-                  widget._account!.id, description, _selectedDate, amount);
+                  _selectedAccount!.id, description, _selectedDate, amount);
               if (widget._transaction == null) {
-                widget._account!.addTransaction(transaction);
+                _selectedAccount!.addTransaction(transaction);
               } else {
-                widget._account!
+                _selectedAccount!
                     .updateTransaction(widget._transaction!, transaction);
               }
               FocusManager.instance.primaryFocus?.unfocus();

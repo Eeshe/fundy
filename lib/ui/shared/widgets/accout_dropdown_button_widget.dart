@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 
 class AccountDropdownButtonWidget extends StatefulWidget {
   final Account? account;
-  final Function(Account? account) onChanged;
+  final Function(Account? account)? onChanged;
+  final String? Function(Account?)? validator;
 
-  const AccountDropdownButtonWidget(this.account, this.onChanged, {super.key});
+  const AccountDropdownButtonWidget(
+      {super.key, this.account, this.onChanged, this.validator});
 
   @override
   State<StatefulWidget> createState() => AccountDropdownButtonState();
@@ -42,10 +44,12 @@ class AccountDropdownButtonState extends State<AccountDropdownButtonWidget> {
                 color: Theme.of(context).colorScheme.primary, width: 3),
             borderRadius: BorderRadius.circular(5),
           ),
-          child: DropdownButton<Account>(
+          child: DropdownButtonFormField<Account>(
             padding: const EdgeInsets.only(left: 5, right: 5),
+            decoration: const InputDecoration(
+                errorMaxLines: 3, enabledBorder: InputBorder.none),
             isExpanded: true,
-            underline: const SizedBox(),
+            validator: widget.validator,
             value: widget.account,
             items: accounts
                 .map(

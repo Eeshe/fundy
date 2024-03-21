@@ -31,11 +31,16 @@ class ExchangePageState extends State<ExchangePage> {
       children: [
         Flexible(
             child: AccountDropdownButtonWidget(
-          _startingAccount,
-          (account) {
+          account: _startingAccount,
+          onChanged: (account) {
             setState(() {
               _startingAccount = account;
             });
+          },
+          validator: (value) {
+            if (value != _finalAccount) return null;
+
+            return getAppLocalizations(context)!.sameAccountExchange;
           },
         )),
         const SizedBox(width: 20),
@@ -87,7 +92,6 @@ class ExchangePageState extends State<ExchangePage> {
       double finalAmount = double.parse(finalAmountString);
       rate = finalAmount / startingAmount;
     }
-    print("RATE: $rate");
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -117,11 +121,16 @@ class ExchangePageState extends State<ExchangePage> {
       children: [
         Flexible(
             child: AccountDropdownButtonWidget(
-          _finalAccount,
-          (account) {
+          account: _finalAccount,
+          onChanged: (account) {
             setState(() {
               _finalAccount = account;
             });
+          },
+          validator: (value) {
+            if (value != _startingAccount) return null;
+
+            return getAppLocalizations(context)!.sameAccountExchange;
           },
         )),
         const SizedBox(width: 20),
