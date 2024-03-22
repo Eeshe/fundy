@@ -150,15 +150,13 @@ class AccountListPageState extends State<AccountListPage> {
           resizeToAvoidBottomInset: true,
           body: Padding(
             padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
-            child: Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                   _createCurrencyRadios(),
                   _createNewAccountButtonWidget(),
-                  Expanded(child: listWidget),
-                ],
-              ),
+                Expanded(child: Center(child: listWidget)),
+              ],
             ),
           ),
         );
