@@ -28,7 +28,7 @@ class AccountPageState extends State<AccountPage> {
       const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
 
   bool _convertCurrency = false;
-  late List<Saving> _accountSavings;
+  List<Saving>? _accountSavings;
 
   Future<void> _fetchAccountSavings() async {
     Account account = widget._account;
@@ -45,7 +45,7 @@ class AccountPageState extends State<AccountPage> {
     Account account = widget._account;
     double bruteBalance = account.balance;
     double netBalance = bruteBalance;
-    for (Saving saving in _accountSavings) {
+    for (Saving saving in _accountSavings!) {
       netBalance -= saving.calculateRemainingAmount();
     }
     if (_convertCurrency && bruteBalance != netBalance) {
@@ -155,11 +155,11 @@ class AccountPageState extends State<AccountPage> {
   }
 
   Widget _createSavingListWidget() {
-    if (_accountSavings.isEmpty) return const SizedBox();
+    if (_accountSavings!.isEmpty) return const SizedBox();
 
     double screenHeight = MediaQuery.of(context).size.height;
     double containerHeight =
-        min(screenHeight * 0.3, _accountSavings.length * 65);
+        min(screenHeight * 0.3, _accountSavings!.length * 65);
     return Column(
       children: [
         Row(
@@ -200,12 +200,12 @@ class AccountPageState extends State<AccountPage> {
           child: ListView.separated(
               shrinkWrap: true,
               padding: const EdgeInsets.all(5),
-              itemBuilder: (context, index) => _accountSavings[index]
+              itemBuilder: (context, index) => _accountSavings![index]
                   .createListWidget(
                       context, widget._account, () => setState(() {})),
               separatorBuilder: (context, index) =>
                   Divider(color: Theme.of(context).colorScheme.primary),
-              itemCount: _accountSavings.length),
+              itemCount: _accountSavings!.length),
         )
       ],
     );
@@ -302,6 +302,8 @@ class AccountPageState extends State<AccountPage> {
     return FutureBuilder(
       future: _fetchAccountSavings(),
       builder: (context, snapshot) {
+        if (_accountSavings == null) return const SizedBox();
+
         return Scaffold(
           appBar: AppBar(
             title: Text(account.id),
