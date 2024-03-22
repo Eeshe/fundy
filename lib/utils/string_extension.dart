@@ -1,6 +1,6 @@
 extension StringExtension on String {
   bool isScientificNotation() {
-    final regex = RegExp(r'^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$');
+    final regex = RegExp(r'^[-+]?\d+(\.\d*)?[eE][-+]?\d+$');
     return regex.hasMatch(this);
   }
 
