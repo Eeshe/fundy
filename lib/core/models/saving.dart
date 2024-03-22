@@ -35,10 +35,12 @@ class Saving {
 
   void _setPaid() {
     paidAmount = amount;
+    saveData();
   }
 
   void _clearPaid() {
     paidAmount = 0;
+    saveData();
   }
 
   double calculateRemainingAmount() {
@@ -47,6 +49,7 @@ class Saving {
 
   void increasePaidAmount(double amount) {
     paidAmount = max(0, min(this.amount, paidAmount + amount));
+    saveData();
   }
 
   void delete() {
