@@ -176,7 +176,7 @@ class ExpenseListPageState extends State<ExpenseListPage> {
                     children: [
                       _createDateSelectorWidget(),
                       _createNewExpenseButton(),
-                      Expanded(child: _createExpenseListWidget())
+                      Expanded(child: Center(child: _createExpenseListWidget()))
                     ],
                   ),
                 ),

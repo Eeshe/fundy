@@ -109,15 +109,13 @@ class DebtListState extends State<DebtListPage> {
               subtitle: getAppLocalizations(context)!.createDebtInstruction,
             );
           }
-          return Expanded(
-            child: ListView.separated(
-                itemBuilder: (context, index) => debts[index]
-                    .createDisplayWidget(context, () => setState(() {})),
-                separatorBuilder: (context, index) => Divider(
+          return ListView.separated(
+              itemBuilder: (context, index) => debts[index]
+                  .createDisplayWidget(context, () => setState(() {})),
+              separatorBuilder: (context, index) => Divider(
                       color: Theme.of(context).colorScheme.primary,
                     ),
-                itemCount: debts.length),
-          );
+              itemCount: debts.length);
         });
   }
 
@@ -138,7 +136,7 @@ class DebtListState extends State<DebtListPage> {
           children: [
             _createDebtTypeRadios(),
             _createNewDebtButton(),
-            _createDebtListWidget(),
+            Expanded(child: Center(child: _createDebtListWidget())),
           ],
         ),
       ),

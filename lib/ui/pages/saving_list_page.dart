@@ -78,7 +78,7 @@ class SavingListPageState extends State<SavingListPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _createNewSavingButton(),
-                  Expanded(child: _createSavingListWidget()),
+                  Expanded(child: Center(child: _createSavingListWidget())),
                 ],
               )),
         );
