@@ -117,16 +117,12 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double expenseAmount;
-          if (widget._monthlyExpense != null) {
-            expenseAmount = widget._monthlyExpense!.amount;
-          } else {
             String expenseAmountString = _amountInputController.text;
             if (expenseAmountString.isEmpty ||
                 !expenseAmountString.isNumeric()) {
               return getAppLocalizations(context)!.invalidExpenseAmount;
-            }
-            expenseAmount = double.parse(expenseAmountString);
           }
+          expenseAmount = double.parse(expenseAmountString);
           double paidAmount = value!.isEmpty ? 0 : double.parse(value);
           if (paidAmount < 0) {
             return getAppLocalizations(context)!.lessThanZeroPaidAmount;
