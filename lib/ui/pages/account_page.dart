@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
@@ -259,7 +258,7 @@ class AccountPageState extends State<AccountPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        AccountService().delete(widget._account);
+                        widget._account.delete();
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },

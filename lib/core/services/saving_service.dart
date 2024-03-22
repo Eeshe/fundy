@@ -1,3 +1,4 @@
+import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:hive/hive.dart';
 
@@ -40,6 +41,13 @@ class SavingService {
   Future<List<Saving>> fetchAll() async {
     final Box<Saving> box = await _openBox();
     return box.values.toList();
+  }
+
+  Future<List<Saving>> fetchAllByAccount(Account account) async {
+    final Box<Saving> box = await _openBox();
+    return box.values
+        .where((saving) => saving.accountId == account.id)
+        .toList();
   }
 
   Future<void> delete(Saving saving) async {

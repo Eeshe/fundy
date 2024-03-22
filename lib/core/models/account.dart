@@ -1,7 +1,9 @@
 import 'package:finman/core/models/currency_type.dart';
+import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
+import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/account_page.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/utils/double_extension.dart';
@@ -113,5 +115,12 @@ class Account {
             )),
           ],
         ));
+  }
+
+  void delete() async {
+    AccountService().delete(this);
+    for (Saving saving in await SavingService().fetchAllByAccount(this)) {
+      saving.delete();
+    }
   }
 }
