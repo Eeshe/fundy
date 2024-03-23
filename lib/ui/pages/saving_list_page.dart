@@ -16,25 +16,24 @@ class SavingListPage extends StatefulWidget {
 }
 
 class SavingListPageState extends State<SavingListPage> {
-  List<Widget>? _savingWidgets;
+  Map<Saving, Account>? _savingsMap;
 
   Future<void> _fetchSavings() async {
-    _savingWidgets = [];
+    Map<Saving, Account> savingsMap = <Saving, Account>{};
     for (Saving saving in await SavingService().fetchAll()) {
       Account? account = await AccountService().fetch(saving.accountId);
       if (account == null) continue;
-      if (!context.mounted) continue;
 
-      _savingWidgets?.add(
-          saving.createDisplayWidget(context, account, () => setState(() {})));
+      savingsMap[saving] = account;
     }
+    _savingsMap = savingsMap;
   }
 
   Widget _createNewSavingButton() {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
-      onPressed: () {
-        Navigator.push(
+      onPressed: () async {
+        await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const SavingFormPage(null, null),
@@ -45,30 +44,38 @@ class SavingListPageState extends State<SavingListPage> {
   }
 
   Widget _createSavingListWidget() {
-    if (_savingWidgets!.isEmpty) {
-      return EmptyListWidget(
-        title: getAppLocalizations(context)!.noSavingsFound,
-        subtitle: getAppLocalizations(context)!.createSavingInstruction,
-      );
-    }
-    return ListView.separated(
-        itemBuilder: (context, index) => _savingWidgets![index],
-        separatorBuilder: (context, index) => Divider(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-        itemCount: _savingWidgets!.length);
+    return FutureBuilder(
+      future: _fetchSavings(),
+      builder: (context, snapshot) {
+        if (_savingsMap == null) {
+          print("A");
+        }
+        if (_savingsMap!.isEmpty) {
+          print("B");
+          return EmptyListWidget(
+            title: getAppLocalizations(context)!.noSavingsFound,
+            subtitle: getAppLocalizations(context)!.createSavingInstruction,
+          );
+        }
+        return ListView.separated(
+            itemBuilder: (context, index) {
+              Saving saving = _savingsMap!.keys.toList()[index];
+              return saving.createDisplayWidget(
+                  context, _savingsMap![saving]!, () => setState(() {}));
+            },
+            separatorBuilder: (context, index) => Divider(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            itemCount: _savingsMap!.length);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _fetchSavings(),
-      builder: (context, snapshot) {
-        if (_savingWidgets == null) return const SizedBox();
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(getAppLocalizations(context)!.savings),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(getAppLocalizations(context)!.savings),
             centerTitle: true,
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
@@ -82,7 +89,5 @@ class SavingListPageState extends State<SavingListPage> {
                 ],
               )),
         );
-      },
-    );
   }
 }

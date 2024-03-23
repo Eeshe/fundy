@@ -86,8 +86,8 @@ class Saving {
       valueListenable: paidAmountNotifier,
       builder: (context, value, child) {
         return InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => SavingFormPage(this, null)));
