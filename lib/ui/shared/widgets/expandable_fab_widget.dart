@@ -209,7 +209,7 @@ class ActionButton extends StatelessWidget {
     return Row(
       children: [
         leading!,
-        SizedBox(width: leading != const SizedBox() ? 5 : 0),
+        SizedBox(width: leading.runtimeType != SizedBox ? 5 : 0),
         Material(
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
@@ -221,7 +221,7 @@ class ActionButton extends StatelessWidget {
             color: Theme.of(context).colorScheme.onSecondary,
           ),
         ),
-        SizedBox(width: leading != const SizedBox() ? 5 : 0),
+        SizedBox(width: leading.runtimeType != SizedBox ? 5 : 0),
         trailing!
       ],
     );
