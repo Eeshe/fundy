@@ -19,8 +19,8 @@ import 'package:finman/ui/pages/settings_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
+import 'package:finman/ui/shared/widgets/expandable_fab_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:intl/intl.dart';
 
 class OverviewPage extends StatefulWidget {
@@ -31,8 +31,6 @@ class OverviewPage extends StatefulWidget {
 }
 
 class OverviewPageState extends State<OverviewPage> {
-  final GlobalKey<ExpandableFabState> _key = GlobalKey<ExpandableFabState>();
-
   double? _bruteBalance;
   double? _netBalance;
   double? _netBalanceMinusSavings;
@@ -335,29 +333,14 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   ExpandableFab _createFloatingActionButton() {
+    Color primaryColor = Theme.of(context).colorScheme.primary;
+    Color onBackgroundColor = Theme.of(context).colorScheme.onBackground;
     return ExpandableFab(
-      openButtonBuilder: RotateFloatingActionButtonBuilder(
-        heroTag: "openFab",
-        child: const Icon(Icons.add),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        fabSize: ExpandableFabSize.regular,
-      ),
-      closeButtonBuilder: RotateFloatingActionButtonBuilder(
-          heroTag: "closeFab",
-          child: const Icon(Icons.close),
-          fabSize: ExpandableFabSize.regular,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          shape: const CircleBorder()),
-      children: [
-        FloatingActionButton.small(
-          heroTag: "newTransactionFab",
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.attach_money),
+      distance: 80,
+      backgroundColor: primaryColor,
+      actionButtons: [
+        ActionButton(
           onPressed: () async {
-            ExpandableFabState? fabState = _key.currentState;
-            if (fabState != null) {
-              fabState.toggle();
-            }
             await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -365,16 +348,14 @@ class OverviewPageState extends State<OverviewPage> {
                 ));
             setState(() {});
           },
+          icon: Icon(
+            Icons.attach_money,
+            color: onBackgroundColor,
+          ),
+          backgroundColor: primaryColor,
         ),
-        FloatingActionButton.small(
-          heroTag: "newExchangeFab",
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: const Icon(Icons.currency_exchange),
+        ActionButton(
           onPressed: () async {
-            ExpandableFabState? fabState = _key.currentState;
-            if (fabState != null) {
-              fabState.toggle();
-            }
             await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -382,9 +363,65 @@ class OverviewPageState extends State<OverviewPage> {
                 ));
             setState(() {});
           },
-        )
+          icon: Icon(
+            Icons.currency_exchange,
+            color: onBackgroundColor,
+          ),
+          backgroundColor: primaryColor,
+        ),
       ],
+      child: const Icon(Icons.add),
     );
+    // return ExpandableFab(
+    //   openButtonBuilder: RotateFloatingActionButtonBuilder(
+    //     heroTag: "openFab",
+    //     child: const Icon(Icons.add),
+    //     backgroundColor: primaryColor,
+    //     fabSize: ExpandableFabSize.regular,
+    //   ),
+    //   closeButtonBuilder: RotateFloatingActionButtonBuilder(
+    //       heroTag: "closeFab",
+    //       child: const Icon(Icons.close),
+    //       fabSize: ExpandableFabSize.regular,
+    //       backgroundColor: primaryColor,
+    //       shape: const CircleBorder()),
+    //   children: [
+    //     FloatingActionButton.small(
+    //       heroTag: "newTransactionFab",
+    //       backgroundColor: Theme.of(context).colorScheme.primary,
+    //       child: const Icon(Icons.attach_money),
+    //       onPressed: () async {
+    //         ExpandableFabState? fabState = _key.currentState;
+    //         if (fabState != null) {
+    //           fabState.toggle();
+    //         }
+    //         await Navigator.push(
+    //             context,
+    //             MaterialPageRoute(
+    //               builder: (context) => TransactionFormPage(null, null),
+    //             ));
+    //         setState(() {});
+    //       },
+    //     ),
+    //     FloatingActionButton.small(
+    //       heroTag: "newExchangeFab",
+    //       backgroundColor: Theme.of(context).colorScheme.primary,
+    //       child: const Icon(Icons.currency_exchange),
+    //       onPressed: () async {
+    //         ExpandableFabState? fabState = _key.currentState;
+    //         if (fabState != null) {
+    //           fabState.toggle();
+    //         }
+    //         await Navigator.push(
+    //             context,
+    //             MaterialPageRoute(
+    //               builder: (context) => const ExchangePage(),
+    //             ));
+    //         setState(() {});
+    //       },
+    //     )
+    //   ],
+    // );
   }
 
   @override
@@ -402,7 +439,6 @@ class OverviewPageState extends State<OverviewPage> {
           _createRecentTransactionsWidget(),
         ],
       ),
-      floatingActionButtonLocation: ExpandableFab.location,
       floatingActionButton: _createFloatingActionButton(),
     );
   }

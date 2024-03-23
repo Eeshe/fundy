@@ -9,6 +9,7 @@
   "recentTransactions": "Transacciones Recientes",
   "fetchingTransactions": "Obteniendo transacciones recientes...",
   "noRecentTransactions": "No se encontraron transacciones recientes",
+  "transactionFab": "Transacción",
   "noAccountsFound": "No se encontraron cuentas",
   "createAccountInstruction": "Intenta crear una con el botón de arriba",
   "accountFetchingError": "Hubo un error al obtener tus cuentas",
