@@ -29,15 +29,13 @@ class SettingsService {
   }
 
   Color fetchBackgroundColor(ThemeMode themeMode) {
-    return _fetchColor("backgroundColor", themeMode, Colors.white);
+    return _fetchColor("backgroundColor", themeMode,
+        themeMode == ThemeMode.light ? Colors.white : Colors.black);
   }
 
   Color fetchPrimaryColor(ThemeMode themeMode) {
-    return _fetchColor("primaryColor", themeMode, Colors.black12);
-  }
-
-  Color fetchAccentColor(ThemeMode themeMode) {
-    return _fetchColor("accentColor", themeMode, Colors.lightBlue);
+    return _fetchColor("primaryColor", themeMode,
+        themeMode == ThemeMode.light ? Colors.lightBlue : Colors.purple);
   }
 
   Color fetchPositiveColor(ThemeMode themeMode) {

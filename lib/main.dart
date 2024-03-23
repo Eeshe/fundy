@@ -57,7 +57,6 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light,
               background: settingsService.fetchBackgroundColor(ThemeMode.light),
               primary: settingsService.fetchPrimaryColor(ThemeMode.light),
-              secondary: settingsService.fetchAccentColor(ThemeMode.light),
               error: settingsService.fetchNegativeColor(ThemeMode.light),
               tertiary: settingsService.fetchPositiveColor(ThemeMode.light));
           ColorScheme darkColorScheme = ColorScheme.fromSeed(
@@ -65,7 +64,6 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.dark,
               background: settingsService.fetchBackgroundColor(ThemeMode.dark),
               primary: settingsService.fetchPrimaryColor(ThemeMode.dark),
-              secondary: settingsService.fetchAccentColor(ThemeMode.dark),
               error: settingsService.fetchNegativeColor(ThemeMode.dark),
               tertiary: settingsService.fetchPositiveColor(ThemeMode.dark));
           return MaterialApp(
