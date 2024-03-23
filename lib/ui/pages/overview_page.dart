@@ -39,6 +39,8 @@ class OverviewPageState extends State<OverviewPage> {
   double? _netBalanceMinusSavings;
   List<Transaction>? _recentTransactions;
 
+  bool _showBalances = false;
+
   AppBar _createAppBar() {
     return AppBar(
       title: const Text("FinMan"),
@@ -46,6 +48,14 @@ class OverviewPageState extends State<OverviewPage> {
       automaticallyImplyLeading: false,
       scrolledUnderElevation: 0,
       actions: [
+        IconButton(
+          onPressed: () {
+            setState(() {
+              _showBalances = !_showBalances;
+            });
+          },
+          icon: Icon(_showBalances ? Icons.visibility_off : Icons.visibility),
+        ),
         IconButton(
             onPressed: () async {
               await Navigator.push(
@@ -109,7 +119,7 @@ class OverviewPageState extends State<OverviewPage> {
           ),
         ),
         Text(
-          "\$${balance.toStringAsFixed(2)}",
+          !_showBalances ? "\$******" : "\$${balance.toStringAsFixed(2)}",
           style: const TextStyle(
             fontSize: 25,
           ),
@@ -270,6 +280,14 @@ class OverviewPageState extends State<OverviewPage> {
         Account account = snapshot.data as Account;
         CurrencyType currencyType = account.currencyType;
         double amount = transaction.amount;
+        Color textColor;
+        if (!_showBalances) {
+          textColor = Theme.of(context).colorScheme.onBackground;
+        } else {
+          textColor = amount >= 0
+              ? Theme.of(context).colorScheme.tertiary
+              : Theme.of(context).colorScheme.error;
+        }
         return InkWell(
           onTap: () async {
             await Navigator.push(
@@ -312,13 +330,13 @@ class OverviewPageState extends State<OverviewPage> {
               Expanded(
                 flex: 2,
                 child: Text(
-                  transaction.formatAmount(currencyType),
+                  !_showBalances
+                      ? "******"
+                      : transaction.formatAmount(currencyType),
                   textAlign: TextAlign.end,
                   style: TextStyle(
                     fontSize: 20,
-                    color: amount >= 0
-                        ? Theme.of(context).colorScheme.tertiary
-                        : Theme.of(context).colorScheme.error,
+                    color: textColor,
                   ),
                 ),
               )
