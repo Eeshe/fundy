@@ -3,6 +3,8 @@
   "bruteBalance": "Saldo Bruto",
   "netBalance": "Saldo Neto",
   "usableBalance": "Saldo Usable",
+  "parallelDollar": "Dólar Paralelo",
+  "bcvDollar": "Dólar BCV",
   "accounts": "Cuentas",
   "expenses": "Gastos",
   "soon": "Próximamente",

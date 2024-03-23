@@ -29,7 +29,8 @@ void main() async {
   Hive.registerAdapter(DebtTypeAdapter());
 
   AccountService();
-  ConversionService();
+  ConversionService.updateFuture = ConversionService().updateConversions();
+  await ConversionService().loadConversionData();
   MonthlyExpenseService();
 
   SettingsService settingsService = SettingsService();

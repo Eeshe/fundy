@@ -3,6 +3,8 @@
   "bruteBalance": "Brute Balance",
   "netBalance": "Net Balance",
   "usableBalance": "Usable Balance",
+  "parallelDollar": "Parallel Dollar",
+  "bcvDollar": "BCV Dollar",
   "accounts": "Accounts",
   "expenses": "Expenses",
   "soon": "Soon",

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/debt.dart';
@@ -20,6 +22,7 @@ import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/expandable_fab_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -116,36 +119,88 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createBalancesOverviewWidget() {
+    return FutureBuilder(
+      future: _computeBalances(),
+      builder: (context, snapshot) {
+        if (_bruteBalance == null ||
+            _netBalance == null ||
+            _netBalanceMinusSavings == null) {
+          return Column(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 10),
+              Text(getAppLocalizations(context)!.computingBalances)
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _createBalanceOverviewWidget(
+                _bruteBalance!, getAppLocalizations(context)!.bruteBalance),
+            _createBalanceOverviewWidget(
+                _netBalance!, getAppLocalizations(context)!.netBalance),
+            _createBalanceOverviewWidget(_netBalanceMinusSavings!,
+                getAppLocalizations(context)!.usableBalance),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _createDollarRateWidget(String text, double rate) {
+    Widget rateWidget = rate == 0
+        ? CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.onBackground,
+          )
+        : Text(
+            "Bs${rate.format()}",
+            style: const TextStyle(fontSize: 25),
+          );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          text,
+          style: const TextStyle(fontSize: 18),
+        ),
+        rateWidget
+      ],
+    );
+  }
+
+  Widget _createDollarRatesWidget() {
+    return FutureBuilder(
+      future: ConversionService.updateFuture,
+      builder: (context, snapshot) {
+        ConversionService conversionService = ConversionService();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _createDollarRateWidget(
+                getAppLocalizations(context)!.parallelDollar,
+                conversionService.fetchRate('parallel')),
+            _createDollarRateWidget(getAppLocalizations(context)!.bcvDollar,
+                conversionService.fetchRate('bcv')),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _createTopPanelWidget() {
     return Container(
       color: Theme.of(context).colorScheme.primary,
       width: double.infinity,
-      padding: const EdgeInsets.only(left: 20, bottom: 20),
-      child: FutureBuilder(
-        future: _computeBalances(),
-        builder: (context, snapshot) {
-          if (_bruteBalance == null ||
-              _netBalance == null ||
-              _netBalanceMinusSavings == null) {
-            return Column(
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 10),
-                Text(getAppLocalizations(context)!.computingBalances)
-              ],
-            );
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _createBalanceOverviewWidget(
-                  _bruteBalance!, getAppLocalizations(context)!.bruteBalance),
-              _createBalanceOverviewWidget(
-                  _netBalance!, getAppLocalizations(context)!.netBalance),
-              _createBalanceOverviewWidget(_netBalanceMinusSavings!,
-                  getAppLocalizations(context)!.usableBalance),
-            ],
-          );
-        },
+      padding: const EdgeInsets.only(left: 20, bottom: 20, right: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _createBalancesOverviewWidget(),
+          _createDollarRatesWidget(),
+        ],
       ),
     );
   }
@@ -372,56 +427,6 @@ class OverviewPageState extends State<OverviewPage> {
       ],
       child: const Icon(Icons.add),
     );
-    // return ExpandableFab(
-    //   openButtonBuilder: RotateFloatingActionButtonBuilder(
-    //     heroTag: "openFab",
-    //     child: const Icon(Icons.add),
-    //     backgroundColor: primaryColor,
-    //     fabSize: ExpandableFabSize.regular,
-    //   ),
-    //   closeButtonBuilder: RotateFloatingActionButtonBuilder(
-    //       heroTag: "closeFab",
-    //       child: const Icon(Icons.close),
-    //       fabSize: ExpandableFabSize.regular,
-    //       backgroundColor: primaryColor,
-    //       shape: const CircleBorder()),
-    //   children: [
-    //     FloatingActionButton.small(
-    //       heroTag: "newTransactionFab",
-    //       backgroundColor: Theme.of(context).colorScheme.primary,
-    //       child: const Icon(Icons.attach_money),
-    //       onPressed: () async {
-    //         ExpandableFabState? fabState = _key.currentState;
-    //         if (fabState != null) {
-    //           fabState.toggle();
-    //         }
-    //         await Navigator.push(
-    //             context,
-    //             MaterialPageRoute(
-    //               builder: (context) => TransactionFormPage(null, null),
-    //             ));
-    //         setState(() {});
-    //       },
-    //     ),
-    //     FloatingActionButton.small(
-    //       heroTag: "newExchangeFab",
-    //       backgroundColor: Theme.of(context).colorScheme.primary,
-    //       child: const Icon(Icons.currency_exchange),
-    //       onPressed: () async {
-    //         ExpandableFabState? fabState = _key.currentState;
-    //         if (fabState != null) {
-    //           fabState.toggle();
-    //         }
-    //         await Navigator.push(
-    //             context,
-    //             MaterialPageRoute(
-    //               builder: (context) => const ExchangePage(),
-    //             ));
-    //         setState(() {});
-    //       },
-    //     )
-    //   ],
-    // );
   }
 
   @override
@@ -432,7 +437,7 @@ class OverviewPageState extends State<OverviewPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _createBalancesOverviewWidget(),
+          _createTopPanelWidget(),
           const SizedBox(height: 10),
           _createPageButtons(),
           const SizedBox(height: 10),

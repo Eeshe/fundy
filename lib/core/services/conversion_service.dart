@@ -14,18 +14,17 @@ class ConversionService {
 
   static Map<String, double> conversions = <String, double>{};
 
-  ConversionService() {
-    _loadConversionData();
-    _updateConversions();
-  }
+  ConversionService();
 
   ConversionService._();
 
   static final ConversionService _instance = ConversionService._();
 
+  static Future<void>? updateFuture;
+
   factory ConversionService.getInstance() => _instance;
 
-  void _loadConversionData() async {
+  Future<void> loadConversionData() async {
     Box box = await Hive.openBox(_conversionsBox);
     box.keys.toList().forEach((element) {
       conversions[element] = box.get(element);
@@ -74,7 +73,7 @@ class ConversionService {
     };
   }
 
-  Future<void> _updateConversions() async {
+  Future<void> updateConversions() async {
     try {
       Map<String, double> fetchedConversions = {
         ...(await _fetchBsConversions()),
@@ -102,5 +101,13 @@ class ConversionService {
     } else {
       return amount * conversionRate;
     }
+  }
+
+  double fetchRate(String currency) {
+    return conversions[currency] ?? 0;
+  }
+
+  bool hasLoadedRates() {
+    return conversions.isNotEmpty;
   }
 }
