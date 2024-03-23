@@ -48,10 +48,9 @@ class SavingListPageState extends State<SavingListPage> {
       future: _fetchSavings(),
       builder: (context, snapshot) {
         if (_savingsMap == null) {
-          print("A");
+          return const SizedBox();
         }
         if (_savingsMap!.isEmpty) {
-          print("B");
           return EmptyListWidget(
             title: getAppLocalizations(context)!.noSavingsFound,
             subtitle: getAppLocalizations(context)!.createSavingInstruction,
