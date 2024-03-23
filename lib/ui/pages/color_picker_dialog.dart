@@ -39,7 +39,6 @@ class ColorPickerDialogState extends State<ColorPickerDialog> {
             Material(
               child: HueRingPicker(
                 pickerColor: widget._color,
-                enableAlpha: true,
                 displayThumbColor: true,
                 onColorChanged: (value) {
                   setState(() {
