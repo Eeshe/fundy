@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:finman/core/models/account.dart';
+import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/account_service.dart';
 import 'package:finman/ui/shared/localization.dart';
@@ -29,6 +32,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
   Account? _selectedAccount;
+  bool _isMobilePayment = false;
   DateTime _selectedDate = DateTime.now();
 
   Future<List<Account>> _fetchAccounts() async {
@@ -63,10 +67,41 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 setState(
                   () {
                     _selectedAccount = account!;
+                    if (account.currencyType == CurrencyType.bs) return;
+
+                    _isMobilePayment = false;
                   },
                 );
               },
       )
+    ];
+  }
+
+  List<Widget> _createMobilePaymentInputWidgets() {
+    if (_selectedAccount == null ||
+        _selectedAccount!.currencyType != CurrencyType.bs) {
+      return [];
+    }
+    return [
+      Row(
+        children: [
+          SizedBox(
+            height: 24,
+            width: 24,
+            child: Checkbox(
+              value: _isMobilePayment,
+              onChanged: (value) {
+                setState(() {
+                  _isMobilePayment = !_isMobilePayment;
+                });
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(getAppLocalizations(context)!.mobilePayment)
+        ],
+      ),
+      const SizedBox(height: 10)
     ];
   }
 
@@ -132,6 +167,10 @@ class TransactionFormPageState extends State<TransactionFormPage> {
     ];
   }
 
+  double _calculateMobilePaymentFee(double amount) {
+    return max(0.13, amount * 0.003);
+  }
+
   List<Widget> _createAmountInputWidgets() {
     return [
       Text(
@@ -150,11 +189,14 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double amount = double.parse(value);
+          if (_isMobilePayment) {
+            amount -= _calculateMobilePaymentFee(amount);
+          }
           if (amount < 0) {
             if (widget._transaction != null) {
               amount = amount - widget._transaction!.amount;
             }
-            if (widget._account!.balance + amount < 0) {
+            if (_selectedAccount!.balance + amount < 0) {
               return getAppLocalizations(context)!.negativeBalanceAmount;
             }
           }
@@ -176,6 +218,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
               String description = _descriptionInputController.text;
               double amount = double.parse(_amountInputController.text);
+              if (_isMobilePayment) {
+                amount -= _calculateMobilePaymentFee(amount);
+              }
               Transaction transaction = Transaction(
                   _selectedAccount!.id, description, _selectedDate, amount);
               if (widget._transaction == null) {
@@ -229,6 +274,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             children: [
               ..._createAccountInputWidgets(),
               const SizedBox(height: 10),
+              ..._createMobilePaymentInputWidgets(),
               ..._createDescriptionInputWidgets(),
               const SizedBox(height: 20),
               ..._createDateInputWidgets(),
