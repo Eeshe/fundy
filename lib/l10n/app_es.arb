@@ -38,6 +38,7 @@
   "newTransaction": "Nueva Transacción",
   "editTransaction": "Editar Transacción",
   "account": "Cuenta",
+  "mobilePayment": "Pago Móvil",
   "description": "Descripción",
   "transactionDescriptionHint": "Ingresa la descripción de la transacción",
   "emptyTransactionDescription": "Por favor ingresa una descripción de la transacción",
