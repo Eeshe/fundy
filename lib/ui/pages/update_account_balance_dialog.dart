@@ -75,7 +75,7 @@ class UpdateBalanceDialogStage extends State<UpdateBalanceDialog> {
             Navigator.pop(context);
           },
           child: Text(
-            getAppLocalizations(context)!.confirm,
+            getAppLocalizations(context)!.update,
             style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
           ),
         )

@@ -27,6 +27,7 @@
   "currency": "Moneda",
   "icon": "Icono",
   "confirm": "Confirmar",
+  "update": "Actualizar",
   "transactions": "Transacciones",
   "newText": "Nuevo",
   "updateBalance": "Actualizar Saldo",

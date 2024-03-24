@@ -258,12 +258,10 @@ class AccountPageState extends State<AccountPage> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        widget._account.delete();
-                        Navigator.pop(context);
                         Navigator.pop(context);
                       },
                       child: Text(
-                        getAppLocalizations(context)!.yes,
+                        getAppLocalizations(context)!.cancel,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onBackground,
                         ),
@@ -271,15 +269,17 @@ class AccountPageState extends State<AccountPage> {
                     ),
                     TextButton(
                       onPressed: () {
+                        widget._account.delete();
+                        Navigator.pop(context);
                         Navigator.pop(context);
                       },
                       child: Text(
-                        getAppLocalizations(context)!.no,
+                        getAppLocalizations(context)!.delete,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onBackground,
                         ),
                       ),
-                    )
+                    ),
                   ],
                 );
               },
