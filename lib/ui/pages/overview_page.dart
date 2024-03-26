@@ -78,7 +78,7 @@ class OverviewPageState extends State<OverviewPage> {
         bruteBalance += account.balance;
         continue;
       }
-      bruteBalance += conversionService.convert(
+      bruteBalance += conversionService.currencyToUsd(
           account.balance, account.currencyType.name.toLowerCase());
     }
     _bruteBalance = bruteBalance;

@@ -32,7 +32,7 @@ class Transaction {
   String formatUsdAmount(CurrencyType currencyType) {
     if (currencyType == CurrencyType.usd) return formatAmount(currencyType);
 
-    return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().convert(amount.abs(), currencyType.name).format()}";
+    return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().currencyToUsd(amount.abs(), currencyType.name).format()}";
   }
 
   Widget createListWidget(BuildContext context, Account account,

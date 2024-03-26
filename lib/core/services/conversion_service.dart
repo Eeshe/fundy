@@ -51,8 +51,8 @@ class ConversionService {
         json['data']['getCountryConversions']['conversionRates'];
 
     return {
-      'parallel': conversionRates[0]['baseValue'],
-      'bcv': conversionRates[1]['baseValue']
+      'parallel': 1 / conversionRates[0]['baseValue'],
+      'bcv': 1 / conversionRates[1]['baseValue']
     };
   }
 
@@ -89,22 +89,25 @@ class ConversionService {
     }
   }
 
-  double convert(double amount, String currency) {
+  double usdToCurrency(double amount, String currency) {
     if (currency == 'bs') {
       currency = 'bcv';
     }
     if (!conversions.containsKey(currency)) return 0;
 
     double conversionRate = conversions[currency]!;
-    if (conversionRate > 1) {
-      return amount / conversionRate;
-    } else {
-      return amount * conversionRate;
+    return amount / conversionRate;
+  }
+
+  double currencyToUsd(double amount, String currency) {
+    if (currency == 'bs') {
+      currency = 'bcv';
     }
+    return amount * (conversions[currency] ?? 0);
   }
 
   double fetchRate(String currency) {
-    return conversions[currency] ?? 0;
+    return 1 / (conversions[currency] ?? 0);
   }
 
   bool hasLoadedRates() {

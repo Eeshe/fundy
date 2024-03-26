@@ -46,11 +46,12 @@ class AccountPageState extends State<AccountPage> {
     double bruteBalance = account.balance;
     double netBalance = bruteBalance;
     for (Saving saving in _accountSavings!) {
-      netBalance -= saving.calculateRemainingAmount();
+      netBalance -= ConversionService().usdToCurrency(
+          saving.calculateRemainingAmount(), account.currencyType.name);
     }
     if (_convertCurrency && bruteBalance != netBalance) {
       netBalance = ConversionService.getInstance()
-          .convert(netBalance, account.currencyType.name);
+          .currencyToUsd(netBalance, account.currencyType.name);
     }
     List<Widget> netBalanceWidgets = [];
     if (bruteBalance != netBalance) {
