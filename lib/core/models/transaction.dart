@@ -19,8 +19,11 @@ class Transaction {
   DateTime date;
   @HiveField(3)
   double amount;
+  @HiveField(4)
+  bool isMobilePayment;
 
-  Transaction(this.accountId, this.description, this.date, this.amount);
+  Transaction(this.accountId, this.description, this.date, this.amount,
+      this.isMobilePayment);
 
   String formatAmount(CurrencyType currencyType) {
     return "${amount > 0 ? '+' : '-'}${currencyType.symbol}${amount.abs().format()}";

@@ -184,15 +184,17 @@ class ExchangePageState extends State<ExchangePage> {
                   getAppLocalizations(context)!.exchangeDescription(
                       _startingAccount!.id, _finalAccount!.id),
                       DateTime.now(),
-                      -startingAmount));
-                  _finalAccount!.addTransaction(Transaction(
+                  -startingAmount,
+                  false));
+              _finalAccount!.addTransaction(Transaction(
                       _finalAccount!.id,
                       getAppLocalizations(context)!.exchangeDescription(
                           _startingAccount!.id, _finalAccount!.id),
                       DateTime.now(),
-                      finalAmount));
+                  finalAmount,
+                  false));
 
-                  FocusManager.instance.primaryFocus?.unfocus();
+              FocusManager.instance.primaryFocus?.unfocus();
                   Navigator.pop(context);
             },
           ),

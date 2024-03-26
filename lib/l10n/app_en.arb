@@ -48,6 +48,7 @@
   "emptyTransactionAccount": "Please select an account for the transaction",
   "differentTransactionAccount": "You can't change a transaction's account",
   "emptyTransactionAmount": "Please enter a transaction amount",
+  "positiveMobilePayment": "Mobile payments can only be negative amounts",
   "nonNumberAmount": "Amount must be a number",
   "negativeBalanceAmount": "This amount would set the account's balance to negative",
   "save": "Save",

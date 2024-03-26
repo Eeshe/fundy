@@ -48,6 +48,7 @@
   "emptyTransactionAccount": "Por favor selecciona una cuenta para la transacción",
   "differentTransactionAccount": "No puedes cambiar la cuenta de una transacción",
   "emptyTransactionAmount": "Por favor ingresa un monto de transacción",
+  "positiveMobilePayment": "Los pagos móviles solo se pueden seleccionar con montos negativos",
   "nonNumberAmount": "El monto debe ser un número",
   "negativeBalanceAmount": "Este monto dejaría el saldo de la cuenta en negativo",
   "save": "Guardar",

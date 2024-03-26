@@ -42,11 +42,6 @@ class AccountService {
   Future<Account?> fetch(String accountId) async {
     final box = await Hive.openBox(_accountsBox);
     final account = box.getAt(await _findIndex(accountId));
-    if (accountId == 'Test3') {
-      print("ACCOUNT ID: $accountId");
-      print("INDEX: ${await _findIndex(accountId)}");
-      print("FETCHED ACCOUNT: $account");
-    }
     if (account == null) return null;
 
     return account as Account;

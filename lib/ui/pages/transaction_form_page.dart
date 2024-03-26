@@ -15,9 +15,9 @@ import 'package:intl/intl.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final Transaction? _transaction;
-  Account? _account;
+  final Account? _account;
 
-  TransactionFormPage(this._account, this._transaction, {super.key});
+  const TransactionFormPage(this._account, this._transaction, {super.key});
 
   @override
   State<StatefulWidget> createState() => TransactionFormPageState();
@@ -81,6 +81,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
     if (_selectedAccount == null ||
         _selectedAccount!.currencyType != CurrencyType.bs) {
       return [];
+    }
+    if (widget._transaction != null) {
+      _isMobilePayment = widget._transaction!.isMobilePayment;
     }
     return [
       Row(
@@ -168,7 +171,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   }
 
   double _calculateMobilePaymentFee(double amount) {
-    return max(0.13, amount * 0.003);
+    return min(-0.13, amount * 0.003);
   }
 
   List<Widget> _createAmountInputWidgets() {
@@ -190,6 +193,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
           }
           double amount = double.parse(value);
           if (_isMobilePayment) {
+            if (amount > 0) {
+              return getAppLocalizations(context)!.positiveMobilePayment;
+            }
             amount -= _calculateMobilePaymentFee(amount);
           }
           if (amount < 0) {
@@ -218,11 +224,13 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
               String description = _descriptionInputController.text;
               double amount = double.parse(_amountInputController.text);
-              if (_isMobilePayment) {
-                amount -= _calculateMobilePaymentFee(amount);
+              if (_isMobilePayment &&
+                  (widget._transaction == null ||
+                      !widget._transaction!.isMobilePayment)) {
+                amount += _calculateMobilePaymentFee(amount);
               }
-              Transaction transaction = Transaction(
-                  _selectedAccount!.id, description, _selectedDate, amount);
+              Transaction transaction = Transaction(_selectedAccount!.id,
+                  description, _selectedDate, amount, _isMobilePayment);
               if (widget._transaction == null) {
                 _selectedAccount!.addTransaction(transaction);
               } else {

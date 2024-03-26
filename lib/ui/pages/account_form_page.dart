@@ -174,7 +174,8 @@ class _AccountFormPageState extends State<AccountFormPage> {
                   accountName,
                   getAppLocalizations(context)!.initialBalance,
                   DateTime.now(),
-                  initialBalance));
+                  initialBalance,
+                  false));
             }
             AccountService().save(Account(accountName, initialBalance,
                 currencyType, selectedIconPath, initialTransactions));
