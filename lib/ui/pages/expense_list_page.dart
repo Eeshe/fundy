@@ -1,5 +1,5 @@
 import 'package:finman/core/models/monthly_expense.dart';
-import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/ui/pages/expense_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
@@ -9,6 +9,7 @@ import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:provider/provider.dart';
 
 class ExpenseListPage extends StatefulWidget {
   const ExpenseListPage({super.key});
@@ -19,56 +20,56 @@ class ExpenseListPage extends StatefulWidget {
 
 class ExpenseListPageState extends State<ExpenseListPage> {
   DateTime _selectedDate = DateTime.now();
-  List<MonthlyExpense>? _monthlyExpenses;
-
-  Future<void> _fetchMonthlyExpenses() async {
-    _monthlyExpenses = await MonthlyExpenseService().fetchAll();
-  }
 
   Widget _createTotalMonthlyExpensesWidget() {
-    if (_monthlyExpenses == null || _monthlyExpenses!.isEmpty) {
-      return const SizedBox();
-    }
+    return Consumer<MonthlyExpenseProvider>(
+      builder: (context, expenseProvider, child) {
+        List<MonthlyExpense> monthlyExpenses = expenseProvider.monthlyExpenses;
+        if (monthlyExpenses.isEmpty) {
+          return const SizedBox();
+        }
+        double totalMonthlyExpenses = 0;
+        double totalPaidMonthlyExpenses = 0;
+        String recordKey = MonthlyExpense.createRecordKey(_selectedDate);
+        for (MonthlyExpense monthlyExpense in monthlyExpenses) {
+          totalMonthlyExpenses += monthlyExpense.amount;
+          if (!monthlyExpense.paymentRecords.containsKey(recordKey)) continue;
 
-    double totalMonthlyExpenses = 0;
-    double totalPaidMonthlyExpenses = 0;
-    String recordKey = MonthlyExpense.createRecordKey(_selectedDate);
-    for (MonthlyExpense monthlyExpense in _monthlyExpenses!) {
-      totalMonthlyExpenses += monthlyExpense.amount;
-      if (!monthlyExpense.paymentRecords.containsKey(recordKey)) continue;
-
-      totalPaidMonthlyExpenses += monthlyExpense.paymentRecords[recordKey]!;
-    }
-    double filledPercentage = totalPaidMonthlyExpenses / totalMonthlyExpenses;
-    return Container(
-      color: Theme.of(context).colorScheme.primary,
-      padding: const EdgeInsets.only(left: 20, bottom: 20, right: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            "\$${totalPaidMonthlyExpenses.format()}/\$${totalMonthlyExpenses.format()}",
-            style: const TextStyle(fontSize: 24),
-          ),
-          StyledProgressBarWidget(
-              center: Text(
-                "${(filledPercentage * 100).format()}%",
-                style: const TextStyle(
-                  fontSize: 20,
-                ),
+          totalPaidMonthlyExpenses += monthlyExpense.paymentRecords[recordKey]!;
+        }
+        double filledPercentage =
+            totalPaidMonthlyExpenses / totalMonthlyExpenses;
+        return Container(
+          color: Theme.of(context).colorScheme.primary,
+          padding: const EdgeInsets.only(left: 20, bottom: 20, right: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "\$${totalPaidMonthlyExpenses.format()}/\$${totalMonthlyExpenses.format()}",
+                style: const TextStyle(fontSize: 24),
+              ),
+              StyledProgressBarWidget(
+                center: Text(
+                  "${(filledPercentage * 100).format()}%",
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
               ),
               filledPercentage: filledPercentage,
-            lineHeight: 25,
-            boxDecoration: BoxDecoration(
-              border: Border.all(
-                width: 2,
-                color: Theme.of(context).colorScheme.background,
-              ),
-              borderRadius: BorderRadius.circular(1),
-            ),
-          )
-        ],
-      ),
+                lineHeight: 25,
+                boxDecoration: BoxDecoration(
+                  border: Border.all(
+                    width: 2,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  borderRadius: BorderRadius.circular(1),
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -120,13 +121,12 @@ class ExpenseListPageState extends State<ExpenseListPage> {
           backgroundColor: Theme.of(context).colorScheme.primary,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(5))),
-      onPressed: () async {
-        await Navigator.push(
+      onPressed: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ExpenseFormPage(null, _selectedDate),
             ));
-        setState(() {});
       },
       child: Text(
         getAppLocalizations(context)!.newText,
@@ -136,27 +136,28 @@ class ExpenseListPageState extends State<ExpenseListPage> {
   }
 
   Widget _createExpenseListWidget() {
-    if (_monthlyExpenses!.isEmpty) {
-      return EmptyListWidget(
-        title: getAppLocalizations(context)!.noMonthlyExpenses,
-        subtitle: getAppLocalizations(context)!.createSavingInstruction,
-      );
-    }
-    return ListView.separated(
-        itemBuilder: (context, index) => _monthlyExpenses![index]
-            .createListWidget(context, _selectedDate, () => setState(() {})),
-        separatorBuilder: (context, index) => Divider(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-        itemCount: _monthlyExpenses!.length);
+    return Consumer<MonthlyExpenseProvider>(
+      builder: (context, expenseProvider, child) {
+        List<MonthlyExpense> monthlyExpenses = expenseProvider.monthlyExpenses;
+        if (monthlyExpenses.isEmpty) {
+          return EmptyListWidget(
+            title: getAppLocalizations(context)!.noMonthlyExpenses,
+            subtitle: getAppLocalizations(context)!.createSavingInstruction,
+          );
+        }
+        return ListView.separated(
+            itemBuilder: (context, index) =>
+                monthlyExpenses[index].createListWidget(context, _selectedDate),
+            separatorBuilder: (context, index) => Divider(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            itemCount: monthlyExpenses.length);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _fetchMonthlyExpenses(),
-      builder: (context, snapshot) {
-        if (_monthlyExpenses == null) return const SizedBox();
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
@@ -184,7 +185,5 @@ class ExpenseListPageState extends State<ExpenseListPage> {
             ],
           ),
         );
-      },
-    );
   }
 }

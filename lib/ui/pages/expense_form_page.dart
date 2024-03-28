@@ -1,5 +1,5 @@
 import 'package:finman/core/models/monthly_expense.dart';
-import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
@@ -9,6 +9,7 @@ import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
+import 'package:provider/provider.dart';
 
 class ExpenseFormPage extends StatefulWidget {
   final MonthlyExpense? _monthlyExpense;
@@ -170,12 +171,13 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
             monthlyExpense.paymentRecords[
                     MonthlyExpense.createRecordKey(widget._selectedDate)] =
                 paidAmount;
-            monthlyExpense.saveData();
+            Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                .save(monthlyExpense);
           } else {
             Map<String, double> paymentRecords = {
               MonthlyExpense.createRecordKey(widget._selectedDate): paidAmount
             };
-            MonthlyExpenseService().save(
+            Provider.of<MonthlyExpenseProvider>(context, listen: false).save(
                 MonthlyExpense(id, amount, DateTime.now(), paymentRecords));
           }
           FocusManager.instance.primaryFocus?.unfocus();
@@ -194,7 +196,8 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
         text: getAppLocalizations(context)!.delete,
         isNegativeButton: true,
         onPressed: () {
-          widget._monthlyExpense!.delete();
+          Provider.of<MonthlyExpenseProvider>(context, listen: false)
+              .delete(widget._monthlyExpense!);
           Navigator.pop(context);
         },
       ),

@@ -22,6 +22,7 @@
   "name": "Nombre",
   "accountNameHint": "Ingresa el nombre de la cuenta",
   "emptyAccountName": "Por favor ingresa un nombre de cuenta",
+  "usedAccountName": "Ya existe una cuenta con este nombre",
   "initialBalance": "Saldo Inicial",
   "nonNumberInitialBalance": "El saldo inicial debe ser un número",
   "currency": "Moneda",

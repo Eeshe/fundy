@@ -22,6 +22,7 @@
   "name": "Name",
   "accountNameHint": "Enter account name",
   "emptyAccountName": "Please enter an account name",
+  "usedAccountName": "There's already an account with this name",
   "initialBalance": "Initial Balance",
   "nonNumberInitialBalance": "Initial balance must be a number",
   "currency": "Currency",

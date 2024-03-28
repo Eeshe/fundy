@@ -1,18 +1,19 @@
 import 'package:finman/core/models/monthly_expense.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-class MonthlyExpenseService {
-  static final MonthlyExpenseService _singleton =
-      MonthlyExpenseService._internal();
+class MonthlyExpenseProvider extends ChangeNotifier {
+  List<MonthlyExpense> _monthlyExpenses = [];
 
-  factory MonthlyExpenseService() {
-    return _singleton;
-  }
-
-  MonthlyExpenseService._internal();
+  List<MonthlyExpense> get monthlyExpenses => _monthlyExpenses;
 
   Future<Box<MonthlyExpense>> _openBox() async {
     return await Hive.openBox<MonthlyExpense>('monthly_expenses');
+  }
+
+  Future<void> fetchAll() async {
+    final Box<MonthlyExpense> box = await _openBox();
+    _monthlyExpenses = box.values.toList();
   }
 
   Future<int> _findIndex(MonthlyExpense expense) async {
@@ -27,6 +28,7 @@ class MonthlyExpenseService {
     if (index == -1) return;
 
     await box.putAt(index, expense);
+    notifyListeners();
   }
 
   Future<void> save(MonthlyExpense expense) async {
@@ -36,11 +38,8 @@ class MonthlyExpenseService {
     }
     final Box<MonthlyExpense> box = await _openBox();
     await box.add(expense);
-  }
-
-  Future<List<MonthlyExpense>> fetchAll() async {
-    final Box<MonthlyExpense> box = await _openBox();
-    return box.values.toList();
+    _monthlyExpenses.add(expense);
+    notifyListeners();
   }
 
   Future<void> delete(MonthlyExpense expense) async {
@@ -49,5 +48,7 @@ class MonthlyExpenseService {
     if (index == -1) return;
 
     await box.deleteAt(index);
+    _monthlyExpenses.remove(expense);
+    notifyListeners();
   }
 }

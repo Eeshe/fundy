@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/saving.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
@@ -13,6 +14,7 @@ import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
   final Account _account;
@@ -42,43 +44,47 @@ class AccountPageState extends State<AccountPage> {
   }
 
   Widget _createBalancesWidget() {
-    Account account = widget._account;
-    double bruteBalance = account.balance;
-    double netBalance = bruteBalance;
-    for (Saving saving in _accountSavings!) {
-      netBalance -= ConversionService().usdToCurrency(
-          saving.calculateRemainingAmount(), account.currencyType.name);
-    }
-    if (_convertCurrency && bruteBalance != netBalance) {
-      netBalance = ConversionService.getInstance()
-          .currencyToUsd(netBalance, account.currencyType.name);
-    }
-    List<Widget> netBalanceWidgets = [];
-    if (bruteBalance != netBalance) {
-      netBalanceWidgets.addAll([
-        Text(
-          getAppLocalizations(context)!.netBalance,
-          style: _labelStyle,
-        ),
-        Text(
-          "${_convertCurrency ? CurrencyType.usd.symbol : account.currencyType.symbol}${netBalance.format()}",
-          style: const TextStyle(fontSize: 20),
-        )
-      ]);
-    }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          getAppLocalizations(context)!.bruteBalance,
-          style: _labelStyle,
-        ),
-        Text(
-          account.formatBalance(_convertCurrency),
-          style: const TextStyle(fontSize: 20),
-        ),
-        ...netBalanceWidgets
-      ],
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        Account account = widget._account;
+        double bruteBalance = account.balance;
+        double netBalance = bruteBalance;
+        for (Saving saving in _accountSavings!) {
+          netBalance -= ConversionService().usdToCurrency(
+              saving.calculateRemainingAmount(), account.currencyType.name);
+        }
+        if (_convertCurrency && bruteBalance != netBalance) {
+          netBalance = ConversionService.getInstance()
+              .currencyToUsd(netBalance, account.currencyType.name);
+        }
+        List<Widget> netBalanceWidgets = [];
+        if (bruteBalance != netBalance) {
+          netBalanceWidgets.addAll([
+            Text(
+              getAppLocalizations(context)!.netBalance,
+              style: _labelStyle,
+            ),
+            Text(
+              "${_convertCurrency ? CurrencyType.usd.symbol : account.currencyType.symbol}${netBalance.format()}",
+              style: const TextStyle(fontSize: 20),
+            )
+          ]);
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              getAppLocalizations(context)!.bruteBalance,
+              style: _labelStyle,
+            ),
+            Text(
+              account.formatBalance(_convertCurrency),
+              style: const TextStyle(fontSize: 20),
+            ),
+            ...netBalanceWidgets
+          ],
+        );
+      },
     );
   }
 
@@ -100,58 +106,61 @@ class AccountPageState extends State<AccountPage> {
   }
 
   Widget _createTransactionListWidget() {
-    Account account = widget._account;
-
-    double screenHeight = MediaQuery.of(context).size.height;
-    double containerHeight =
-        min(screenHeight * 0.3, account.transactions.length * 65);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        Account account = widget._account;
+        double screenHeight = MediaQuery.of(context).size.height;
+        double containerHeight =
+            min(screenHeight * 0.3, account.transactions.length * 65);
+        return Column(
           children: [
-            Text(
-              getAppLocalizations(context)!.transactions,
-              style: _labelStyle,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  getAppLocalizations(context)!.transactions,
+                  style: _labelStyle,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5))),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              TransactionFormPage(account, null),
+                        ));
+                  },
+                  child: Text(
+                    getAppLocalizations(context)!.newText,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onBackground),
+                  ),
+                )
+              ],
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5))),
-              onPressed: () async {
-                await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TransactionFormPage(account, null),
-                    ));
-                setState(() {});
-              },
-              child: Text(
-                getAppLocalizations(context)!.newText,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onBackground),
+            Container(
+              height: containerHeight,
+              decoration: BoxDecoration(
+                border:
+                    Border.all(color: Theme.of(context).colorScheme.primary),
+                borderRadius: BorderRadius.circular(5),
               ),
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.all(5),
+                  itemBuilder: (context, index) => account.transactions[index]
+                      .createListWidget(context, account, _convertCurrency),
+                  separatorBuilder: (context, index) =>
+                      Divider(color: Theme.of(context).colorScheme.primary),
+                  itemCount: account.transactions.length),
             )
           ],
-        ),
-        Container(
-          height: containerHeight,
-          decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.primary),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: ListView.separated(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(5),
-              itemBuilder: (context, index) => account.transactions[index]
-                  .createListWidget(context, account, _convertCurrency,
-                      () => setState(() {})),
-              separatorBuilder: (context, index) =>
-                  Divider(color: Theme.of(context).colorScheme.primary),
-              itemCount: account.transactions.length),
-        )
-      ],
+        );
+      },
     );
   }
 
@@ -223,11 +232,10 @@ class AccountPageState extends State<AccountPage> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           ),
-          onPressed: () async {
-            await showDialog(
+          onPressed: () {
+            showDialog(
                 context: context,
                 builder: (context) => UpdateBalanceDialog(widget._account));
-            setState(() {});
           },
           child: Text(
             getAppLocalizations(context)!.updateBalance,
@@ -270,7 +278,8 @@ class AccountPageState extends State<AccountPage> {
                     ),
                     TextButton(
                       onPressed: () {
-                        widget._account.delete();
+                        Provider.of<AccountProvider>(context, listen: false)
+                            .delete(widget._account);
                         Navigator.pop(context);
                         Navigator.pop(context);
                       },

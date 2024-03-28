@@ -5,15 +5,16 @@ import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/core/services/monthly_expense_service.dart';
 import 'package:finman/core/services/settings_service.dart';
 import 'package:finman/ui/pages/authentication_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,15 +29,27 @@ void main() async {
   Hive.registerAdapter(DebtAdapter());
   Hive.registerAdapter(DebtTypeAdapter());
 
-  AccountService();
   ConversionService.updateFuture = ConversionService().updateConversions();
   await ConversionService().loadConversionData();
-  MonthlyExpenseService();
 
   SettingsService settingsService = SettingsService();
   await settingsService.initializeSettings();
 
-  runApp(MyApp(settingsService: settingsService));
+  AccountProvider accountProvider = AccountProvider();
+  MonthlyExpenseProvider monthlyExpenseProvider = MonthlyExpenseProvider();
+  await accountProvider.fetchAll();
+  await monthlyExpenseProvider.fetchAll();
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => accountProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => monthlyExpenseProvider,
+      )
+    ],
+    child: MyApp(settingsService: settingsService),
+  ));
 }
 
 class MyApp extends StatelessWidget {

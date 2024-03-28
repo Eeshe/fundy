@@ -1,12 +1,13 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SavingListPage extends StatefulWidget {
   const SavingListPage({super.key});
@@ -21,7 +22,7 @@ class SavingListPageState extends State<SavingListPage> {
   Future<void> _fetchSavings() async {
     Map<Saving, Account> savingsMap = <Saving, Account>{};
     for (Saving saving in await SavingService().fetchAll()) {
-      Account? account = await AccountService().fetch(saving.accountId);
+      Account? account = Provider.of<AccountProvider>(context, listen: false).getById(saving.accountId);
       if (account == null) continue;
 
       savingsMap[saving] = account;
