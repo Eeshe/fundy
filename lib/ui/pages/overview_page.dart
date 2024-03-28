@@ -58,11 +58,10 @@ class OverviewPageState extends State<OverviewPage> {
         ),
         IconButton(
             onPressed: () async {
-              await Navigator.push(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const SettingsPage()));
-              setState(() {});
             },
             icon: const Icon(Icons.settings))
       ],
