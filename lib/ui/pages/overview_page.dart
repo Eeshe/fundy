@@ -11,7 +11,6 @@ import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
 import 'package:finman/core/services/debt_service.dart';
-import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/account_list_page.dart';
 import 'package:finman/ui/pages/debt_list_page.dart';
 import 'package:finman/ui/pages/exchange_page.dart';
@@ -26,6 +25,8 @@ import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import '../../core/providers/saving_provider.dart';
 
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
@@ -102,7 +103,8 @@ class OverviewPageState extends State<OverviewPage> {
     _netBalance = bruteBalance - remainingMonthlyExpenses - remainingDebts;
 
     double remainingSavings = 0;
-    for (Saving saving in (await SavingService().fetchAll())) {
+    for (Saving saving
+        in Provider.of<SavingProvider>(context, listen: false).savings) {
       remainingSavings += saving.calculateRemainingAmount();
     }
     _netBalanceMinusSavings = bruteBalance -

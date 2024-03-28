@@ -1,7 +1,5 @@
-import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/providers/account_provider.dart';
-import 'package:finman/core/services/saving_service.dart';
+import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
@@ -17,41 +15,35 @@ class SavingListPage extends StatefulWidget {
 }
 
 class SavingListPageState extends State<SavingListPage> {
-  Map<Saving, Account>? _savingsMap;
-
-  Future<void> _fetchSavings() async {
-    Map<Saving, Account> savingsMap = <Saving, Account>{};
-    for (Saving saving in await SavingService().fetchAll()) {
-      Account? account = Provider.of<AccountProvider>(context, listen: false).getById(saving.accountId);
-      if (account == null) continue;
-
-      savingsMap[saving] = account;
-    }
-    _savingsMap = savingsMap;
-  }
+  // Future<void> _fetchSavings() async {
+  //   Map<Saving, Account> savingsMap = <Saving, Account>{};
+  //   for (Saving saving in await SavingService().fetchAll()) {
+  //     Account? account = Provider.of<AccountProvider>(context, listen: false).getById(saving.accountId);
+  //     if (account == null) continue;
+  //
+  //     savingsMap[saving] = account;
+  //   }
+  //   _savingsMap = savingsMap;
+  // }
 
   Widget _createNewSavingButton() {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
-      onPressed: () async {
-        await Navigator.push(
+      onPressed: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const SavingFormPage(null, null),
             ));
-        setState(() {});
       },
     );
   }
 
   Widget _createSavingListWidget() {
-    return FutureBuilder(
-      future: _fetchSavings(),
-      builder: (context, snapshot) {
-        if (_savingsMap == null) {
-          return const SizedBox();
-        }
-        if (_savingsMap!.isEmpty) {
+    return Consumer<SavingProvider>(
+      builder: (context, savingProvider, child) {
+        List<Saving> savings = savingProvider.savings;
+        if (savings.isEmpty) {
           return EmptyListWidget(
             title: getAppLocalizations(context)!.noSavingsFound,
             subtitle: getAppLocalizations(context)!.createSavingInstruction,
@@ -59,14 +51,12 @@ class SavingListPageState extends State<SavingListPage> {
         }
         return ListView.separated(
             itemBuilder: (context, index) {
-              Saving saving = _savingsMap!.keys.toList()[index];
-              return saving.createDisplayWidget(
-                  context, _savingsMap![saving]!, () => setState(() {}));
+              return savings[index].createDisplayWidget(context);
             },
             separatorBuilder: (context, index) => Divider(
                   color: Theme.of(context).colorScheme.primary,
                 ),
-            itemCount: _savingsMap!.length);
+            itemCount: savings.length);
       },
     );
   }

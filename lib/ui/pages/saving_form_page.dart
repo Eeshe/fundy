@@ -1,6 +1,7 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
@@ -40,7 +41,7 @@ class SavingFormState extends State<SavingFormPage> {
     if (widget._saving == null) return;
     if (_selectedAccount != null) return;
 
-    Provider.of<AccountProvider>(context, listen: false)
+    _selectedAccount = Provider.of<AccountProvider>(context, listen: false)
         .getById(widget._saving!.accountId);
   }
 
@@ -82,7 +83,6 @@ class SavingFormState extends State<SavingFormPage> {
 
   List<Widget> _createAccountInputWidgets() {
     _fetchSavingAccount();
-
     return [
       Text(
         getAppLocalizations(context)!.account,
@@ -176,9 +176,10 @@ class SavingFormState extends State<SavingFormPage> {
             saving.accountId = _selectedAccount!.id;
             saving.amount = amount;
             saving.paidAmount = paidAmount;
-            saving.saveData();
+            Provider.of<SavingProvider>(context, listen: false).save(saving);
           } else {
-            Saving(id, _selectedAccount!.id, amount, paidAmount).saveData();
+            Provider.of<SavingProvider>(context, listen: false)
+                .save(Saving(id, _selectedAccount!.id, amount, paidAmount));
           }
           FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
@@ -196,7 +197,8 @@ class SavingFormState extends State<SavingFormPage> {
           text: getAppLocalizations(context)!.delete,
           isNegativeButton: true,
           onPressed: () {
-            widget._saving!.delete();
+            Provider.of<SavingProvider>(context, listen: false)
+                .delete(widget._saving!);
             Navigator.pop(context);
           }),
     );
