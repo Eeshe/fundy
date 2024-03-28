@@ -200,9 +200,7 @@ class AccountPageState extends State<AccountPage> {
               child: ListView.separated(
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(5),
-                  itemBuilder: (context, index) => savings[index]
-                      .createListWidget(
-                          context, widget._account, () => setState(() {})),
+                  itemBuilder: (context, index) => savings[index].createListWidget(context, widget._account),
                   separatorBuilder: (context, index) =>
                       Divider(color: Theme.of(context).colorScheme.primary),
                   itemCount: savings.length),

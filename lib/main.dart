@@ -6,6 +6,7 @@ import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/debt_provider.dart';
 import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
@@ -39,9 +40,11 @@ void main() async {
   AccountProvider accountProvider = AccountProvider();
   MonthlyExpenseProvider monthlyExpenseProvider = MonthlyExpenseProvider();
   SavingProvider savingProvider = SavingProvider();
+  DebtProvider debtProvider = DebtProvider();
   await accountProvider.fetchAll();
   await monthlyExpenseProvider.fetchAll();
   await savingProvider.fetchAll();
+  await debtProvider.fetchAll();
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(
@@ -52,6 +55,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (_) => savingProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => debtProvider,
       )
     ],
     child: MyApp(settingsService: settingsService),

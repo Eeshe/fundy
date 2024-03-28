@@ -113,15 +113,13 @@ class Saving {
     );
   }
 
-  Widget createListWidget(
-      BuildContext context, Account account, Function() redrawCallback) {
+  Widget createListWidget(BuildContext context, Account account) {
     return InkWell(
       onTap: () async {
-        await Navigator.push(
+        Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => SavingFormPage(this, account)));
-        redrawCallback();
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

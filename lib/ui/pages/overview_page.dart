@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/debt.dart';
@@ -8,9 +6,9 @@ import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/debt_provider.dart';
 import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/core/services/debt_service.dart';
 import 'package:finman/ui/pages/account_list_page.dart';
 import 'package:finman/ui/pages/debt_list_page.dart';
 import 'package:finman/ui/pages/exchange_page.dart';
@@ -72,7 +70,7 @@ class OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Future<void> _computeBalances() async {
+  void _computeBalances() {
     final ConversionService conversionService = ConversionService.getInstance();
     double bruteBalance = 0;
     for (Account account
@@ -95,7 +93,7 @@ class OverviewPageState extends State<OverviewPage> {
     }
     // Subtract own debts
     double remainingDebts = 0;
-    for (Debt debt in (await DebtService().fetchAll())) {
+    for (Debt debt in Provider.of<DebtProvider>(context, listen: false).debts) {
       if (debt.debtType == DebtType.other) continue;
 
       remainingDebts += debt.calculateRemainingAmount();
@@ -134,8 +132,9 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createBalancesOverviewWidget() {
-    return Consumer<AccountProvider>(
-      builder: (context, accountProvider, child) {
+    return Consumer4<AccountProvider, MonthlyExpenseProvider, SavingProvider,
+        DebtProvider>(
+      builder: (context, value, value2, value3, value4, child) {
         _computeBalances();
         if (_bruteBalance == null ||
             _netBalance == null ||
@@ -228,13 +227,12 @@ class OverviewPageState extends State<OverviewPage> {
           width: 50,
           height: 50,
           child: ElevatedButton(
-              onPressed: () async {
-                await Navigator.push(
+              onPressed: () {
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => destination,
                     ));
-                setState(() {});
               },
               style: ButtonStyle(
                 shape: MaterialStateProperty.all(const CircleBorder()),
