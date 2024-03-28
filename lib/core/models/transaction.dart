@@ -35,17 +35,16 @@ class Transaction {
     return "${amount > 0 ? '+' : '-'}${CurrencyType.usd.symbol}${ConversionService.getInstance().currencyToUsd(amount.abs(), currencyType.name).format()}";
   }
 
-  Widget createListWidget(BuildContext context, Account account,
-      bool convertCurrency, Function() redrawCallback) {
+  Widget createListWidget(
+      BuildContext context, Account account, bool convertCurrency) {
     CurrencyType currencyType = account.currencyType;
     return InkWell(
-      onTap: () async {
-        await Navigator.push(
+      onTap: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => TransactionFormPage(account, this),
             ));
-        redrawCallback();
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

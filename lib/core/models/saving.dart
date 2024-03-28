@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:finman/core/models/account.dart';
-import 'package:finman/core/services/saving_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
@@ -9,6 +10,7 @@ import 'package:finman/ui/shared/widgets/styled_progress_bar_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 
 part 'saving.g.dart';
 
@@ -25,22 +27,16 @@ class Saving {
 
   Saving(this.id, this.accountId, this.amount, this.paidAmount);
 
-  void saveData() {
-    SavingService().save(this);
-  }
-
   bool _isPaid() {
     return paidAmount >= amount;
   }
 
   void _setPaid() {
     paidAmount = amount;
-    saveData();
   }
 
   void _clearPaid() {
     paidAmount = 0;
-    saveData();
   }
 
   double calculateRemainingAmount() {
@@ -49,15 +45,9 @@ class Saving {
 
   void increasePaidAmount(double amount) {
     paidAmount = max(0, min(this.amount, paidAmount + amount));
-    saveData();
   }
 
-  void delete() {
-    SavingService().delete(this);
-  }
-
-  Widget _createAdjustableProgressBarWidget(
-      ValueNotifier<double> paidAmountNotifier) {
+  Widget _createAdjustableProgressBarWidget(BuildContext context) {
     return AdjustableProgressBarWidget(
       filledPercentage: paidAmount / amount,
       lineHeight: 20,
@@ -65,46 +55,51 @@ class Saving {
           style: const TextStyle(color: Colors.white, fontSize: 16)),
       onMin: () {
         _clearPaid();
-        paidAmountNotifier.value = paidAmount;
+        // paidAmountNotifier.value = paidAmount;
+        Provider.of<SavingProvider>(context, listen: false).save(this);
       },
       onMax: () {
         _setPaid();
-        paidAmountNotifier.value = paidAmount;
+        // paidAmountNotifier.value = paidAmount;
+        Provider.of<SavingProvider>(context, listen: false).save(this);
       },
       onTweak: (value) {
         increasePaidAmount(value);
-        paidAmountNotifier.value = paidAmount;
+        Provider.of<SavingProvider>(context, listen: false).save(this);
+        // paidAmountNotifier.value = paidAmount;
       },
     );
   }
 
-  Widget createDisplayWidget(
-      BuildContext context, Account account, Function() redrawCallback) {
+  Widget createDisplayWidget(BuildContext context) {
     TextStyle labelStyle = const TextStyle(fontSize: 20);
     ValueNotifier<double> paidAmountNotifier = ValueNotifier(paidAmount);
-    return ValueListenableBuilder(
-      valueListenable: paidAmountNotifier,
-      builder: (context, value, child) {
-        return InkWell(
-          onTap: () async {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => SavingFormPage(this, null)));
-            redrawCallback();
-          },
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(id, style: labelStyle),
-              AccountIconWidget(account.iconPath, 50, 50),
-              Text(accountId, style: labelStyle),
-              _createAdjustableProgressBarWidget(paidAmountNotifier),
-            ],
-          ),
-        );
+    Account? account =
+        Provider.of<AccountProvider>(context, listen: false).getById(accountId);
+    if (account == null) return const SizedBox();
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SavingFormPage(this, null)));
       },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(id, style: labelStyle),
+          AccountIconWidget(account.iconPath, 50, 50),
+          Text(accountId, style: labelStyle),
+          _createAdjustableProgressBarWidget(context),
+        ],
+      ),
     );
+    // return ValueListenableBuilder(
+    //   valueListenable: paidAmountNotifier,
+    //   builder: (context, value, child) {
+    //   },
+    // );
   }
 
   Widget _createProgressBarWidget(BuildContext context) {
@@ -118,15 +113,13 @@ class Saving {
     );
   }
 
-  Widget createListWidget(
-      BuildContext context, Account account, Function() redrawCallback) {
+  Widget createListWidget(BuildContext context, Account account) {
     return InkWell(
       onTap: () async {
-        await Navigator.push(
+        Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => SavingFormPage(this, account)));
-        redrawCallback();
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

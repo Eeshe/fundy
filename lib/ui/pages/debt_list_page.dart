@@ -1,11 +1,12 @@
 import 'package:finman/core/models/debt.dart';
 import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/services/debt_service.dart';
+import 'package:finman/core/providers/debt_provider.dart';
 import 'package:finman/ui/pages/debt_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DebtListPage extends StatefulWidget {
   const DebtListPage({super.key});
@@ -16,36 +17,6 @@ class DebtListPage extends StatefulWidget {
 
 class DebtListState extends State<DebtListPage> {
   String? _filteredDebtType;
-
-  Widget _createErrorWidget() {
-    return Center(
-      child: Column(
-        children: [
-          const Icon(
-            Icons.error_outline,
-            color: Colors.red,
-          ),
-          Text(
-            getAppLocalizations(context)!.debtFetchingError,
-            style: const TextStyle(fontSize: 36),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _createLoadingWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const CircularProgressIndicator(),
-        Text(
-          getAppLocalizations(context)!.fetchingDebts,
-          style: const TextStyle(fontSize: 36),
-        )
-      ],
-    );
-  }
 
   Widget _createDebtTypeRadio(String debtTypeName) {
     return Row(
@@ -78,45 +49,39 @@ class DebtListState extends State<DebtListPage> {
   Widget _createNewDebtButton() {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
-      onPressed: () async {
-        await Navigator.push(
+      onPressed: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const DebtFormPage(null),
             ));
-        setState(() {});
       },
     );
   }
 
   Widget _createDebtListWidget() {
-    return FutureBuilder(
-        future: DebtService().fetchAll(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return _createLoadingWidget();
-          } else if (snapshot.hasError) {
-            return _createErrorWidget();
-          }
-          List<Debt> debts = snapshot.data!;
-          if (_filteredDebtType != getAppLocalizations(context)!.all) {
-            debts.removeWhere((element) =>
-                element.debtType.localized(context) != _filteredDebtType!);
-          }
-          if (debts.isEmpty) {
-            return EmptyListWidget(
-              title: getAppLocalizations(context)!.noDebtsFound,
-              subtitle: getAppLocalizations(context)!.createDebtInstruction,
-            );
-          }
-          return ListView.separated(
-              itemBuilder: (context, index) => debts[index]
-                  .createDisplayWidget(context, () => setState(() {})),
-              separatorBuilder: (context, index) => Divider(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-              itemCount: debts.length);
-        });
+    return Consumer<DebtProvider>(
+      builder: (context, debtProvider, child) {
+        List<Debt> debts = debtProvider.debts.toList();
+        if (_filteredDebtType != getAppLocalizations(context)!.all) {
+          debts.removeWhere((element) =>
+              element.debtType.localized(context) != _filteredDebtType!);
+        }
+        if (debts.isEmpty) {
+          return EmptyListWidget(
+            title: getAppLocalizations(context)!.noDebtsFound,
+            subtitle: getAppLocalizations(context)!.createDebtInstruction,
+          );
+        }
+        return ListView.separated(
+            itemBuilder: (context, index) =>
+                debts[index].createDisplayWidget(context),
+            separatorBuilder: (context, index) => Divider(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            itemCount: debts.length);
+      },
+    );
   }
 
   @override

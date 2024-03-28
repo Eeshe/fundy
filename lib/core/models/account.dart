@@ -1,9 +1,6 @@
 import 'package:finman/core/models/currency_type.dart';
-import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/account_page.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/utils/double_extension.dart';
@@ -61,7 +58,6 @@ class Account {
     transactions.add(transaction);
     increaseBalance(transaction.amount);
     _sortTransactions();
-    _save();
   }
 
   void updateTransaction(
@@ -70,29 +66,22 @@ class Account {
     double balanceDifference = newTransaction.amount - oldTransaction.amount;
     increaseBalance(balanceDifference);
     _sortTransactions();
-    _save();
   }
 
   void deleteTransaction(Transaction transaction) {
     transactions.remove(transaction);
     decreaseBalance(transaction.amount);
     _sortTransactions();
-    _save();
   }
 
-  void _save() {
-    AccountService().save(this);
-  }
-
-  Widget createListWidget(BuildContext context, Function() redrawCallback) {
+  Widget createListWidget(BuildContext context) {
     return InkWell(
-        onTap: () async {
-          await Navigator.push(
+        onTap: () {
+          Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => AccountPage(this),
               ));
-          redrawCallback();
         },
         child: Row(
           children: [
@@ -115,12 +104,5 @@ class Account {
             )),
           ],
         ));
-  }
-
-  void delete() async {
-    AccountService().delete(this);
-    for (Saving saving in await SavingService().fetchAllByAccount(this)) {
-      saving.delete();
-    }
   }
 }

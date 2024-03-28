@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/debt.dart';
@@ -7,11 +5,10 @@ import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/debt_provider.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/core/services/debt_service.dart';
-import 'package:finman/core/services/monthly_expense_service.dart';
-import 'package:finman/core/services/saving_service.dart';
 import 'package:finman/ui/pages/account_list_page.dart';
 import 'package:finman/ui/pages/debt_list_page.dart';
 import 'package:finman/ui/pages/exchange_page.dart';
@@ -25,6 +22,9 @@ import 'package:finman/ui/shared/widgets/expandable_fab_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../../core/providers/saving_provider.dart';
 
 class OverviewPage extends StatefulWidget {
   const OverviewPage({super.key});
@@ -58,11 +58,10 @@ class OverviewPageState extends State<OverviewPage> {
         ),
         IconButton(
             onPressed: () async {
-              await Navigator.push(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const SettingsPage()));
-              setState(() {});
             },
             icon: const Icon(Icons.settings))
       ],
@@ -70,10 +69,11 @@ class OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Future<void> _computeBalances() async {
+  void _computeBalances() {
     final ConversionService conversionService = ConversionService.getInstance();
     double bruteBalance = 0;
-    for (Account account in (await AccountService.getInstance().fetchAll())) {
+    for (Account account
+        in Provider.of<AccountProvider>(context, listen: false).accounts) {
       if (account.currencyType == CurrencyType.usd) {
         bruteBalance += account.balance;
         continue;
@@ -85,13 +85,14 @@ class OverviewPageState extends State<OverviewPage> {
     // Subtract monthly expenses
     double remainingMonthlyExpenses = 0;
     for (MonthlyExpense monthlyExpense
-        in (await MonthlyExpenseService().fetchAll())) {
+        in Provider.of<MonthlyExpenseProvider>(context, listen: false)
+            .monthlyExpenses) {
       remainingMonthlyExpenses +=
           monthlyExpense.getRemainingPayment(DateTime.now());
     }
     // Subtract own debts
     double remainingDebts = 0;
-    for (Debt debt in (await DebtService().fetchAll())) {
+    for (Debt debt in Provider.of<DebtProvider>(context, listen: false).debts) {
       if (debt.debtType == DebtType.other) continue;
 
       remainingDebts += debt.calculateRemainingAmount();
@@ -99,7 +100,8 @@ class OverviewPageState extends State<OverviewPage> {
     _netBalance = bruteBalance - remainingMonthlyExpenses - remainingDebts;
 
     double remainingSavings = 0;
-    for (Saving saving in (await SavingService().fetchAll())) {
+    for (Saving saving
+        in Provider.of<SavingProvider>(context, listen: false).savings) {
       remainingSavings += saving.calculateRemainingAmount();
     }
     _netBalanceMinusSavings = bruteBalance -
@@ -129,9 +131,10 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createBalancesOverviewWidget() {
-    return FutureBuilder(
-      future: _computeBalances(),
-      builder: (context, snapshot) {
+    return Consumer4<AccountProvider, MonthlyExpenseProvider, SavingProvider,
+        DebtProvider>(
+      builder: (context, value, value2, value3, value4, child) {
+        _computeBalances();
         if (_bruteBalance == null ||
             _netBalance == null ||
             _netBalanceMinusSavings == null) {
@@ -223,13 +226,12 @@ class OverviewPageState extends State<OverviewPage> {
           width: 50,
           height: 50,
           child: ElevatedButton(
-              onPressed: () async {
-                await Navigator.push(
+              onPressed: () {
+                Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => destination,
                     ));
-                setState(() {});
               },
               style: ButtonStyle(
                 shape: MaterialStateProperty.all(const CircleBorder()),
@@ -261,9 +263,9 @@ class OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Future<void> _computeRecentTransactions() async {
+  void _computeRecentTransactions(List<Account> accounts) {
     List<Transaction> transactions = [];
-    for (Account account in (await AccountService.getInstance().fetchAll())) {
+    for (Account account in accounts) {
       transactions.addAll(account.transactions);
     }
     transactions.sort((a, b) => b.date.compareTo(a.date));
@@ -271,13 +273,11 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createTransactionWidget(Transaction transaction) {
-    return FutureBuilder<Account?>(
-      future: AccountService.getInstance().fetch(transaction.accountId),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.hasError) {
-          return const SizedBox();
-        }
-        Account account = snapshot.data as Account;
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        Account? account = accountProvider.getById(transaction.accountId);
+        if (account == null) return const SizedBox();
+
         CurrencyType currencyType = account.currencyType;
         double amount = transaction.amount;
         Color textColor;
@@ -289,14 +289,13 @@ class OverviewPageState extends State<OverviewPage> {
               : Theme.of(context).colorScheme.error;
         }
         return InkWell(
-          onTap: () async {
-            await Navigator.push(
+          onTap: () {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) =>
                       TransactionFormPage(account, transaction),
                 ));
-            setState(() {});
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -348,9 +347,9 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createRecentTransactionsWidget() {
-    return FutureBuilder(
-      future: _computeRecentTransactions(),
-      builder: (context, snapshot) {
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        _computeRecentTransactions(accountProvider.accounts);
         if (_recentTransactions == null) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -413,13 +412,12 @@ class OverviewPageState extends State<OverviewPage> {
       backgroundColor: primaryColor,
       actionButtons: [
         ActionButton(
-          onPressed: () async {
-            await Navigator.push(
+          onPressed: () {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => TransactionFormPage(null, null),
                 ));
-            setState(() {});
           },
           icon: Icon(
             Icons.attach_money,
@@ -428,13 +426,12 @@ class OverviewPageState extends State<OverviewPage> {
           backgroundColor: primaryColor,
         ),
         ActionButton(
-          onPressed: () async {
-            await Navigator.push(
+          onPressed: () {
+            Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const ExchangePage(),
                 ));
-            setState(() {});
           },
           icon: Icon(
             Icons.currency_exchange,

@@ -1,12 +1,13 @@
 import 'dart:math';
 
-import 'package:finman/core/services/monthly_expense_service.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/ui/pages/expense_form_page.dart';
 import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 part 'monthly_expense.g.dart';
 
@@ -30,10 +31,6 @@ class MonthlyExpense {
     return DateFormat('MMMM-y').format(dateTime);
   }
 
-  void saveData() {
-    MonthlyExpenseService().save(this);
-  }
-
   bool isPaid(DateTime date) {
     String recordKey = createRecordKey(date);
     if (!paymentRecords.containsKey(recordKey)) return false;
@@ -43,12 +40,10 @@ class MonthlyExpense {
 
   void setPaid(DateTime date) {
     paymentRecords[createRecordKey(date)] = amount;
-    saveData();
   }
 
   void setUnpaid(DateTime date) {
     paymentRecords.remove(createRecordKey(date));
-    saveData();
   }
 
   double getPaymentRecord(DateTime date) {
@@ -67,25 +62,18 @@ class MonthlyExpense {
     currentRecord += amount;
     paymentRecords[createRecordKey(date)] =
         min(this.amount, max(0, currentRecord));
-    saveData();
   }
 
-  void delete() {
-    MonthlyExpenseService().delete(this);
-  }
-
-  Widget createListWidget(
-      BuildContext context, DateTime date, Function() redrawCallback) {
+  Widget createListWidget(BuildContext context, DateTime date) {
     double paidAmount = getPaymentRecord(date);
     double paidPercentage = paidAmount / amount;
     return InkWell(
-      onTap: () async {
-        await Navigator.push(
+      onTap: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => ExpenseFormPage(this, date),
             ));
-        redrawCallback();
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,15 +88,18 @@ class MonthlyExpense {
             center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
             onMin: () {
               setUnpaid(date);
-              redrawCallback();
+              Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                  .save(this);
             },
             onMax: () {
               setPaid(date);
-              redrawCallback();
+              Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                  .save(this);
             },
             onTweak: (value) {
               addPayment(date, value);
-              redrawCallback();
+              Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                  .save(this);
             },
           )
         ],

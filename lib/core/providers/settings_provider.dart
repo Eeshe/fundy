@@ -2,7 +2,7 @@ import 'package:finman/utils/hex_color_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsService {
+class SettingsProvider extends ChangeNotifier {
   late final SharedPreferences preferences;
 
   Future<void> initializeSettings() async {
@@ -18,6 +18,7 @@ class SettingsService {
 
   void saveThemeMode(ThemeMode themeMode) async {
     (await SharedPreferences.getInstance()).setString("theme", themeMode.name);
+    notifyListeners();
   }
 
   Color _fetchColor(String path, ThemeMode themeMode, Color defaultColor) {
@@ -48,6 +49,7 @@ class SettingsService {
 
   Future<void> _setColor(String path, ThemeMode themeMode, Color color) async {
     (await SharedPreferences.getInstance()).setString("themeColors.${themeMode.name}.$path", color.toHex());
+    notifyListeners();
   }
 
   void saveBackgroundColor(Color color, ThemeMode themeMode) {

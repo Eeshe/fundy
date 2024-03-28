@@ -1,7 +1,8 @@
 import 'package:finman/core/models/account.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AccountDropdownButtonWidget extends StatefulWidget {
   final Account? account;
@@ -16,27 +17,17 @@ class AccountDropdownButtonWidget extends StatefulWidget {
 }
 
 class AccountDropdownButtonState extends State<AccountDropdownButtonWidget> {
-  Future<List<Account>> _fetchAccounts() async {
-    return await AccountService().fetchAll();
-  }
 
   @override
   void initState() {
     super.initState();
-    _fetchAccounts();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _fetchAccounts(),
-        builder: (context, snapshot) {
-          List<Account> accounts;
-          if (!snapshot.hasData) {
-            accounts = [];
-          } else {
-            accounts = snapshot.data!;
-          }
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        List<Account> accounts = accountProvider.accounts;
         return DecoratedBox(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary,

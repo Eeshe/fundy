@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
@@ -12,6 +12,7 @@ import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class TransactionFormPage extends StatefulWidget {
   final Transaction? _transaction;
@@ -35,15 +36,10 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   bool _isMobilePayment = false;
   DateTime _selectedDate = DateTime.now();
 
-  Future<List<Account>> _fetchAccounts() async {
-    return await AccountService().fetchAll();
-  }
-
   @override
   void initState() {
     super.initState();
     _selectedAccount = widget._account;
-    _fetchAccounts();
 
     Transaction? transaction = widget._transaction;
     if (transaction == null) return;
@@ -237,6 +233,8 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 _selectedAccount!
                     .updateTransaction(widget._transaction!, transaction);
               }
+              Provider.of<AccountProvider>(context, listen: false)
+                  .save(_selectedAccount!);
               FocusManager.instance.primaryFocus?.unfocus();
               Navigator.pop(context);
             },
@@ -257,6 +255,8 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 isNegativeButton: true,
                 onPressed: () {
                   widget._account!.deleteTransaction(widget._transaction!);
+                  Provider.of<AccountProvider>(context, listen: false)
+                      .save(_selectedAccount!);
                   Navigator.pop(context);
                 }))
       ],

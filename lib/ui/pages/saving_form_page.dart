@@ -1,6 +1,7 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
@@ -9,6 +10,7 @@ import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SavingFormPage extends StatefulWidget {
   final Saving? _saving;
@@ -31,7 +33,7 @@ class SavingFormState extends State<SavingFormPage> {
 
   Account? _selectedAccount;
 
-  Future<void> _fetchSavingAccount() async {
+  void _fetchSavingAccount() {
     if (widget._account != null) {
       _selectedAccount = widget._account;
       return;
@@ -39,7 +41,8 @@ class SavingFormState extends State<SavingFormPage> {
     if (widget._saving == null) return;
     if (_selectedAccount != null) return;
 
-    _selectedAccount = await AccountService().fetch(widget._saving!.accountId);
+    _selectedAccount = Provider.of<AccountProvider>(context, listen: false)
+        .getById(widget._saving!.accountId);
   }
 
   void _initializePaidAmountInput() {
@@ -79,27 +82,23 @@ class SavingFormState extends State<SavingFormPage> {
   }
 
   List<Widget> _createAccountInputWidgets() {
+    _fetchSavingAccount();
     return [
       Text(
         getAppLocalizations(context)!.account,
         style: _inputLabelStyle,
       ),
-      FutureBuilder(
-        future: _fetchSavingAccount(),
-        builder: (context, snapshot) {
-          return AccountDropdownButtonWidget(
-            account: _selectedAccount,
-            onChanged: (account) {
-              setState(() {
-                _selectedAccount = account;
-              });
-            },
-            validator: (account) {
-              if (account != null) return null;
+      AccountDropdownButtonWidget(
+        account: _selectedAccount,
+        onChanged: (account) {
+          setState(() {
+            _selectedAccount = account;
+          });
+        },
+        validator: (account) {
+          if (account != null) return null;
 
-              return getAppLocalizations(context)!.emptySavingAccount;
-            },
-          );
+          return getAppLocalizations(context)!.emptySavingAccount;
         },
       )
     ];
@@ -177,9 +176,10 @@ class SavingFormState extends State<SavingFormPage> {
             saving.accountId = _selectedAccount!.id;
             saving.amount = amount;
             saving.paidAmount = paidAmount;
-            saving.saveData();
+            Provider.of<SavingProvider>(context, listen: false).save(saving);
           } else {
-            Saving(id, _selectedAccount!.id, amount, paidAmount).saveData();
+            Provider.of<SavingProvider>(context, listen: false)
+                .save(Saving(id, _selectedAccount!.id, amount, paidAmount));
           }
           FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
@@ -197,7 +197,8 @@ class SavingFormState extends State<SavingFormPage> {
           text: getAppLocalizations(context)!.delete,
           isNegativeButton: true,
           onPressed: () {
-            widget._saving!.delete();
+            Provider.of<SavingProvider>(context, listen: false)
+                .delete(widget._saving!);
             Navigator.pop(context);
           }),
     );

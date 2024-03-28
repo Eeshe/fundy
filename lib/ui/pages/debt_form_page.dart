@@ -1,5 +1,6 @@
 import 'package:finman/core/models/debt.dart';
 import 'package:finman/core/models/debt_type.dart';
+import 'package:finman/core/providers/debt_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
@@ -7,6 +8,7 @@ import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DebtFormPage extends StatefulWidget {
   final Debt? _debt;
@@ -168,9 +170,10 @@ class DebtFormState extends State<DebtFormPage> {
             debt.debtType = debtType;
             debt.amount = amount;
             debt.paidAmount = paidAmount;
-            debt.saveData();
+            Provider.of<DebtProvider>(context, listen: false).save(debt);
           } else {
-            Debt(id, debtType, amount, paidAmount).saveData();
+            Provider.of<DebtProvider>(context, listen: false)
+                .save(Debt(id, debtType, amount, paidAmount));
           }
           FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
@@ -188,7 +191,8 @@ class DebtFormState extends State<DebtFormPage> {
           text: getAppLocalizations(context)!.delete,
           isNegativeButton: true,
           onPressed: () {
-            widget._debt!.delete();
+            Provider.of<DebtProvider>(context, listen: false)
+                .delete(widget._debt!);
             Navigator.pop(context);
           }),
     );

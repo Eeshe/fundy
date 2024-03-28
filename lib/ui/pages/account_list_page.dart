@@ -1,11 +1,12 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/ui/pages/account_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AccountListPage extends StatefulWidget {
   const AccountListPage({super.key});
@@ -17,17 +18,9 @@ class AccountListPage extends StatefulWidget {
 class AccountListPageState extends State<AccountListPage> {
   String? _filteredCurrency;
 
-  Future<List<Account>> _fetchAccounts() async {
-    List<Account> accounts = await AccountService().fetchAll();
-    accounts.sort((a, b) => b.balance.compareTo(a.balance));
-
-    return accounts;
-  }
-
   @override
   void initState() {
     super.initState();
-    _fetchAccounts();
   }
 
   Row _createCurrencyRadio(String value) {
@@ -62,36 +55,41 @@ class AccountListPageState extends State<AccountListPage> {
   Widget _createNewAccountButtonWidget() {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
-      onPressed: () async {
-        await Navigator.push(
+      onPressed: () {
+        Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => const AccountFormPage(),
             ));
-        setState(() {});
       },
     );
   }
 
-  Widget _createAccountListWidget(List<Account> accounts) {
-    if (_filteredCurrency != getAppLocalizations(context)!.all) {
-      accounts.removeWhere((element) =>
-          element.currencyType.name != _filteredCurrency!.toLowerCase());
-    }
-    if (accounts.isEmpty) {
-      return EmptyListWidget(
-        title: getAppLocalizations(context)!.noAccountsFound,
-        subtitle: getAppLocalizations(context)!.createAccountInstruction,
-      );
-    }
-    return ListView.separated(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      itemBuilder: (context, index) =>
-          accounts[index].createListWidget(context, () => setState(() {})),
-      separatorBuilder: (context, index) => Divider(
-        color: Theme.of(context).colorScheme.primary,
-      ),
-      itemCount: accounts.length,
+  Widget _createAccountListWidget() {
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        List<Account> accounts = accountProvider.accounts.toList();
+        if (_filteredCurrency != getAppLocalizations(context)!.all) {
+          accounts.removeWhere((element) =>
+              element.currencyType.name != _filteredCurrency!.toLowerCase());
+        }
+        if (accounts.isEmpty) {
+          return EmptyListWidget(
+            title: getAppLocalizations(context)!.noAccountsFound,
+            subtitle: getAppLocalizations(context)!.createAccountInstruction,
+          );
+        }
+        accounts.sort((a, b) => b.balance.compareTo(a.balance));
+        return ListView.separated(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          itemBuilder: (context, index) =>
+              accounts[index].createListWidget(context),
+          separatorBuilder: (context, index) => Divider(
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          itemCount: accounts.length,
+        );
+      },
     );
   }
 
@@ -128,21 +126,9 @@ class AccountListPageState extends State<AccountListPage> {
   @override
   Widget build(BuildContext context) {
     _filteredCurrency ??= getAppLocalizations(context)!.all;
-    return FutureBuilder<List<Account>>(
-      future: _fetchAccounts(),
-      builder: (context, snapshot) {
-        Widget listWidget;
-        if (snapshot.hasData) {
-          List<Account> accounts = snapshot.data!;
-          listWidget = _createAccountListWidget(accounts);
-        } else if (snapshot.hasError) {
-          listWidget = _createErrorWidget();
-        } else {
-          listWidget = _createLoadingWidget();
-        }
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(getAppLocalizations(context)!.yourAccounts),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(getAppLocalizations(context)!.yourAccounts),
             centerTitle: true,
             scrolledUnderElevation: 0,
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -155,12 +141,10 @@ class AccountListPageState extends State<AccountListPage> {
               children: [
                   _createCurrencyRadios(),
                   _createNewAccountButtonWidget(),
-                Expanded(child: Center(child: listWidget)),
-              ],
-            ),
-          ),
+            Expanded(child: Center(child: _createAccountListWidget())),
+          ],
+        ),
+      ),
         );
-      },
-    );
   }
 }

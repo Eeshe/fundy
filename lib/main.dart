@@ -5,15 +5,18 @@ import 'package:finman/core/models/debt_type.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
+import 'package:finman/core/providers/debt_provider.dart';
+import 'package:finman/core/providers/monthly_expense_provider.dart';
+import 'package:finman/core/providers/saving_provider.dart';
+import 'package:finman/core/providers/settings_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/core/services/monthly_expense_service.dart';
-import 'package:finman/core/services/settings_service.dart';
 import 'package:finman/ui/pages/authentication_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,58 +31,76 @@ void main() async {
   Hive.registerAdapter(DebtAdapter());
   Hive.registerAdapter(DebtTypeAdapter());
 
-  AccountService();
   ConversionService.updateFuture = ConversionService().updateConversions();
   await ConversionService().loadConversionData();
-  MonthlyExpenseService();
 
-  SettingsService settingsService = SettingsService();
-  await settingsService.initializeSettings();
-
-  runApp(MyApp(settingsService: settingsService));
+  AccountProvider accountProvider = AccountProvider();
+  MonthlyExpenseProvider monthlyExpenseProvider = MonthlyExpenseProvider();
+  SavingProvider savingProvider = SavingProvider();
+  DebtProvider debtProvider = DebtProvider();
+  SettingsProvider settingsProvider = SettingsProvider();
+  await accountProvider.fetchAll();
+  await monthlyExpenseProvider.fetchAll();
+  await savingProvider.fetchAll();
+  await debtProvider.fetchAll();
+  await settingsProvider.initializeSettings();
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => accountProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => monthlyExpenseProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => savingProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => debtProvider,
+      ),
+      ChangeNotifierProvider(
+        create: (_) => settingsProvider,
+      )
+    ],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  static final ValueNotifier<ThemeMode> themeNotifier =
-      ValueNotifier(ThemeMode.light);
-  final SettingsService settingsService;
-
-  const MyApp({super.key, required this.settingsService});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    themeNotifier.value = settingsService.fetchThemeMode();
-    return ValueListenableBuilder(
-        valueListenable: themeNotifier,
-        builder: (context, value, child) {
-          ColorScheme lightColorScheme = ColorScheme.fromSeed(
-              seedColor: Colors.white,
-              brightness: Brightness.light,
-              background: settingsService.fetchBackgroundColor(ThemeMode.light),
-              primary: settingsService.fetchPrimaryColor(ThemeMode.light),
-              error: settingsService.fetchNegativeColor(ThemeMode.light),
-              tertiary: settingsService.fetchPositiveColor(ThemeMode.light));
-          ColorScheme darkColorScheme = ColorScheme.fromSeed(
-              seedColor: Colors.black,
-              brightness: Brightness.dark,
-              background: settingsService.fetchBackgroundColor(ThemeMode.dark),
-              primary: settingsService.fetchPrimaryColor(ThemeMode.dark),
-              error: settingsService.fetchNegativeColor(ThemeMode.dark),
-              tertiary: settingsService.fetchPositiveColor(ThemeMode.dark));
-          return MaterialApp(
-              title: 'FinMan',
-              localizationsDelegates: AppLocalizations.localizationsDelegates,
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: const Locale('es'),
-              debugShowCheckedModeBanner: false,
-              themeMode: value,
-              theme:
-                  ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
-              darkTheme:
-                  ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-              home: const AuthenticationPage());
-        });
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
+        ColorScheme lightColorScheme = ColorScheme.fromSeed(
+            seedColor: Colors.white,
+            brightness: Brightness.light,
+            background: settingsProvider.fetchBackgroundColor(ThemeMode.light),
+            primary: settingsProvider.fetchPrimaryColor(ThemeMode.light),
+            error: settingsProvider.fetchNegativeColor(ThemeMode.light),
+            tertiary: settingsProvider.fetchPositiveColor(ThemeMode.light));
+        ColorScheme darkColorScheme = ColorScheme.fromSeed(
+            seedColor: Colors.black,
+            brightness: Brightness.dark,
+            background: settingsProvider.fetchBackgroundColor(ThemeMode.dark),
+            primary: settingsProvider.fetchPrimaryColor(ThemeMode.dark),
+            error: settingsProvider.fetchNegativeColor(ThemeMode.dark),
+            tertiary: settingsProvider.fetchPositiveColor(ThemeMode.dark));
+        return MaterialApp(
+            title: 'FinMan',
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: const Locale('es'),
+            debugShowCheckedModeBanner: false,
+            themeMode: settingsProvider.fetchThemeMode(),
+            theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
+            darkTheme:
+                ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
+            home: const AuthenticationPage());
+      },
+    );
   }
 }
 

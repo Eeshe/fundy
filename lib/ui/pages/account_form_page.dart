@@ -1,7 +1,7 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/services/account_service.dart';
+import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
@@ -9,6 +9,7 @@ import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AccountFormPage extends StatefulWidget {
   const AccountFormPage({super.key});
@@ -50,6 +51,11 @@ class _AccountFormPageState extends State<AccountFormPage> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return getAppLocalizations(context)!.emptyAccountName;
+            }
+            if (Provider.of<AccountProvider>(context, listen: false)
+                    .getById(value) !=
+                null) {
+              return getAppLocalizations(context)!.usedAccountName;
             }
             return null;
           })
@@ -177,7 +183,9 @@ class _AccountFormPageState extends State<AccountFormPage> {
                   initialBalance,
                   false));
             }
-            AccountService().save(Account(accountName, initialBalance,
+            Provider.of<AccountProvider>(context, listen: false).save(Account(
+                accountName,
+                initialBalance,
                 currencyType, selectedIconPath, initialTransactions));
             Navigator.pop(context);
           },

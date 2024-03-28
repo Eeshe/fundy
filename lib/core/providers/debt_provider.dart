@@ -1,17 +1,19 @@
 import 'package:finman/core/models/debt.dart';
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-class DebtService {
-  static final DebtService _singleton = DebtService._internal();
+class DebtProvider extends ChangeNotifier {
+  List<Debt> _debts = [];
 
-  factory DebtService() {
-    return _singleton;
-  }
-
-  DebtService._internal();
+  List<Debt> get debts => _debts;
 
   Future<Box<Debt>> _openBox() async {
-    return await Hive.openBox<Debt>('debt');
+    return await Hive.openBox<Debt>('debts');
+  }
+
+  Future<void> fetchAll() async {
+    final Box<Debt> box = await _openBox();
+    _debts = box.values.toList();
   }
 
   Future<int> _findIndex(Debt debt) async {
@@ -26,6 +28,7 @@ class DebtService {
     if (index == -1) return;
 
     await box.putAt(index, debt);
+    notifyListeners();
   }
 
   Future<void> save(Debt debt) async {
@@ -35,11 +38,8 @@ class DebtService {
     }
     final Box<Debt> box = await _openBox();
     await box.add(debt);
-  }
-
-  Future<List<Debt>> fetchAll() async {
-    final Box<Debt> box = await _openBox();
-    return box.values.toList();
+    _debts.add(debt);
+    notifyListeners();
   }
 
   Future<void> delete(Debt debt) async {
@@ -48,5 +48,7 @@ class DebtService {
     if (index == -1) return;
 
     await box.deleteAt(index);
+    _debts.remove(debt);
+    notifyListeners();
   }
 }
