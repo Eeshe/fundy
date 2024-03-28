@@ -1,8 +1,8 @@
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ColorPickerDialog extends StatefulWidget {
   Color _color;
@@ -20,7 +20,10 @@ class ColorPickerDialogState extends State<ColorPickerDialog> {
       width: double.infinity,
       child: StyledButtonWidget(
         text: getAppLocalizations(context)!.save,
-        onPressed: () => Navigator.pop(context),
+        onPressed: () {
+          widget._onChanged(widget._color);
+          Navigator.pop(context);
+        },
       ),
     );
   }
@@ -36,17 +39,21 @@ class ColorPickerDialogState extends State<ColorPickerDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Material(
-              child: HueRingPicker(
-                pickerColor: widget._color,
-                displayThumbColor: true,
-                onColorChanged: (value) {
-                  setState(() {
-                    widget._color = value;
+            ColorPicker(
+              color: widget._color,
+              copyPasteBehavior: const ColorPickerCopyPasteBehavior(
+                  copyFormat: ColorPickerCopyFormat.numHexRRGGBB),
+              showColorCode: true,
+              pickersEnabled: const <ColorPickerType, bool>{
+                ColorPickerType.primary: false,
+                ColorPickerType.accent: false,
+                ColorPickerType.wheel: true
+              },
+              onColorChanged: (value) {
+                setState(() {
+                  widget._color = value;
                   });
-                  widget._onChanged(value);
-                },
-              ),
+              },
             ),
             _createSaveButton()
           ],
