@@ -15,16 +15,6 @@ class SavingListPage extends StatefulWidget {
 }
 
 class SavingListPageState extends State<SavingListPage> {
-  // Future<void> _fetchSavings() async {
-  //   Map<Saving, Account> savingsMap = <Saving, Account>{};
-  //   for (Saving saving in await SavingService().fetchAll()) {
-  //     Account? account = Provider.of<AccountProvider>(context, listen: false).getById(saving.accountId);
-  //     if (account == null) continue;
-  //
-  //     savingsMap[saving] = account;
-  //   }
-  //   _savingsMap = savingsMap;
-  // }
 
   Widget _createNewSavingButton() {
     return StyledButtonWidget(

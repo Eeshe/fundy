@@ -57,7 +57,7 @@ class OverviewPageState extends State<OverviewPage> {
           icon: Icon(_showBalances ? Icons.visibility_off : Icons.visibility),
         ),
         IconButton(
-            onPressed: () async {
+            onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
