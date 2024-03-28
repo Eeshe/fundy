@@ -66,8 +66,8 @@ class SettingsPageState extends State<SettingsPage> {
       children: [
         Text(label, style: _colorSettingLabel),
         InkWell(
-          onTap: () async {
-            await showDialog(
+          onTap: () {
+            showDialog(
                 context: context,
                 builder: (context) => ColorPickerDialog(color, onChanged));
           },
@@ -96,6 +96,7 @@ class SettingsPageState extends State<SettingsPage> {
         if (themeMode == ThemeMode.system) return const SizedBox();
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               getAppLocalizations(context)!.colorSettings,
@@ -138,9 +139,11 @@ class SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ..._createAppThemeWidgets(), _createColorsWidgets()],
-            ),
-          ),
-        );
+            ..._createAppThemeWidgets(),
+            _createColorsWidgets(),
+          ],
+        ),
+      ),
+    );
   }
 }
