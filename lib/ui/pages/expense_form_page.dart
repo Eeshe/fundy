@@ -109,6 +109,14 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
             if (value == null || value.isEmpty) {
               return getAppLocalizations(context)!.emptyExpenseName;
             }
+            if (_monthlyExpense == null ||
+                _monthlyExpense != null && _monthlyExpense!.id != value) {
+              if (Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                      .getById(value) !=
+                  null) {
+                return getAppLocalizations(context)!.usedExpenseName;
+              }
+            }
             return null;
           },
         )

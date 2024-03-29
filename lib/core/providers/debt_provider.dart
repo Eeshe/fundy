@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:finman/core/models/debt.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -50,5 +51,9 @@ class DebtProvider extends ChangeNotifier {
     await box.deleteAt(index);
     _debts.remove(debt);
     notifyListeners();
+  }
+
+  Debt? getById(String debtId) {
+    return _debts.firstWhereOrNull((debt) => debt.id == debtId);
   }
 }

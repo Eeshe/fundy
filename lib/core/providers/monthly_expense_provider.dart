@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:finman/core/models/monthly_expense.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -50,5 +51,10 @@ class MonthlyExpenseProvider extends ChangeNotifier {
     await box.deleteAt(index);
     _monthlyExpenses.remove(expense);
     notifyListeners();
+  }
+
+  MonthlyExpense? getById(String expenseId) {
+    return _monthlyExpenses
+        .firstWhereOrNull((account) => account.id == expenseId);
   }
 }

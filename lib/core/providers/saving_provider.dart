@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/saving.dart';
 import 'package:flutter/material.dart';
@@ -56,5 +57,9 @@ class SavingProvider extends ChangeNotifier {
 
   List<Saving> getByAccount(Account account) {
     return _savings.where((saving) => saving.accountId == account.id).toList();
+  }
+
+  Saving? getById(String savingId) {
+    return _savings.firstWhereOrNull((saving) => saving.id == savingId);
   }
 }

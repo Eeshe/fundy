@@ -69,8 +69,16 @@ class DebtFormState extends State<DebtFormPage> {
             if (value == null || value.isEmpty) {
               return getAppLocalizations(context)!.emptyDebtDescription;
             }
-            return null;
-          })
+          if (_debt == null || _debt != null && _debt!.id != value) {
+            if (Provider.of<DebtProvider>(context, listen: false)
+                    .getById(value) !=
+                null) {
+              return getAppLocalizations(context)!.usedSavingDescription;
+            }
+          }
+          return null;
+        },
+      )
     ];
   }
 

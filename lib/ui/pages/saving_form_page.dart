@@ -85,6 +85,13 @@ class SavingFormState extends State<SavingFormPage> {
           if (value == null || value.isEmpty) {
             return getAppLocalizations(context)!.emptySavingDescription;
           }
+          if (_saving == null || _saving != null && _saving!.id != value) {
+            if (Provider.of<SavingProvider>(context, listen: false)
+                    .getById(value) !=
+                null) {
+              return getAppLocalizations(context)!.usedSavingDescription;
+            }
+          }
           return null;
         },
       )
