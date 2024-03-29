@@ -276,53 +276,58 @@ class OverviewPageState extends State<OverviewPage> {
               : Theme.of(context).colorScheme.error;
         }
         return InkWell(
-          onTap: () {
-            Navigator.pushNamed(context, '/transaction_form',
-                arguments: TransactionFormParameters(transaction, account));
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                  flex: 1, child: AccountIconWidget(account.iconPath, 50, 50)),
-              Expanded(
-                flex: 2,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      transaction.description,
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                    Text(
-                      account.id,
-                      style: const TextStyle(
-                        fontSize: 14,
+          onTap: () {},
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              Navigator.pushNamed(context, '/transaction_form',
+                  arguments: TransactionFormParameters(transaction, account));
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: AccountIconWidget(account.iconPath, 50, 50)),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        transaction.description,
+                        style: const TextStyle(fontSize: 20),
                       ),
-                    ),
-                    Text(
-                      DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
-                      style: const TextStyle(
-                        fontSize: 14,
+                      Text(
+                        account.id,
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
                       ),
-                    )
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: Text(
-                  !_showBalances
-                      ? "******"
-                      : transaction.formatAmount(currencyType),
-                  textAlign: TextAlign.end,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: textColor,
+                      Text(
+                        DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
+                        style: const TextStyle(
+                          fontSize: 14,
+                        ),
+                      )
+                    ],
                   ),
                 ),
-              )
-            ],
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    !_showBalances
+                        ? "******"
+                        : transaction.formatAmount(currencyType),
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: textColor,
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },

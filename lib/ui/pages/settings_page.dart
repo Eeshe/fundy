@@ -65,7 +65,7 @@ class SettingsPageState extends State<SettingsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: _colorSettingLabel),
-        InkWell(
+        GestureDetector(
           onTap: () {
             showDialog(
                 context: context,

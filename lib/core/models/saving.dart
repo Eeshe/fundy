@@ -78,25 +78,24 @@ class Saving {
     if (account == null) return const SizedBox();
 
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/saving_form',
-            arguments: SavingFormArguments(this, null));
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(id, style: labelStyle),
-          AccountIconWidget(account.iconPath, 50, 50),
-          Text(accountId, style: labelStyle),
-          _createAdjustableProgressBarWidget(context),
-        ],
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, '/saving_form',
+              arguments: SavingFormArguments(this, null));
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(id, style: labelStyle),
+            AccountIconWidget(account.iconPath, 50, 50),
+            Text(accountId, style: labelStyle),
+            _createAdjustableProgressBarWidget(context),
+          ],
+        ),
       ),
     );
-    // return ValueListenableBuilder(
-    //   valueListenable: paidAmountNotifier,
-    //   builder: (context, value, child) {
-    //   },
-    // );
   }
 
   Widget _createProgressBarWidget(BuildContext context) {
@@ -112,8 +111,11 @@ class Saving {
 
   Widget createListWidget(BuildContext context, Account account) {
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/saving_form',
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, '/saving_form',
             arguments: SavingFormArguments(this, account));
       },
       child: Column(
@@ -128,6 +130,7 @@ class Saving {
           ),
           _createProgressBarWidget(context)
         ],
+      ),
       ),
     );
   }

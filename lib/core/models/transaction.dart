@@ -39,41 +39,51 @@ class Transaction {
       BuildContext context, Account account, bool convertCurrency) {
     CurrencyType currencyType = account.currencyType;
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/transaction_form',
-            arguments: TransactionFormParameters(this, account));
-      },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                description,
-                style: const TextStyle(fontSize: 20),
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, '/transaction_form',
+              arguments: TransactionFormParameters(this, account));
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      description,
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    Text(
+                      DateFormat('dd/MM/yyyy kk:mm').format(date),
+                      style: const TextStyle(
+                        fontSize: 14,
+                      ),
+                    )
+                  ],
+                )),
+            Text(
+              convertCurrency
+                  ? formatUsdAmount(currencyType)
+                  : formatAmount(currencyType),
+              style: TextStyle(
+                fontSize: 20,
+                color: amount >= 0
+                    ? Theme
+                    .of(context)
+                    .colorScheme
+                    .tertiary
+                    : Theme
+                    .of(context)
+                    .colorScheme
+                    .error,
               ),
-              Text(
-                DateFormat('dd/MM/yyyy kk:mm').format(date),
-                style: const TextStyle(
-                  fontSize: 14,
-                ),
-              )
-            ],
-          )),
-          Text(
-            convertCurrency
-                ? formatUsdAmount(currencyType)
-                : formatAmount(currencyType),
-            style: TextStyle(
-              fontSize: 20,
-              color: amount >= 0
-                  ? Theme.of(context).colorScheme.tertiary
-                  : Theme.of(context).colorScheme.error,
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

@@ -125,6 +125,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
         itemBuilder: (context, index) {
           String iconPath = _iconPaths[index];
           return GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () {
               setState(() {
                 selectedIconPath = iconPath;
