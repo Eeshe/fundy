@@ -68,38 +68,42 @@ class MonthlyExpense {
     double paidAmount = getPaymentRecord(date);
     double paidPercentage = paidAmount / amount;
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/expense_form',
-            arguments: ExpenseFormArguments(this, date));
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            id,
-            style: const TextStyle(fontSize: 24),
-          ),
-          AdjustableProgressBarWidget(
-            filledPercentage: paidPercentage,
-            lineHeight: 20,
-            center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
-            onMin: () {
-              setUnpaid(date);
-              Provider.of<MonthlyExpenseProvider>(context, listen: false)
-                  .save(this);
-            },
-            onMax: () {
-              setPaid(date);
-              Provider.of<MonthlyExpenseProvider>(context, listen: false)
-                  .save(this);
-            },
-            onTweak: (value) {
-              addPayment(date, value);
-              Provider.of<MonthlyExpenseProvider>(context, listen: false)
-                  .save(this);
-            },
-          )
-        ],
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, '/expense_form',
+              arguments: ExpenseFormArguments(this, date));
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              id,
+              style: const TextStyle(fontSize: 24),
+            ),
+            AdjustableProgressBarWidget(
+              filledPercentage: paidPercentage,
+              lineHeight: 20,
+              center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
+              onMin: () {
+                setUnpaid(date);
+                Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                    .save(this);
+              },
+              onMax: () {
+                setPaid(date);
+                Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                    .save(this);
+              },
+              onTweak: (value) {
+                addPayment(date, value);
+                Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                    .save(this);
+              },
+            )
+          ],
+        ),
       ),
     );
   }

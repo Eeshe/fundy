@@ -61,44 +61,48 @@ class Debt {
 
   Widget createDisplayWidget(BuildContext context) {
     return InkWell(
-      onTap: () {
-        Navigator.pushNamed(context, '/debt_form',
-            arguments: DebtFormArguments(this));
-      },
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          Navigator.pushNamed(context, '/debt_form',
+              arguments: DebtFormArguments(this));
+        },
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            id,
-            style: const TextStyle(fontSize: 24),
-          ),
-          Text(
-            debtType.localized(context),
-            style: TextStyle(
-              fontSize: 16,
-              color: debtType == DebtType.own
-                  ? Theme.of(context).colorScheme.error
-                  : Theme.of(context).colorScheme.tertiary,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              id,
+              style: const TextStyle(fontSize: 24),
             ),
-          ),
-          AdjustableProgressBarWidget(
-            filledPercentage: paidAmount / amount,
-            lineHeight: 20,
-            center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
-            onMin: () {
-              _clearPaid();
-              Provider.of<DebtProvider>(context, listen: false).save(this);
-            },
-            onMax: () {
-              _setPaid();
-              Provider.of<DebtProvider>(context, listen: false).save(this);
-            },
-            onTweak: (value) {
-              increasePaidAmount(value);
-              Provider.of<DebtProvider>(context, listen: false).save(this);
-            },
-          )
-        ],
+            Text(
+              debtType.localized(context),
+              style: TextStyle(
+                fontSize: 16,
+                color: debtType == DebtType.own
+                    ? Theme.of(context).colorScheme.error
+                    : Theme.of(context).colorScheme.tertiary,
+              ),
+            ),
+            AdjustableProgressBarWidget(
+              filledPercentage: paidAmount / amount,
+              lineHeight: 20,
+              center: Text("\$${paidAmount.format()}/\$${amount.format()}"),
+              onMin: () {
+                _clearPaid();
+                Provider.of<DebtProvider>(context, listen: false).save(this);
+              },
+              onMax: () {
+                _setPaid();
+                Provider.of<DebtProvider>(context, listen: false).save(this);
+              },
+              onTweak: (value) {
+                increasePaidAmount(value);
+                Provider.of<DebtProvider>(context, listen: false).save(this);
+              },
+            )
+          ],
+        ),
       ),
     );
   }

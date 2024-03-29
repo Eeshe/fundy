@@ -75,6 +75,9 @@ class Account {
 
   Widget createListWidget(BuildContext context) {
     return InkWell(
+      onTap: () {},
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: () {
           Navigator.pushNamed(context, '/account', arguments: this);
         },
@@ -98,6 +101,8 @@ class Account {
               ],
             )),
           ],
-        ));
+        ),
+      ),
+    );
   }
 }
