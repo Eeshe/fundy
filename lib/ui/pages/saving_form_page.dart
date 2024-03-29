@@ -8,15 +8,20 @@ import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SavingFormPage extends StatefulWidget {
+class SavingFormArguments {
   final Saving? _saving;
-  final Account? _account;
+  final Account? _previousAccount;
 
-  const SavingFormPage(this._saving, this._account, {super.key});
+  SavingFormArguments(this._saving, this._previousAccount);
+}
+
+class SavingFormPage extends StatefulWidget {
+  const SavingFormPage({super.key});
 
   @override
   State<StatefulWidget> createState() => SavingFormState();
@@ -31,37 +36,42 @@ class SavingFormState extends State<SavingFormPage> {
 
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
-  Account? _selectedAccount;
+  Account? _previousAccount;
+  Saving? _saving;
+  Account? _account;
 
   void _fetchSavingAccount() {
-    if (widget._account != null) {
-      _selectedAccount = widget._account;
+    if (_previousAccount != null) {
+      _account = _previousAccount;
       return;
     }
-    if (widget._saving == null) return;
-    if (_selectedAccount != null) return;
+    if (_saving == null) return;
+    if (_account != null) return;
 
-    _selectedAccount = Provider.of<AccountProvider>(context, listen: false)
-        .getById(widget._saving!.accountId);
+    _account = Provider.of<AccountProvider>(context, listen: false)
+        .getById(_saving!.accountId);
   }
 
   void _initializePaidAmountInput() {
-    double paidAmount = widget._saving!.paidAmount;
-    if (paidAmount == 0) {
-      _paidAmountInputController.text = "";
-    } else {
-      _paidAmountInputController.text = paidAmount.toStringAsFixed(2);
+    double paidAmount = _saving!.paidAmount;
+    if (_paidAmountInputController.text.isEmpty) {
+      if (paidAmount == 0) {
+        _paidAmountInputController.text = "";
+      } else {
+        _paidAmountInputController.text = paidAmount.toStringAsFixed(2);
+      }
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Saving? saving = widget._saving;
+  void _initializeInputs() {
+    Saving? saving = _saving;
     if (saving == null) return;
-
-    _idInputController.text = saving.id;
-    _amountInputController.text = saving.amount.toStringAsFixed(2);
+    if (_idInputController.text.isEmpty) {
+      _idInputController.text = saving.id;
+    }
+    if (_amountInputController.text.isEmpty) {
+      _amountInputController.text = saving.amount.format();
+    }
     _initializePaidAmountInput();
   }
 
@@ -89,10 +99,10 @@ class SavingFormState extends State<SavingFormPage> {
         style: _inputLabelStyle,
       ),
       AccountDropdownButtonWidget(
-        account: _selectedAccount,
+        account: _account,
         onChanged: (account) {
           setState(() {
-            _selectedAccount = account;
+            _account = account;
           });
         },
         validator: (account) {
@@ -118,8 +128,8 @@ class SavingFormState extends State<SavingFormPage> {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double expenseAmount;
-          if (widget._saving != null) {
-            expenseAmount = widget._saving!.amount;
+          if (_saving != null) {
+            expenseAmount = _saving!.amount;
           } else {
             String expenseAmountString = _amountInputController.text;
             if (expenseAmountString.isEmpty ||
@@ -163,23 +173,23 @@ class SavingFormState extends State<SavingFormPage> {
         text: getAppLocalizations(context)!.save,
         onPressed: () {
           if (!_formKey.currentState!.validate()) return;
-          if (_selectedAccount == null) return;
+          if (_account == null) return;
 
           String id = _idInputController.text;
           double amount = double.parse(_amountInputController.text);
           double paidAmount = _paidAmountInputController.text.isEmpty
               ? 0
               : double.parse(_paidAmountInputController.text);
-          if (widget._saving != null) {
-            Saving saving = widget._saving!;
+          if (_saving != null) {
+            Saving saving = _saving!;
             saving.id = id;
-            saving.accountId = _selectedAccount!.id;
+            saving.accountId = _account!.id;
             saving.amount = amount;
             saving.paidAmount = paidAmount;
             Provider.of<SavingProvider>(context, listen: false).save(saving);
           } else {
             Provider.of<SavingProvider>(context, listen: false)
-                .save(Saving(id, _selectedAccount!.id, amount, paidAmount));
+                .save(Saving(id, _account!.id, amount, paidAmount));
           }
           FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
@@ -189,7 +199,7 @@ class SavingFormState extends State<SavingFormPage> {
   }
 
   Widget _createDeleteWidget() {
-    if (widget._saving == null) return const SizedBox();
+    if (_saving == null) return const SizedBox();
 
     return SizedBox(
       width: double.infinity,
@@ -198,7 +208,7 @@ class SavingFormState extends State<SavingFormPage> {
           isNegativeButton: true,
           onPressed: () {
             Provider.of<SavingProvider>(context, listen: false)
-                .delete(widget._saving!);
+                .delete(_saving!);
             Navigator.pop(context);
           }),
     );
@@ -206,11 +216,18 @@ class SavingFormState extends State<SavingFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    SavingFormArguments savingFormArguments =
+        ModalRoute.of(context)!.settings.arguments as SavingFormArguments;
+
+    _saving = savingFormArguments._saving;
+    _previousAccount = savingFormArguments._previousAccount;
+
+    _initializeInputs();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._saving == null
+        title: Text(_saving == null
             ? getAppLocalizations(context)!.newSaving
-            : widget._saving!.id),
+            : _saving!.id),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         scrolledUnderElevation: 0,

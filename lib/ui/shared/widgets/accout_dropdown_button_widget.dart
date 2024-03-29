@@ -19,11 +19,6 @@ class AccountDropdownButtonWidget extends StatefulWidget {
 class AccountDropdownButtonState extends State<AccountDropdownButtonWidget> {
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {

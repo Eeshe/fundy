@@ -6,14 +6,19 @@ import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DebtFormPage extends StatefulWidget {
+class DebtFormArguments {
   final Debt? _debt;
 
-  const DebtFormPage(this._debt, {super.key});
+  DebtFormArguments(this._debt);
+}
+
+class DebtFormPage extends StatefulWidget {
+  const DebtFormPage({super.key});
 
   @override
   State<StatefulWidget> createState() => DebtFormState();
@@ -28,25 +33,29 @@ class DebtFormState extends State<DebtFormPage> {
 
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
+  Debt? _debt;
   String? _selectedDebtType;
 
   void _initializePaidAmountInput() {
-    double paidAmount = widget._debt!.paidAmount;
-    if (paidAmount == 0) {
-      _paidAmountInputController.text = "";
-    } else {
-      _paidAmountInputController.text = paidAmount.toStringAsFixed(2);
+    double paidAmount = _debt!.paidAmount;
+    if (_paidAmountInputController.text.isEmpty) {
+      if (paidAmount == 0) {
+        _paidAmountInputController.text = "";
+      } else {
+        _paidAmountInputController.text = paidAmount.format();
+      }
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    Debt? debt = widget._debt;
+  void _initializeInputs() {
+    Debt? debt = _debt;
     if (debt == null) return;
-
-    _idInputController.text = debt.id;
-    _amountInputController.text = debt.amount.toStringAsFixed(2);
+    if (_idInputController.text.isEmpty) {
+      _idInputController.text = debt.id;
+    }
+    if (_amountInputController.text.isEmpty) {
+      _amountInputController.text = debt.amount.format();
+    }
     _initializePaidAmountInput();
   }
 
@@ -111,8 +120,8 @@ class DebtFormState extends State<DebtFormPage> {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double submittedDebtAmount;
-          if (widget._debt != null) {
-            submittedDebtAmount = widget._debt!.amount;
+          if (_debt != null) {
+            submittedDebtAmount = _debt!.amount;
           } else {
             String expenseAmountString = _amountInputController.text;
             if (expenseAmountString.isEmpty ||
@@ -164,8 +173,8 @@ class DebtFormState extends State<DebtFormPage> {
           double paidAmount = _paidAmountInputController.text.isEmpty
               ? 0
               : double.parse(_paidAmountInputController.text);
-          if (widget._debt != null) {
-            Debt debt = widget._debt!;
+          if (_debt != null) {
+            Debt debt = _debt!;
             debt.id = id;
             debt.debtType = debtType;
             debt.amount = amount;
@@ -183,7 +192,7 @@ class DebtFormState extends State<DebtFormPage> {
   }
 
   Widget _createDeleteWidget() {
-    if (widget._debt == null) return const SizedBox();
+    if (_debt == null) return const SizedBox();
 
     return SizedBox(
       width: double.infinity,
@@ -191,8 +200,7 @@ class DebtFormState extends State<DebtFormPage> {
           text: getAppLocalizations(context)!.delete,
           isNegativeButton: true,
           onPressed: () {
-            Provider.of<DebtProvider>(context, listen: false)
-                .delete(widget._debt!);
+            Provider.of<DebtProvider>(context, listen: false).delete(_debt!);
             Navigator.pop(context);
           }),
     );
@@ -200,13 +208,17 @@ class DebtFormState extends State<DebtFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    DebtFormArguments debtFormArguments =
+        ModalRoute.of(context)!.settings.arguments as DebtFormArguments;
+    _debt = debtFormArguments._debt;
+
+    _initializeInputs();
     _selectedDebtType ??=
-        widget._debt == null ? DebtType.own.name : widget._debt!.debtType.name;
+        _debt == null ? DebtType.own.name : _debt!.debtType.name;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._debt == null
-            ? getAppLocalizations(context)!.newDebt
-            : widget._debt!.id),
+        title: Text(
+            _debt == null ? getAppLocalizations(context)!.newDebt : _debt!.id),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         scrolledUnderElevation: 0,

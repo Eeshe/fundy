@@ -1,7 +1,6 @@
 import 'package:finman/core/models/account.dart';
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/providers/account_provider.dart';
-import 'package:finman/ui/pages/account_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
@@ -56,11 +55,7 @@ class AccountListPageState extends State<AccountListPage> {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
       onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AccountFormPage(),
-            ));
+        Navigator.pushNamed(context, '/account_form');
       },
     );
   }

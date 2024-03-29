@@ -40,11 +40,8 @@ class Transaction {
     CurrencyType currencyType = account.currencyType;
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TransactionFormPage(account, this),
-            ));
+        Navigator.pushNamed(context, '/transaction_form',
+            arguments: TransactionFormParameters(this, account));
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

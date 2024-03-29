@@ -50,11 +50,8 @@ class DebtListState extends State<DebtListPage> {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
       onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const DebtFormPage(null),
-            ));
+        Navigator.pushNamed(context, '/debt_form',
+            arguments: DebtFormArguments(null));
       },
     );
   }

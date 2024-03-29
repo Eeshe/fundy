@@ -9,12 +9,6 @@ import 'package:finman/core/providers/account_provider.dart';
 import 'package:finman/core/providers/debt_provider.dart';
 import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/ui/pages/account_list_page.dart';
-import 'package:finman/ui/pages/debt_list_page.dart';
-import 'package:finman/ui/pages/exchange_page.dart';
-import 'package:finman/ui/pages/expense_list_page.dart';
-import 'package:finman/ui/pages/saving_list_page.dart';
-import 'package:finman/ui/pages/settings_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:finman/ui/shared/localization.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
@@ -58,10 +52,7 @@ class OverviewPageState extends State<OverviewPage> {
         ),
         IconButton(
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SettingsPage()));
+              Navigator.pushNamed(context, '/settings');
             },
             icon: const Icon(Icons.settings))
       ],
@@ -218,8 +209,8 @@ class OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Widget _createPageButton(
-      Widget destination, IconData iconData, String label) {
+  Widget _createPageButton(String destination, IconData iconData,
+      String label) {
     return Column(
       children: [
         SizedBox(
@@ -227,11 +218,7 @@ class OverviewPageState extends State<OverviewPage> {
           height: 50,
           child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => destination,
-                    ));
+                Navigator.pushNamed(context, destination);
               },
               style: ButtonStyle(
                 shape: MaterialStateProperty.all(const CircleBorder()),
@@ -251,13 +238,13 @@ class OverviewPageState extends State<OverviewPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _createPageButton(const AccountListPage(), Icons.account_box_outlined,
+        _createPageButton('/account_list', Icons.account_box_outlined,
             getAppLocalizations(context)!.accounts),
-        _createPageButton(const ExpenseListPage(), Icons.money_off,
+        _createPageButton('/expense_list', Icons.money_off,
             getAppLocalizations(context)!.expenses),
-        _createPageButton(const SavingListPage(), Icons.savings,
+        _createPageButton('/saving_list', Icons.savings,
             getAppLocalizations(context)!.savings),
-        _createPageButton(const DebtListPage(), Icons.account_balance_wallet,
+        _createPageButton('/debt_list', Icons.account_balance_wallet,
             getAppLocalizations(context)!.debts),
       ],
     );
@@ -290,12 +277,8 @@ class OverviewPageState extends State<OverviewPage> {
         }
         return InkWell(
           onTap: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      TransactionFormPage(account, transaction),
-                ));
+            Navigator.pushNamed(context, '/transaction_form',
+                arguments: TransactionFormParameters(transaction, account));
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -413,11 +396,8 @@ class OverviewPageState extends State<OverviewPage> {
       actionButtons: [
         ActionButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => TransactionFormPage(null, null),
-                ));
+            Navigator.pushNamed(context, '/transaction_form',
+                arguments: TransactionFormParameters(null, null));
           },
           icon: Icon(
             Icons.attach_money,
@@ -427,11 +407,7 @@ class OverviewPageState extends State<OverviewPage> {
         ),
         ActionButton(
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ExchangePage(),
-                ));
+            Navigator.pushNamed(context, '/exchange_form');
           },
           icon: Icon(
             Icons.currency_exchange,

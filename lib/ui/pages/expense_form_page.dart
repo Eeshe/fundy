@@ -5,17 +5,22 @@ import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:provider/provider.dart';
 
-class ExpenseFormPage extends StatefulWidget {
+class ExpenseFormArguments {
   final MonthlyExpense? _monthlyExpense;
-  DateTime _selectedDate;
+  final DateTime? _selectedDate;
 
-  ExpenseFormPage(this._monthlyExpense, this._selectedDate, {super.key});
+  ExpenseFormArguments(this._monthlyExpense, this._selectedDate);
+}
+
+class ExpenseFormPage extends StatefulWidget {
+  const ExpenseFormPage({super.key});
 
   @override
   State<StatefulWidget> createState() => ExpenseFormPageState();
@@ -29,33 +34,40 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
       TextEditingController();
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
-  void _initializePaidAmountInput() {
-    if (widget._monthlyExpense == null) return;
+  MonthlyExpense? _monthlyExpense;
+  DateTime? _selectedDate;
 
-    double paymentRecord =
-        widget._monthlyExpense!.getPaymentRecord(widget._selectedDate);
-    if (paymentRecord == 0) {
-      _paidAmountInputController.text = "";
-    } else {
-      _paidAmountInputController.text = paymentRecord.toStringAsFixed(2);
+  void _initializePaidAmountInput() {
+    if (_monthlyExpense == null) return;
+
+    double paymentRecord = _monthlyExpense!.getPaymentRecord(_selectedDate!);
+    if (_paidAmountInputController.text.isEmpty) {
+      if (paymentRecord == 0) {
+        _paidAmountInputController.text = "";
+      } else {
+        _paidAmountInputController.text = paymentRecord.format();
+      }
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    MonthlyExpense? monthlyExpense = widget._monthlyExpense;
-    if (monthlyExpense == null) return;
-
-    _idInputController.text = monthlyExpense.id;
-    _amountInputController.text = monthlyExpense.amount.toStringAsFixed(2);
+  void _initializeInputs() {
+    MonthlyExpense? monthlyExpense = _monthlyExpense;
+    if (monthlyExpense == null) {
+      return;
+    }
+    if (_idInputController.text.isEmpty) {
+      _idInputController.text = monthlyExpense.id;
+    }
+    if (_amountInputController.text.isEmpty) {
+      _amountInputController.text = monthlyExpense.amount.format();
+    }
     _initializePaidAmountInput();
   }
 
   Widget _createDescriptionInputWidget() {
     String locale = Localizations.localeOf(context).languageCode;
     String buttonText =
-        "${DateFormat.MMMM(locale).format(widget._selectedDate).capitalize()} ${widget._selectedDate.year}";
+        "${DateFormat.MMMM(locale).format(_selectedDate!).capitalize()} ${_selectedDate!.year}";
     return Column(
       children: [
         Row(
@@ -77,13 +89,13 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
                   currentMonthTextColor:
                       Theme.of(context).colorScheme.onBackground,
                   context: context,
-                  initialDate: widget._selectedDate,
+                  initialDate: _selectedDate,
                 );
                 if (pickedDate == null) return;
 
                 setState(
                   () {
-                    widget._selectedDate = pickedDate;
+                    _selectedDate = pickedDate;
                   },
                 );
               },
@@ -164,18 +176,17 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
           double paidAmount = _paidAmountInputController.text.isEmpty
               ? 0
               : double.parse(_paidAmountInputController.text);
-          if (widget._monthlyExpense != null) {
-            MonthlyExpense monthlyExpense = widget._monthlyExpense!;
+          if (_monthlyExpense != null) {
+            MonthlyExpense monthlyExpense = _monthlyExpense!;
             monthlyExpense.id = id;
             monthlyExpense.amount = amount;
             monthlyExpense.paymentRecords[
-                    MonthlyExpense.createRecordKey(widget._selectedDate)] =
-                paidAmount;
+                MonthlyExpense.createRecordKey(_selectedDate!)] = paidAmount;
             Provider.of<MonthlyExpenseProvider>(context, listen: false)
                 .save(monthlyExpense);
           } else {
             Map<String, double> paymentRecords = {
-              MonthlyExpense.createRecordKey(widget._selectedDate): paidAmount
+              MonthlyExpense.createRecordKey(_selectedDate!): paidAmount
             };
             Provider.of<MonthlyExpenseProvider>(context, listen: false).save(
                 MonthlyExpense(id, amount, DateTime.now(), paymentRecords));
@@ -188,7 +199,7 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
   }
 
   Widget _createDeleteWidget() {
-    if (widget._monthlyExpense == null) return const SizedBox();
+    if (_monthlyExpense == null) return const SizedBox();
 
     return SizedBox(
       width: double.infinity,
@@ -197,7 +208,7 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
         isNegativeButton: true,
         onPressed: () {
           Provider.of<MonthlyExpenseProvider>(context, listen: false)
-              .delete(widget._monthlyExpense!);
+              .delete(_monthlyExpense!);
           Navigator.pop(context);
         },
       ),
@@ -206,11 +217,16 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    _initializePaidAmountInput();
+    ExpenseFormArguments expenseFormArguments =
+        ModalRoute.of(context)!.settings.arguments as ExpenseFormArguments;
+    _monthlyExpense = expenseFormArguments._monthlyExpense;
+    _selectedDate ??= expenseFormArguments._selectedDate;
+
+    _initializeInputs();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._monthlyExpense != null
-            ? widget._monthlyExpense!.id
+        title: Text(_monthlyExpense != null
+            ? _monthlyExpense!.id
             : getAppLocalizations(context)!.newExpense),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,

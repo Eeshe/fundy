@@ -9,16 +9,21 @@ import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
 import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:finman/utils/double_extension.dart';
 import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class TransactionFormPage extends StatefulWidget {
+class TransactionFormParameters {
   final Transaction? _transaction;
   final Account? _account;
 
-  const TransactionFormPage(this._account, this._transaction, {super.key});
+  TransactionFormParameters(this._transaction, this._account);
+}
+
+class TransactionFormPage extends StatefulWidget {
+  const TransactionFormPage({super.key});
 
   @override
   State<StatefulWidget> createState() => TransactionFormPageState();
@@ -32,21 +37,25 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   final TextStyle _inputLabelStyle = const TextStyle(fontSize: 20);
 
-  Account? _selectedAccount;
   bool _isMobilePayment = false;
-  DateTime _selectedDate = DateTime.now();
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedAccount = widget._account;
+  Transaction? _transaction;
+  Account? _account;
+  DateTime? _selectedDate;
 
-    Transaction? transaction = widget._transaction;
-    if (transaction == null) return;
-
-    _descriptionInputController.text = transaction.description;
-    _amountInputController.text = transaction.amount.toStringAsFixed(2);
-    _selectedDate = transaction.date;
+  void _initializeInputs() {
+    Transaction? transaction = _transaction;
+    if (transaction == null) {
+      _selectedDate ??= DateTime.now();
+      return;
+    }
+    if (_descriptionInputController.text.isEmpty) {
+      _descriptionInputController.text = transaction.description;
+    }
+    if (_amountInputController.text.isEmpty) {
+      _amountInputController.text = transaction.amount.format();
+    }
+    _selectedDate ??= transaction.date;
   }
 
   List<Widget> _createAccountInputWidgets() {
@@ -56,13 +65,13 @@ class TransactionFormPageState extends State<TransactionFormPage> {
         style: _inputLabelStyle,
       ),
       AccountDropdownButtonWidget(
-        account: widget._account,
-        onChanged: widget._account != null
+        account: _account,
+        onChanged: _account != null
             ? null
             : (account) {
                 setState(
                   () {
-                    _selectedAccount = account!;
+                    _account = account!;
                     if (account.currencyType == CurrencyType.bs) return;
 
                     _isMobilePayment = false;
@@ -74,12 +83,11 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   }
 
   List<Widget> _createMobilePaymentInputWidgets() {
-    if (_selectedAccount == null ||
-        _selectedAccount!.currencyType != CurrencyType.bs) {
+    if (_account == null || _account!.currencyType != CurrencyType.bs) {
       return [];
     }
-    if (widget._transaction != null) {
-      _isMobilePayment = widget._transaction!.isMobilePayment;
+    if (_transaction != null) {
+      _isMobilePayment = _transaction!.isMobilePayment;
     }
     return [
       Row(
@@ -132,7 +140,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
       Row(
         children: [
           Text(
-            DateFormat('dd/MM/yyyy - kk:mm').format(_selectedDate),
+            DateFormat('dd/MM/yyyy - kk:mm').format(_selectedDate!),
             style: const TextStyle(
               fontSize: 16,
             ),
@@ -148,7 +156,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
               if (!context.mounted) return;
               TimeOfDay? pickedTime = await showTimePicker(
                   context: context,
-                  initialTime: TimeOfDay.fromDateTime(_selectedDate));
+                  initialTime: TimeOfDay.fromDateTime(_selectedDate!));
               if (pickedTime == null) return;
 
               setState(() {
@@ -195,10 +203,10 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             amount -= _calculateMobilePaymentFee(amount);
           }
           if (amount < 0) {
-            if (widget._transaction != null) {
-              amount = amount - widget._transaction!.amount;
+            if (_transaction != null) {
+              amount = amount - _transaction!.amount;
             }
-            if (_selectedAccount!.balance + amount < 0) {
+            if (_account!.balance + amount < 0) {
               return getAppLocalizations(context)!.negativeBalanceAmount;
             }
           }
@@ -216,25 +224,23 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             text: getAppLocalizations(context)!.save,
             onPressed: () {
               if (!_formKey.currentState!.validate()) return;
-              if (_selectedAccount == null) return;
+              if (_account == null) return;
 
               String description = _descriptionInputController.text;
               double amount = double.parse(_amountInputController.text);
               if (_isMobilePayment &&
-                  (widget._transaction == null ||
-                      !widget._transaction!.isMobilePayment)) {
+                  (_transaction == null || !_transaction!.isMobilePayment)) {
                 amount += _calculateMobilePaymentFee(amount);
               }
-              Transaction transaction = Transaction(_selectedAccount!.id,
-                  description, _selectedDate, amount, _isMobilePayment);
-              if (widget._transaction == null) {
-                _selectedAccount!.addTransaction(transaction);
+              Transaction transaction = Transaction(_account!.id, description,
+                  _selectedDate!, amount, _isMobilePayment);
+              if (_transaction == null) {
+                _account!.addTransaction(transaction);
               } else {
-                _selectedAccount!
-                    .updateTransaction(widget._transaction!, transaction);
+                _account!.updateTransaction(_transaction!, transaction);
               }
               Provider.of<AccountProvider>(context, listen: false)
-                  .save(_selectedAccount!);
+                  .save(_account!);
               FocusManager.instance.primaryFocus?.unfocus();
               Navigator.pop(context);
             },
@@ -245,7 +251,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   }
 
   Widget _createDeleteWidget() {
-    if (widget._transaction == null) return const SizedBox();
+    if (_transaction == null) return const SizedBox();
 
     return Row(
       children: [
@@ -254,9 +260,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 text: getAppLocalizations(context)!.delete,
                 isNegativeButton: true,
                 onPressed: () {
-                  widget._account!.deleteTransaction(widget._transaction!);
+                  _account!.deleteTransaction(_transaction!);
                   Provider.of<AccountProvider>(context, listen: false)
-                      .save(_selectedAccount!);
+                      .save(_account!);
                   Navigator.pop(context);
                 }))
       ],
@@ -265,9 +271,15 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    TransactionFormParameters transactionFormParameters =
+        ModalRoute.of(context)!.settings.arguments as TransactionFormParameters;
+
+    _transaction = transactionFormParameters._transaction;
+    _account = transactionFormParameters._account;
+    _initializeInputs();
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget._transaction == null
+        title: Text(_transaction == null
             ? getAppLocalizations(context)!.newTransaction
             : getAppLocalizations(context)!.editTransaction),
         centerTitle: true,

@@ -20,11 +20,8 @@ class SavingListPageState extends State<SavingListPage> {
     return StyledButtonWidget(
       text: getAppLocalizations(context)!.newText,
       onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SavingFormPage(null, null),
-            ));
+        Navigator.pushNamed(context, '/saving_form',
+            arguments: SavingFormArguments(null, null));
       },
     );
   }
