@@ -90,6 +90,9 @@ class ConversionService {
   }
 
   double usdToCurrency(double amount, String currency) {
+    if (currency == 'usd') {
+      return amount;
+    }
     if (currency == 'bs') {
       currency = 'bcv';
     }
