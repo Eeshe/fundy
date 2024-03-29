@@ -62,8 +62,8 @@ class Debt {
   Widget createDisplayWidget(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => DebtFormPage(this)));
+        Navigator.pushNamed(context, '/debt_form',
+            arguments: DebtFormArguments(this));
       },
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

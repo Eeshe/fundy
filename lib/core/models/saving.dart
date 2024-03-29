@@ -73,17 +73,14 @@ class Saving {
 
   Widget createDisplayWidget(BuildContext context) {
     TextStyle labelStyle = const TextStyle(fontSize: 20);
-    ValueNotifier<double> paidAmountNotifier = ValueNotifier(paidAmount);
     Account? account =
         Provider.of<AccountProvider>(context, listen: false).getById(accountId);
     if (account == null) return const SizedBox();
 
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SavingFormPage(this, null)));
+        Navigator.pushNamed(context, '/saving_form',
+            arguments: SavingFormArguments(this, null));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -116,10 +113,8 @@ class Saving {
   Widget createListWidget(BuildContext context, Account account) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SavingFormPage(this, account)));
+        Navigator.pushNamed(context, '/saving_form',
+            arguments: SavingFormArguments(this, account));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

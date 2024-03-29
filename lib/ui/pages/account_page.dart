@@ -17,9 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
-  final Account _account;
-
-  const AccountPage(this._account, {super.key});
+  const AccountPage({super.key});
 
   @override
   State<StatefulWidget> createState() => AccountPageState();
@@ -29,21 +27,21 @@ class AccountPageState extends State<AccountPage> {
   final TextStyle _labelStyle =
       const TextStyle(fontSize: 24, fontWeight: FontWeight.bold);
 
+  late Account _account;
   bool _convertCurrency = false;
 
   Widget _createBalancesWidget() {
     return Consumer2<AccountProvider, SavingProvider>(
       builder: (context, accountProvider, savingProvider, child) {
-        Account account = widget._account;
-        double bruteBalance = account.balance;
+        double bruteBalance = _account.balance;
         double netBalance = bruteBalance;
-        for (Saving saving in savingProvider.getByAccount(account)) {
+        for (Saving saving in savingProvider.getByAccount(_account)) {
           netBalance -= ConversionService().usdToCurrency(
-              saving.calculateRemainingAmount(), account.currencyType.name);
+              saving.calculateRemainingAmount(), _account.currencyType.name);
         }
         if (_convertCurrency && bruteBalance != netBalance) {
           netBalance = ConversionService.getInstance()
-              .currencyToUsd(netBalance, account.currencyType.name);
+              .currencyToUsd(netBalance, _account.currencyType.name);
         }
         List<Widget> netBalanceWidgets = [];
         if (bruteBalance != netBalance) {
@@ -53,7 +51,7 @@ class AccountPageState extends State<AccountPage> {
               style: _labelStyle,
             ),
             Text(
-              "${_convertCurrency ? CurrencyType.usd.symbol : account.currencyType.symbol}${netBalance.format()}",
+              "${_convertCurrency ? CurrencyType.usd.symbol : _account.currencyType.symbol}${netBalance.format()}",
               style: const TextStyle(fontSize: 20),
             )
           ]);
@@ -66,7 +64,7 @@ class AccountPageState extends State<AccountPage> {
               style: _labelStyle,
             ),
             Text(
-              account.formatBalance(_convertCurrency),
+              _account.formatBalance(_convertCurrency),
               style: const TextStyle(fontSize: 20),
             ),
             ...netBalanceWidgets
@@ -77,7 +75,7 @@ class AccountPageState extends State<AccountPage> {
   }
 
   Widget _createConversionSwitch() {
-    if (widget._account.currencyType == CurrencyType.usd) {
+    if (_account.currencyType == CurrencyType.usd) {
       return const SizedBox();
     }
 
@@ -96,10 +94,9 @@ class AccountPageState extends State<AccountPage> {
   Widget _createTransactionListWidget() {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {
-        Account account = widget._account;
         double screenHeight = MediaQuery.of(context).size.height;
         double containerHeight =
-            min(screenHeight * 0.3, account.transactions.length * 65);
+            min(screenHeight * 0.3, _account.transactions.length * 65);
         return Column(
           children: [
             Row(
@@ -115,12 +112,8 @@ class AccountPageState extends State<AccountPage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5))),
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              TransactionFormPage(account, null),
-                        ));
+                    Navigator.pushNamed(context, '/transaction_form',
+                        arguments: TransactionFormParameters(null, _account));
                   },
                   child: Text(
                     getAppLocalizations(context)!.newText,
@@ -140,11 +133,11 @@ class AccountPageState extends State<AccountPage> {
               child: ListView.separated(
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(5),
-                  itemBuilder: (context, index) => account.transactions[index]
-                      .createListWidget(context, account, _convertCurrency),
+                  itemBuilder: (context, index) => _account.transactions[index]
+                      .createListWidget(context, _account, _convertCurrency),
                   separatorBuilder: (context, index) =>
                       Divider(color: Theme.of(context).colorScheme.primary),
-                  itemCount: account.transactions.length),
+                  itemCount: _account.transactions.length),
             )
           ],
         );
@@ -155,7 +148,7 @@ class AccountPageState extends State<AccountPage> {
   Widget _createSavingListWidget() {
     return Consumer<SavingProvider>(
       builder: (context, savingProvider, child) {
-        List<Saving> savings = savingProvider.getByAccount(widget._account);
+        List<Saving> savings = savingProvider.getByAccount(_account);
         if (savings.isEmpty) return const SizedBox();
 
         double screenHeight = MediaQuery.of(context).size.height;
@@ -175,12 +168,8 @@ class AccountPageState extends State<AccountPage> {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5))),
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              SavingFormPage(null, widget._account),
-                        ));
+                    Navigator.pushNamed(context, '/saving_form',
+                        arguments: SavingFormArguments(null, _account));
                   },
                   child: Text(
                     getAppLocalizations(context)!.newText,
@@ -200,7 +189,8 @@ class AccountPageState extends State<AccountPage> {
               child: ListView.separated(
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(5),
-                  itemBuilder: (context, index) => savings[index].createListWidget(context, widget._account),
+                  itemBuilder: (context, index) =>
+                      savings[index].createListWidget(context, _account),
                   separatorBuilder: (context, index) =>
                       Divider(color: Theme.of(context).colorScheme.primary),
                   itemCount: savings.length),
@@ -225,7 +215,7 @@ class AccountPageState extends State<AccountPage> {
           onPressed: () {
             showDialog(
                 context: context,
-                builder: (context) => UpdateBalanceDialog(widget._account));
+                builder: (context) => UpdateBalanceDialog(_account));
           },
           child: Text(
             getAppLocalizations(context)!.updateBalance,
@@ -269,11 +259,11 @@ class AccountPageState extends State<AccountPage> {
                     TextButton(
                       onPressed: () {
                         Provider.of<AccountProvider>(context, listen: false)
-                            .delete(widget._account);
+                            .delete(_account);
                         SavingProvider savingProvider =
                             Provider.of<SavingProvider>(context, listen: false);
                         for (var saving
-                            in savingProvider.getByAccount(widget._account)) {
+                            in savingProvider.getByAccount(_account)) {
                           savingProvider.delete(saving);
                         }
                         Navigator.pop(context);
@@ -304,12 +294,12 @@ class AccountPageState extends State<AccountPage> {
 
   @override
   Widget build(BuildContext context) {
-    Account account = widget._account;
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(account.id),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            scrolledUnderElevation: 0,
+    _account = ModalRoute.of(context)!.settings.arguments as Account;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_account.id),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        scrolledUnderElevation: 0,
             centerTitle: true,
           ),
           resizeToAvoidBottomInset: false,
@@ -317,9 +307,9 @@ class AccountPageState extends State<AccountPage> {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  Center(child: AccountIconWidget(account.iconPath, 100, 100)),
-                  _createBalancesWidget(),
-                  _createConversionSwitch(),
+              Center(child: AccountIconWidget(_account.iconPath, 100, 100)),
+              _createBalancesWidget(),
+              _createConversionSwitch(),
                   _createTransactionListWidget(),
                   _createSavingListWidget(),
                   _createUpdateBalanceButton(),

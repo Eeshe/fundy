@@ -1,7 +1,6 @@
 import 'package:finman/core/models/currency_type.dart';
 import 'package:finman/core/models/transaction.dart';
 import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/ui/pages/account_page.dart';
 import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
 import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
@@ -77,11 +76,7 @@ class Account {
   Widget createListWidget(BuildContext context) {
     return InkWell(
         onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AccountPage(this),
-              ));
+          Navigator.pushNamed(context, '/account', arguments: this);
         },
         child: Row(
           children: [

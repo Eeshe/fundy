@@ -20,8 +20,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
           if (!result) return;
           if (!context.mounted) return;
 
-          await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const OverviewPage()));
+          Navigator.pushNamed(context, '/overview');
         },
         style: ButtonStyle(
           shape: MaterialStateProperty.all(const CircleBorder()),

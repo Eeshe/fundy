@@ -11,7 +11,20 @@ import 'package:finman/core/providers/monthly_expense_provider.dart';
 import 'package:finman/core/providers/saving_provider.dart';
 import 'package:finman/core/providers/settings_provider.dart';
 import 'package:finman/core/services/conversion_service.dart';
+import 'package:finman/ui/pages/account_form_page.dart';
+import 'package:finman/ui/pages/account_list_page.dart';
+import 'package:finman/ui/pages/account_page.dart';
 import 'package:finman/ui/pages/authentication_page.dart';
+import 'package:finman/ui/pages/debt_form_page.dart';
+import 'package:finman/ui/pages/debt_list_page.dart';
+import 'package:finman/ui/pages/exchange_page.dart';
+import 'package:finman/ui/pages/expense_form_page.dart';
+import 'package:finman/ui/pages/expense_list_page.dart';
+import 'package:finman/ui/pages/overview_page.dart';
+import 'package:finman/ui/pages/saving_form_page.dart';
+import 'package:finman/ui/pages/saving_list_page.dart';
+import 'package:finman/ui/pages/settings_page.dart';
+import 'package:finman/ui/pages/transaction_form_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -98,7 +111,24 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
             darkTheme:
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
-            home: const AuthenticationPage());
+          initialRoute: '/',
+          routes: {
+            '/': (context) => const AuthenticationPage(),
+            '/overview': (context) => const OverviewPage(),
+            '/account_list': (context) => const AccountListPage(),
+            '/account_form': (context) => const AccountFormPage(),
+            '/account': (context) => const AccountPage(),
+            '/transaction_form': (context) => const TransactionFormPage(),
+            '/expense_list': (context) => const ExpenseListPage(),
+            '/expense_form': (context) => const ExpenseFormPage(),
+            '/saving_list': (context) => const SavingListPage(),
+            '/saving_form': (context) => const SavingFormPage(),
+            '/debt_list': (context) => const DebtListPage(),
+            '/debt_form': (context) => const DebtFormPage(),
+            '/exchange_form': (context) => const ExchangePage(),
+            '/settings': (context) => const SettingsPage(),
+          },
+        );
       },
     );
   }

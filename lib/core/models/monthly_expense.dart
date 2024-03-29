@@ -69,11 +69,8 @@ class MonthlyExpense {
     double paidPercentage = paidAmount / amount;
     return InkWell(
       onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ExpenseFormPage(this, date),
-            ));
+        Navigator.pushNamed(context, '/expense_form',
+            arguments: ExpenseFormArguments(this, date));
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

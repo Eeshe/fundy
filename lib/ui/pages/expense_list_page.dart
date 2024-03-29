@@ -122,11 +122,8 @@ class ExpenseListPageState extends State<ExpenseListPage> {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(5))),
       onPressed: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ExpenseFormPage(null, _selectedDate),
-            ));
+        Navigator.pushNamed(context, '/expense_form',
+            arguments: ExpenseFormArguments(null, _selectedDate));
       },
       child: Text(
         getAppLocalizations(context)!.newText,
