@@ -13,15 +13,17 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class AuthenticationPageState extends State<AuthenticationPage> {
+  void _handleAuthentication() async {
+    bool result = await LocalAuthenticationService().authenticate(context);
+    if (!result) return;
+    if (!context.mounted) return;
+
+    Navigator.pushNamed(context, '/overview');
+  }
+
   Widget _createAuthenticateButton() {
     return ElevatedButton(
-        onPressed: () async {
-          bool result = await LocalAuthenticationService().authenticate(context);
-          if (!result) return;
-          if (!context.mounted) return;
-
-          Navigator.pushNamed(context, '/overview');
-        },
+        onPressed: () => _handleAuthentication(),
         style: ButtonStyle(
           shape: MaterialStateProperty.all(const CircleBorder()),
           padding: MaterialStateProperty.all(EdgeInsets.zero),
@@ -66,6 +68,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
           }
         }
         if (snapshot.hasData && snapshot.data!) {
+          _handleAuthentication();
           return _createAuthenticationWidget();
         }
         return const OverviewPage();
