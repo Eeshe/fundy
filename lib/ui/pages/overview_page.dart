@@ -281,7 +281,7 @@ class OverviewPageState extends State<OverviewPage> {
             behavior: HitTestBehavior.opaque,
             onTap: () {
               Navigator.pushNamed(context, '/transaction_form',
-                  arguments: TransactionFormParameters(transaction, account));
+                  arguments: TransactionFormArguments(transaction, account));
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -402,7 +402,7 @@ class OverviewPageState extends State<OverviewPage> {
         ActionButton(
           onPressed: () {
             Navigator.pushNamed(context, '/transaction_form',
-                arguments: TransactionFormParameters(null, null));
+                arguments: TransactionFormArguments(null, null));
           },
           icon: Icon(
             Icons.attach_money,

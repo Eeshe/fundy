@@ -25,6 +25,7 @@ import 'package:finman/ui/pages/saving_form_page.dart';
 import 'package:finman/ui/pages/saving_list_page.dart';
 import 'package:finman/ui/pages/settings_page.dart';
 import 'package:finman/ui/pages/transaction_form_page.dart';
+import 'package:finman/ui/shared/widgets/transition_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
@@ -112,21 +113,60 @@ class MyApp extends StatelessWidget {
             darkTheme:
                 ThemeData(useMaterial3: true, colorScheme: darkColorScheme),
           initialRoute: '/',
+          onGenerateRoute: (settings) {
+            Offset bottomStartingPoint = const Offset(0.0, 1.0);
+            Offset rightStartingPoint = const Offset(1.0, 0.0);
+            switch (settings.name) {
+              case '/account_list':
+                return createTransitionRoute(
+                    const AccountListPage(), bottomStartingPoint);
+              case '/account_form':
+                return createTransitionRoute(
+                    const AccountFormPage(), rightStartingPoint);
+              case '/account':
+                return createTransitionRoute(
+                    AccountPage(account: settings.arguments as Account),
+                    rightStartingPoint);
+              case '/transaction_form':
+                return createTransitionRoute(
+                    TransactionFormPage(
+                        data: settings.arguments as TransactionFormArguments),
+                    rightStartingPoint);
+              case '/expense_list':
+                return createTransitionRoute(
+                    const ExpenseListPage(), bottomStartingPoint);
+              case '/expense_form':
+                return createTransitionRoute(
+                    ExpenseFormPage(
+                        data: settings.arguments as ExpenseFormArguments),
+                    rightStartingPoint);
+              case '/saving_list':
+                return createTransitionRoute(
+                    const SavingListPage(), bottomStartingPoint);
+              case '/saving_form':
+                return createTransitionRoute(
+                    SavingFormPage(
+                        data: settings.arguments as SavingFormArguments),
+                    rightStartingPoint);
+              case '/debt_list':
+                return createTransitionRoute(
+                    const DebtListPage(), bottomStartingPoint);
+              case '/debt_form':
+                return createTransitionRoute(
+                    DebtFormPage(data: settings.arguments as DebtFormArguments),
+                    rightStartingPoint);
+              case '/exchange_form':
+                return createTransitionRoute(
+                    const ExchangeFormPage(), rightStartingPoint);
+              case '/settings':
+                return createTransitionRoute(
+                    const SettingsPage(), rightStartingPoint);
+            }
+            return null;
+          },
           routes: {
             '/': (context) => const AuthenticationPage(),
-            '/overview': (context) => const OverviewPage(),
-            '/account_list': (context) => const AccountListPage(),
-            '/account_form': (context) => const AccountFormPage(),
-            '/account': (context) => const AccountPage(),
-            '/transaction_form': (context) => const TransactionFormPage(),
-            '/expense_list': (context) => const ExpenseListPage(),
-            '/expense_form': (context) => const ExpenseFormPage(),
-            '/saving_list': (context) => const SavingListPage(),
-            '/saving_form': (context) => const SavingFormPage(),
-            '/debt_list': (context) => const DebtListPage(),
-            '/debt_form': (context) => const DebtFormPage(),
-            '/exchange_form': (context) => const ExchangePage(),
-            '/settings': (context) => const SettingsPage(),
+            '/overview': (context) => const OverviewPage()
           },
         );
       },
