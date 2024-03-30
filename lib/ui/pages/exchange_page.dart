@@ -10,14 +10,14 @@ import 'package:finman/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ExchangePage extends StatefulWidget {
-  const ExchangePage({super.key});
+class ExchangeFormPage extends StatefulWidget {
+  const ExchangeFormPage({super.key});
 
   @override
-  State<StatefulWidget> createState() => ExchangePageState();
+  State<StatefulWidget> createState() => ExchangeFormPageState();
 }
 
-class ExchangePageState extends State<ExchangePage> {
+class ExchangeFormPageState extends State<ExchangeFormPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _startingAmountController =

@@ -44,7 +44,7 @@ class Transaction {
         behavior: HitTestBehavior.opaque,
         onTap: () {
           Navigator.pushNamed(context, '/transaction_form',
-              arguments: TransactionFormParameters(this, account));
+              arguments: TransactionFormArguments(this, account));
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

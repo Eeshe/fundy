@@ -15,15 +15,17 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class TransactionFormParameters {
+class TransactionFormArguments {
   final Transaction? _transaction;
   final Account? _account;
 
-  TransactionFormParameters(this._transaction, this._account);
+  TransactionFormArguments(this._transaction, this._account);
 }
 
 class TransactionFormPage extends StatefulWidget {
-  const TransactionFormPage({super.key});
+  final TransactionFormArguments data;
+
+  const TransactionFormPage({super.key, required this.data});
 
   @override
   State<StatefulWidget> createState() => TransactionFormPageState();
@@ -39,7 +41,6 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   bool _isMobilePayment = false;
 
-  late TransactionFormParameters _transactionFormParameters;
   Transaction? _transaction;
   Account? _account;
   DateTime? _selectedDate;
@@ -67,7 +68,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
       ),
       AccountDropdownButtonWidget(
         account: _account,
-        onChanged: _transactionFormParameters._account != null
+        onChanged: widget.data._account != null
             ? null
             : (account) {
                 setState(
@@ -272,12 +273,8 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    TransactionFormParameters transactionFormParameters =
-        ModalRoute.of(context)!.settings.arguments as TransactionFormParameters;
-
-    _transactionFormParameters = transactionFormParameters;
-    _transaction = transactionFormParameters._transaction;
-    _account ??= transactionFormParameters._account;
+    _transaction = widget.data._transaction;
+    _account ??= widget.data._account;
     _initializeInputs();
     return Scaffold(
       appBar: AppBar(

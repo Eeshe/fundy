@@ -20,7 +20,9 @@ class ExpenseFormArguments {
 }
 
 class ExpenseFormPage extends StatefulWidget {
-  const ExpenseFormPage({super.key});
+  final ExpenseFormArguments data;
+
+  const ExpenseFormPage({super.key, required this.data});
 
   @override
   State<StatefulWidget> createState() => ExpenseFormPageState();
@@ -225,10 +227,8 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    ExpenseFormArguments expenseFormArguments =
-        ModalRoute.of(context)!.settings.arguments as ExpenseFormArguments;
-    _monthlyExpense = expenseFormArguments._monthlyExpense;
-    _selectedDate ??= expenseFormArguments._selectedDate;
+    _monthlyExpense = widget.data._monthlyExpense;
+    _selectedDate ??= widget.data._selectedDate;
 
     _initializeInputs();
     return Scaffold(

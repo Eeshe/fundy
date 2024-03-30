@@ -21,7 +21,9 @@ class SavingFormArguments {
 }
 
 class SavingFormPage extends StatefulWidget {
-  const SavingFormPage({super.key});
+  final SavingFormArguments data;
+
+  const SavingFormPage({super.key, required this.data});
 
   @override
   State<StatefulWidget> createState() => SavingFormState();
@@ -223,11 +225,8 @@ class SavingFormState extends State<SavingFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    SavingFormArguments savingFormArguments =
-        ModalRoute.of(context)!.settings.arguments as SavingFormArguments;
-
-    _saving = savingFormArguments._saving;
-    _previousAccount = savingFormArguments._previousAccount;
+    _saving = widget.data._saving;
+    _previousAccount = widget.data._previousAccount;
 
     _initializeInputs();
     return Scaffold(

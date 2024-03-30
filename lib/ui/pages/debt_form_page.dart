@@ -18,7 +18,9 @@ class DebtFormArguments {
 }
 
 class DebtFormPage extends StatefulWidget {
-  const DebtFormPage({super.key});
+  final DebtFormArguments data;
+
+  const DebtFormPage({super.key, required this.data});
 
   @override
   State<StatefulWidget> createState() => DebtFormState();
@@ -216,9 +218,7 @@ class DebtFormState extends State<DebtFormPage> {
 
   @override
   Widget build(BuildContext context) {
-    DebtFormArguments debtFormArguments =
-        ModalRoute.of(context)!.settings.arguments as DebtFormArguments;
-    _debt = debtFormArguments._debt;
+    _debt = widget.data._debt;
 
     _initializeInputs();
     _selectedDebtType ??=
