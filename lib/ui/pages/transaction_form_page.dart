@@ -39,6 +39,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   bool _isMobilePayment = false;
 
+  late TransactionFormParameters _transactionFormParameters;
   Transaction? _transaction;
   Account? _account;
   DateTime? _selectedDate;
@@ -66,7 +67,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
       ),
       AccountDropdownButtonWidget(
         account: _account,
-        onChanged: _account != null
+        onChanged: _transactionFormParameters._account != null
             ? null
             : (account) {
                 setState(
@@ -274,8 +275,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
     TransactionFormParameters transactionFormParameters =
         ModalRoute.of(context)!.settings.arguments as TransactionFormParameters;
 
+    _transactionFormParameters = transactionFormParameters;
     _transaction = transactionFormParameters._transaction;
-    _account = transactionFormParameters._account;
+    _account ??= transactionFormParameters._account;
     _initializeInputs();
     return Scaffold(
       appBar: AppBar(
