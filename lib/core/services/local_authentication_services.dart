@@ -11,19 +11,7 @@ class LocalAuthenticationService {
   bool isAuthenticated = false;
 
   Future<bool> canAuthenticate() async {
-    final bool canAuthenticateWithBiometrics =
-        await _authentication.canCheckBiometrics;
-    if (!canAuthenticateWithBiometrics ||
-        !await _authentication.isDeviceSupported()) {
-      return false;
-    }
-    try {
-      _authentication.authenticate(localizedReason: "");
-    } catch (e) {
-      return false;
-    }
-    await _authentication.stopAuthentication();
-    return true;
+    return _authentication.isDeviceSupported();
   }
 
   Future<bool> authenticate(BuildContext context) async {
