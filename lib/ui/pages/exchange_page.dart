@@ -1,12 +1,12 @@
-import 'package:finman/core/models/account.dart';
-import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/providers/account_provider.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/accout_dropdown_button_widget.dart';
-import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
-import 'package:finman/ui/shared/widgets/text_input_widget.dart';
-import 'package:finman/utils/double_extension.dart';
-import 'package:finman/utils/string_extension.dart';
+import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/transaction.dart';
+import 'package:fundy/core/providers/account_provider.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/accout_dropdown_button_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
+import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
+import 'package:fundy/utils/double_extension.dart';
+import 'package:fundy/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

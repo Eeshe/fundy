@@ -1,8 +1,8 @@
-import 'package:finman/core/providers/settings_provider.dart';
-import 'package:finman/ui/pages/color_picker_dialog.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
-import 'package:finman/utils/string_extension.dart';
+import 'package:fundy/core/providers/settings_provider.dart';
+import 'package:fundy/ui/pages/color_picker_dialog.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
+import 'package:fundy/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

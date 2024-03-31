@@ -1,6 +1,6 @@
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
-import 'package:finman/ui/shared/widgets/styled_progress_bar_widget.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_progress_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 class AdjustableProgressBarWidget extends StatefulWidget {

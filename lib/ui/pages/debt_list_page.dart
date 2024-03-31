@@ -1,10 +1,10 @@
-import 'package:finman/core/models/debt.dart';
-import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/providers/debt_provider.dart';
-import 'package:finman/ui/pages/debt_form_page.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
-import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
+import 'package:fundy/core/models/debt.dart';
+import 'package:fundy/core/models/debt_type.dart';
+import 'package:fundy/core/providers/debt_provider.dart';
+import 'package:fundy/ui/pages/debt_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/empty_list_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

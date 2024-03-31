@@ -1,13 +1,13 @@
-import 'package:finman/core/models/debt.dart';
-import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/providers/debt_provider.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/scrollable_page_widget.dart';
-import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
-import 'package:finman/ui/shared/widgets/submitted_amount_widget.dart';
-import 'package:finman/ui/shared/widgets/text_input_widget.dart';
-import 'package:finman/utils/double_extension.dart';
-import 'package:finman/utils/string_extension.dart';
+import 'package:fundy/core/models/debt.dart';
+import 'package:fundy/core/models/debt_type.dart';
+import 'package:fundy/core/providers/debt_provider.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
+import 'package:fundy/ui/shared/widgets/submitted_amount_widget.dart';
+import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
+import 'package:fundy/utils/double_extension.dart';
+import 'package:fundy/utils/string_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -1,10 +1,10 @@
 import 'dart:math';
 
-import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/providers/debt_provider.dart';
-import 'package:finman/ui/pages/debt_form_page.dart';
-import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
-import 'package:finman/utils/double_extension.dart';
+import 'package:fundy/core/models/debt_type.dart';
+import 'package:fundy/core/providers/debt_provider.dart';
+import 'package:fundy/ui/pages/debt_form_page.dart';
+import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
+import 'package:fundy/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';

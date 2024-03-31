@@ -1,4 +1,4 @@
-import 'package:finman/utils/hex_color_extension.dart';
+import 'package:fundy/utils/hex_color_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
