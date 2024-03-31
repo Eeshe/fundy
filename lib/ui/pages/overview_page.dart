@@ -1,20 +1,20 @@
-import 'package:finman/core/models/account.dart';
-import 'package:finman/core/models/currency_type.dart';
-import 'package:finman/core/models/debt.dart';
-import 'package:finman/core/models/debt_type.dart';
-import 'package:finman/core/models/monthly_expense.dart';
-import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/models/transaction.dart';
-import 'package:finman/core/providers/account_provider.dart';
-import 'package:finman/core/providers/debt_provider.dart';
-import 'package:finman/core/providers/monthly_expense_provider.dart';
-import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/ui/pages/transaction_form_page.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/account_icon_widget.dart';
-import 'package:finman/ui/shared/widgets/expandable_fab_widget.dart';
-import 'package:finman/utils/double_extension.dart';
 import 'package:flutter/material.dart';
+import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/currency_type.dart';
+import 'package:fundy/core/models/debt.dart';
+import 'package:fundy/core/models/debt_type.dart';
+import 'package:fundy/core/models/monthly_expense.dart';
+import 'package:fundy/core/models/saving.dart';
+import 'package:fundy/core/models/transaction.dart';
+import 'package:fundy/core/providers/account_provider.dart';
+import 'package:fundy/core/providers/debt_provider.dart';
+import 'package:fundy/core/providers/monthly_expense_provider.dart';
+import 'package:fundy/core/services/conversion_service.dart';
+import 'package:fundy/ui/pages/transaction_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
+import 'package:fundy/ui/shared/widgets/expandable_fab_widget.dart';
+import 'package:fundy/utils/double_extension.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -37,8 +37,6 @@ class OverviewPageState extends State<OverviewPage> {
 
   AppBar _createAppBar() {
     return AppBar(
-      title: const Text("FinMan"),
-      centerTitle: true,
       automaticallyImplyLeading: false,
       scrolledUnderElevation: 0,
       actions: [
@@ -153,7 +151,7 @@ class OverviewPageState extends State<OverviewPage> {
   }
 
   Widget _createDollarRateWidget(String text, double rate) {
-    Widget rateWidget = rate == 0
+    Widget rateWidget = rate == 0 || rate == double.infinity
         ? CircularProgressIndicator(
             color: Theme.of(context).colorScheme.onBackground,
           )

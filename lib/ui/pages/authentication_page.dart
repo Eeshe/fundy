@@ -1,6 +1,6 @@
-import 'package:finman/core/services/local_authentication_services.dart';
-import 'package:finman/ui/pages/overview_page.dart';
-import 'package:finman/ui/shared/localization.dart';
+import 'package:fundy/core/services/local_authentication_services.dart';
+import 'package:fundy/ui/pages/overview_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;

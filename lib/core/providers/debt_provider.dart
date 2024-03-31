@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart';
-import 'package:finman/core/models/debt.dart';
+import 'package:fundy/core/models/debt.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 

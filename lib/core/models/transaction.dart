@@ -1,8 +1,8 @@
-import 'package:finman/core/models/account.dart';
-import 'package:finman/core/models/currency_type.dart';
-import 'package:finman/core/services/conversion_service.dart';
-import 'package:finman/ui/pages/transaction_form_page.dart';
-import 'package:finman/utils/double_extension.dart';
+import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/currency_type.dart';
+import 'package:fundy/core/services/conversion_service.dart';
+import 'package:fundy/ui/pages/transaction_form_page.dart';
+import 'package:fundy/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';

@@ -1,4 +1,4 @@
-import 'package:finman/ui/shared/widgets/text_input_widget.dart';
+import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
 import 'package:flutter/material.dart';
 
 class SubmittedAmountWidget extends StatelessWidget {

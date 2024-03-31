@@ -1,4 +1,4 @@
-# finman
+# fundy
 
 Financial manager
 

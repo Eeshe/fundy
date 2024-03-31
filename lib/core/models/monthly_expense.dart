@@ -1,9 +1,9 @@
 import 'dart:math';
 
-import 'package:finman/core/providers/monthly_expense_provider.dart';
-import 'package:finman/ui/pages/expense_form_page.dart';
-import 'package:finman/ui/shared/widgets/adjustable_progress_bar_widget.dart';
-import 'package:finman/utils/double_extension.dart';
+import 'package:fundy/core/providers/monthly_expense_provider.dart';
+import 'package:fundy/ui/pages/expense_form_page.dart';
+import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
+import 'package:fundy/utils/double_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';

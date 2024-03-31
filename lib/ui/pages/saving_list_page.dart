@@ -1,9 +1,9 @@
-import 'package:finman/core/models/saving.dart';
-import 'package:finman/core/providers/saving_provider.dart';
-import 'package:finman/ui/pages/saving_form_page.dart';
-import 'package:finman/ui/shared/localization.dart';
-import 'package:finman/ui/shared/widgets/empty_list_widget.dart';
-import 'package:finman/ui/shared/widgets/styled_button_widget.dart';
+import 'package:fundy/core/models/saving.dart';
+import 'package:fundy/core/providers/saving_provider.dart';
+import 'package:fundy/ui/pages/saving_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/widgets/empty_list_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

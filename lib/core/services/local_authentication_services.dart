@@ -1,4 +1,4 @@
-import 'package:finman/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;

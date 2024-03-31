@@ -1,4 +1,4 @@
-import 'package:finman/ui/shared/localization.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hive/hive.dart';
 

@@ -1,4 +1,4 @@
-import 'package:finman/core/models/account.dart';
+import 'package:fundy/core/models/account.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:collection/collection.dart';
