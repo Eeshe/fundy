@@ -37,6 +37,7 @@ class TextInputState extends State<TextInputWidget> {
       style: widget.textStyle,
       validator: widget.validator,
       onChanged: widget.onChanged,
+      textCapitalization: TextCapitalization.sentences,
     );
   }
 }
