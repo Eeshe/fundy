@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fundy/core/models/account.dart';
 import 'package:fundy/core/models/currency_type.dart';
 import 'package:fundy/core/models/debt.dart';
@@ -15,6 +17,7 @@ import 'package:fundy/ui/pages/account_form_page.dart';
 import 'package:fundy/ui/pages/account_list_page.dart';
 import 'package:fundy/ui/pages/account_page.dart';
 import 'package:fundy/ui/pages/authentication_page.dart';
+import 'package:fundy/ui/pages/conversion_calculator_page.dart';
 import 'package:fundy/ui/pages/debt_form_page.dart';
 import 'package:fundy/ui/pages/debt_list_page.dart';
 import 'package:fundy/ui/pages/exchange_page.dart';
@@ -26,8 +29,6 @@ import 'package:fundy/ui/pages/saving_list_page.dart';
 import 'package:fundy/ui/pages/settings_page.dart';
 import 'package:fundy/ui/pages/transaction_form_page.dart';
 import 'package:fundy/ui/shared/widgets/transition_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:provider/provider.dart';
@@ -106,7 +107,6 @@ class MyApp extends StatelessWidget {
             title: 'FinMan',
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
-            locale: const Locale('es'),
             debugShowCheckedModeBanner: false,
             themeMode: settingsProvider.fetchThemeMode(),
             theme: ThemeData(useMaterial3: true, colorScheme: lightColorScheme),
@@ -158,6 +158,9 @@ class MyApp extends StatelessWidget {
               case '/exchange_form':
                 return createTransitionRoute(
                     const ExchangeFormPage(), rightStartingPoint);
+              case '/conversion_calculator':
+                return createTransitionRoute(
+                    const ConversionCalculatorPage(), rightStartingPoint);
               case '/settings':
                 return createTransitionRoute(
                     const SettingsPage(), rightStartingPoint);

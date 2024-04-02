@@ -3,7 +3,7 @@
   "bruteBalance": "Saldo Bruto",
   "netBalance": "Saldo Neto",
   "usableBalance": "Saldo Usable",
-  "parallelDollar": "Dólar Paralelo",
+  "paraleloDollar": "Dólar Paralelo",
   "bcvDollar": "Dólar BCV",
   "accounts": "Cuentas",
   "expenses": "Gastos",
@@ -121,5 +121,6 @@
   "primaryColor": "Primario",
   "accentColor": "Secundario",
   "positiveColor": "Positivo",
-  "negativeColor": "Negativo"
+  "negativeColor": "Negativo",
+  "conversionCalculator": "Calculadora de Conversiones"
 }

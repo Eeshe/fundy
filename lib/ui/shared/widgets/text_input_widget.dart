@@ -8,16 +8,18 @@ class TextInputWidget extends StatefulWidget {
   final String? Function(String?)? onChanged;
   final TextAlign textAlign;
   final TextStyle? textStyle;
+  final FocusNode? focusNode;
 
   const TextInputWidget(
       {super.key,
       required this.inputController,
       required this.hintText,
       this.textInputType,
-      required this.validator,
+      this.validator,
       this.onChanged,
       this.textAlign = TextAlign.start,
-      this.textStyle});
+      this.textStyle,
+      this.focusNode});
 
   @override
   State<StatefulWidget> createState() => TextInputState();
@@ -38,6 +40,7 @@ class TextInputState extends State<TextInputWidget> {
       validator: widget.validator,
       onChanged: widget.onChanged,
       textCapitalization: TextCapitalization.sentences,
+      focusNode: widget.focusNode,
     );
   }
 }
