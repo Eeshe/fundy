@@ -181,8 +181,8 @@ class OverviewPageState extends State<OverviewPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _createDollarRateWidget(
-                getAppLocalizations(context)!.parallelDollar,
-                conversionService.fetchRate('parallel')),
+                getAppLocalizations(context)!.paraleloDollar,
+                conversionService.fetchRate('paralelo')),
             _createDollarRateWidget(getAppLocalizations(context)!.bcvDollar,
                 conversionService.fetchRate('bcv')),
           ],
@@ -414,6 +414,16 @@ class OverviewPageState extends State<OverviewPage> {
           },
           icon: Icon(
             Icons.currency_exchange,
+            color: onBackgroundColor,
+          ),
+          backgroundColor: primaryColor,
+        ),
+        ActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/conversion_calculator');
+          },
+          icon: Icon(
+            Icons.calculate_outlined,
             color: onBackgroundColor,
           ),
           backgroundColor: primaryColor,

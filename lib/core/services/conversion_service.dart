@@ -51,7 +51,7 @@ class ConversionService {
         json['data']['getCountryConversions']['conversionRates'];
 
     return {
-      'parallel': 1 / conversionRates[0]['baseValue'],
+      'paralelo': 1 / conversionRates[0]['baseValue'],
       'bcv': 1 / conversionRates[1]['baseValue']
     };
   }

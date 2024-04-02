@@ -5,6 +5,7 @@ extension StringExtension on String {
   }
 
   bool isNumeric() {
+    if (this == '.') return false;
     if (isScientificNotation()) return true;
 
     return !RegExp(r'[A-Za-z,]+').hasMatch(this);

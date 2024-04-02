@@ -3,7 +3,7 @@
   "bruteBalance": "Brute Balance",
   "netBalance": "Net Balance",
   "usableBalance": "Usable Balance",
-  "parallelDollar": "Parallel Dollar",
+  "paraleloDollar": "Paralelo Dollar",
   "bcvDollar": "BCV Dollar",
   "accounts": "Accounts",
   "expenses": "Expenses",
@@ -121,5 +121,6 @@
   "primaryColor": "Primary",
   "accentColor": "Accent",
   "positiveColor": "Positive",
-  "negativeColor": "Negative"
+  "negativeColor": "Negative",
+  "conversionCalculator": "Conversion Calculator"
 }
