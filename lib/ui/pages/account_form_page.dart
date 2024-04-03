@@ -26,11 +26,16 @@ class _AccountFormPageState extends State<AccountFormPage> {
       TextEditingController();
 
   final List<String> _iconPaths = [
-    'bdv.png',
-    'bancamiga.png',
-    'banesco.png',
+    'bs.png',
     'cash.png',
+    'bancamiga.png',
+    'bancaribe.png',
+    'banesco.png',
+    'bdv.png',
+    'bnc.png',
+    'mercantil.png',
     'paypal.png',
+    'provincial.png',
     'usdt.png'
   ];
 
