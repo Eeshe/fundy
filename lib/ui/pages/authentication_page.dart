@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fundy/core/services/local_authentication_services.dart';
 import 'package:fundy/ui/pages/overview_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
 
 class AuthenticationPage extends StatefulWidget {
@@ -38,12 +38,12 @@ class AuthenticationPageState extends State<AuthenticationPage> {
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            getAppLocalizations(context)!.authenticate,
-            textAlign: TextAlign.center,
+          Center(
+            child: Text(
+              getAppLocalizations(context)!.authenticate,
             style: const TextStyle(fontSize: 30),
+            ),
           ),
           _createAuthenticateButton()
         ],
