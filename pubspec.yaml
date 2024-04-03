@@ -50,6 +50,7 @@ dependencies:
   provider: ^6.1.2
   collection: ^1.18.0
   flex_color_picker: ^3.4.1
+  flutter_secure_storage: ^4.2.1
 
 dev_dependencies:
   flutter_test:

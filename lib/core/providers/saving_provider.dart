@@ -1,7 +1,8 @@
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:fundy/core/models/account.dart';
 import 'package:fundy/core/models/saving.dart';
-import 'package:flutter/material.dart';
+import 'package:fundy/core/services/encryption_service.dart';
 import 'package:hive/hive.dart';
 
 class SavingProvider extends ChangeNotifier {
@@ -11,7 +12,8 @@ class SavingProvider extends ChangeNotifier {
   List<Saving> get savings => _savings;
 
   Future<Box<Saving>> _openBox() async {
-    return await Hive.openBox<Saving>('savings');
+    return await Hive.openBox<Saving>('savings',
+        encryptionCipher: await EncryptionService().fetchEncryptionKey());
   }
 
   Future<void> fetchAll() async {
