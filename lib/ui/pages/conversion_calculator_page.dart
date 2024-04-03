@@ -102,7 +102,7 @@ class ConversionCalculatorPageState extends State<ConversionCalculatorPage> {
       rateRadios.add(_createRateWidget(rate));
     }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: rateRadios,
     );
   }

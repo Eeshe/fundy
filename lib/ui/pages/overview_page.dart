@@ -351,8 +351,9 @@ class OverviewPageState extends State<OverviewPage> {
           return Center(
             child: Column(
               children: [
-                const Icon(
+                Icon(
                   Icons.search_off,
+                  color: Theme.of(context).colorScheme.error,
                   size: 50,
                 ),
                 Text(
