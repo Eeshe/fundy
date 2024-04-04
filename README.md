@@ -6,7 +6,9 @@ help manage all of the user's funds in order to achieve better financial plannin
 ### What the app CAN do
 
 - Keep track of your account's balances.
-- Record monthly expenses, savings and debts.
+- Record monthly expenses.
+- Record savings.
+- Record debts.
 - Calculate three different overall balances:
   - **Brute balance:** Total balance between all the accounts.
   - **Net balance:** Brute balance - all of the unpaid monthly expenses and debts.
@@ -24,9 +26,11 @@ help manage all of the user's funds in order to achieve better financial plannin
 
 - Customizable theme colors, one for light mode and one for dark mode.
 
-Since the app is mostly designed for its use in Venezuela, lots of its features aren't useful when
-used outside of the country, particularly all the Bs currency options, however, these options don't
-limit the use of the app if ignored, which means users from outside Venezuela that work with USD and
+----
+
+Since the app is primarily designed for use in Venezuela, some features, such as the Bs currency 
+options, may not be as useful when used outside the country. However, these options don't limit 
+the use of the app if ignored, which means users from outside Venezuela that work with USD and 
 USDT funds can still enjoy the features of the app.
 
 All the data is stored and encrypted locally on the device, the app only connects to the internet to
@@ -43,6 +47,14 @@ fetch the Bs-USD conversions and USDT-USD conversion rates.
 |  ![](https://github.com/Eeshe/fundy/blob/main/screenshots/saving_list_page.png?raw=true)   |   ![](https://github.com/Eeshe/fundy/blob/main/screenshots/saving_form_page.png?raw=true)    |   ![](https://github.com/Eeshe/fundy/blob/main/screenshots/debt_list_page.png?raw=true)   |       ![](https://github.com/Eeshe/fundy/blob/main/screenshots/debt_form_page.png?raw=true)       |
 |                                     S**ettings Page**                                      |                                   **Color Picker Dialog**                                    |                                  **Exchange Form Page**                                   |                                  **Conversion Calculator Page**                                   |
 |    ![](https://github.com/Eeshe/fundy/blob/main/screenshots/settings_page.png?raw=true)    |  ![](https://github.com/Eeshe/fundy/blob/main/screenshots/color_picker_dialog.png?raw=true)  | ![](https://github.com/Eeshe/fundy/blob/main/screenshots/exchange_form_page.png?raw=true) | ![](https://github.com/Eeshe/fundy/blob/main/screenshots/conversion_calculator_page.png?raw=true) |
+
+### Demonstration Video
+
+
+
+https://github.com/Eeshe/fundy/assets/75171906/80bb3caa-6749-455b-8a5f-6f7308ba22b2
+
+
 
 ### Contributing
 
