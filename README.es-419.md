@@ -60,6 +60,11 @@ Internet para obtener las conversiones de Bs-USD y las tasas de conversión de U
 
 https://github.com/Eeshe/fundy/assets/75171906/80bb3caa-6749-455b-8a5f-6f7308ba22b2
 
+### Instalación
+
+Descarga la APK proporcionada en la última release disponible e instálala usando el administrador de
+paquetes de Android.
+
 ### Contribuir
 
 Si deseas contribuir al proyecto, eres más que bienvenido a hacerlo. Solo necesitas abrir una

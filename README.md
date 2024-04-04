@@ -56,11 +56,11 @@ fetch the Bs-USD conversions and USDT-USD conversion rates.
 
 ### Demonstration Video
 
-
-
 https://github.com/Eeshe/fundy/assets/75171906/80bb3caa-6749-455b-8a5f-6f7308ba22b2
 
+### Installation
 
+Download the provided APK in the latest release and install it using Android's package installer.
 
 ### Contributing
 
