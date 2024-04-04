@@ -1,5 +1,11 @@
 # Fundy
 
+Read in other languages:
+
+[![en](https://img.shields.io/badge/lang-es-blue.svg)](https://github.com/Eeshe/fundy/blob/main/README.es-419.md)
+
+----
+
 Fundy is a financial management app heavily oriented towards Venezuelans. The goal of the app is to
 help manage all of the user's funds in order to achieve better financial planning.
 
