@@ -27,6 +27,7 @@ import 'package:fundy/ui/pages/overview_page.dart';
 import 'package:fundy/ui/pages/saving_form_page.dart';
 import 'package:fundy/ui/pages/saving_list_page.dart';
 import 'package:fundy/ui/pages/settings_page.dart';
+import 'package:fundy/ui/pages/transaction_explorer_page.dart';
 import 'package:fundy/ui/pages/transaction_form_page.dart';
 import 'package:fundy/ui/shared/widgets/transition_widget.dart';
 import 'package:hive/hive.dart';
@@ -158,6 +159,8 @@ class MyApp extends StatelessWidget {
               case '/exchange_form':
                 return createTransitionRoute(
                     const ExchangeFormPage(), rightStartingPoint);
+              case "/transaction_explorer":
+                return createTransitionRoute(TransactionExplorerPage(), bottomStartingPoint);
               case '/conversion_calculator':
                 return createTransitionRoute(
                     const ConversionCalculatorPage(), rightStartingPoint);

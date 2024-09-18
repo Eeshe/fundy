@@ -122,5 +122,8 @@
   "accentColor": "Secundario",
   "positiveColor": "Positivo",
   "negativeColor": "Negativo",
-  "conversionCalculator": "Calculadora de Conversiones"
+  "conversionCalculator": "Calculadora de Conversiones",
+  "transactionExplorerButton": "Explorador",
+  "transactionExplorerBar": "Explorador de Transacciones",
+  "filteredAccounts": "Cuentas ({COUNT})"
 }

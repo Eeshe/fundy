@@ -367,10 +367,29 @@ class OverviewPageState extends State<OverviewPage> {
         return Expanded(
           child: Column(
             children: [
-              Text(
-                getAppLocalizations(context)!.recentTransactions,
-                style: const TextStyle(
-                  fontSize: 26,
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      getAppLocalizations(context)!.recentTransactions,
+                      style: const TextStyle(
+                        fontSize: 26,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, "/transaction_explorer"),
+                      child: Text(
+                        getAppLocalizations(context)!.transactionExplorerButton,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
               Expanded(
