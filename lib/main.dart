@@ -106,7 +106,9 @@ class MyApp extends StatelessWidget {
             tertiary: settingsProvider.fetchPositiveColor(ThemeMode.dark));
         return MaterialApp(
             title: 'FinMan',
-            localizationsDelegates: AppLocalizations.localizationsDelegates,
+          // TODO: This is for testing
+          // locale: const Locale('es'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             debugShowCheckedModeBanner: false,
             themeMode: settingsProvider.fetchThemeMode(),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/transaction.dart';
+import 'package:fundy/core/models/transaction_filter.dart';
 import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
+import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
 import 'package:fundy/utils/date_time_extension.dart';
 import 'package:provider/provider.dart';
 
@@ -16,11 +19,16 @@ class TransactionExplorerPage extends StatefulWidget {
 
 class TransactionExplorerState extends State<TransactionExplorerPage> {
   final TextStyle _labelStyle = const TextStyle(fontSize: 20);
+  final double _totalsFontSize = 18;
 
   final List<Account> _filteredAccounts = [];
 
   DateTime? _startingDate;
   DateTime? _endingDate;
+  TransactionFilter _selectedTransactionFilter = TransactionFilter.all;
+
+  final TextEditingController _descriptionFilterController =
+      TextEditingController();
 
   Widget _createAccountWidget(Account account) {
     return InkWell(
@@ -135,6 +143,134 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
     );
   }
 
+  Widget _createDescriptionFilterWidget() {
+    return TextInputWidget(
+        inputController: _descriptionFilterController,
+        hintText: getAppLocalizations(context)!.descriptionFilterInputHint);
+  }
+
+  Widget _createTransactionTypeButton(TransactionFilter transactionFilter) {
+    Color textColor;
+    switch (transactionFilter) {
+      case TransactionFilter.all:
+        textColor = Theme.of(context).colorScheme.onBackground;
+        break;
+      case TransactionFilter.income:
+        textColor = Theme.of(context).colorScheme.tertiary;
+        break;
+      case TransactionFilter.outcome:
+        textColor = Theme.of(context).colorScheme.error;
+        break;
+    }
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        side: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 3,
+        ),
+        splashFactory: NoSplash.splashFactory,
+        textStyle: const TextStyle(fontSize: 16),
+        backgroundColor: transactionFilter == _selectedTransactionFilter
+            ? Theme.of(context).colorScheme.primary
+            : Colors.transparent,
+        foregroundColor: textColor,
+      ),
+      onPressed: () {
+        setState(() {
+          _selectedTransactionFilter = transactionFilter;
+        });
+      },
+      child: Text(
+        transactionFilter.localized(context),
+        style: TextStyle(color: textColor),
+      ),
+    );
+  }
+
+  Widget _createTransactionTypeFiltersWidget() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _createTransactionTypeButton(TransactionFilter.all),
+        _createTransactionTypeButton(TransactionFilter.income),
+        _createTransactionTypeButton(TransactionFilter.outcome),
+      ],
+    );
+  }
+
+  List<Transaction> _computeDisplayedTransactions() {
+    List<Transaction> displayedTransactions = [];
+    for (Account filteredAccount in _filteredAccounts) {
+      //                                                    Create a copy
+      List<Transaction> transactions = filteredAccount.transactions.toList();
+      transactions.removeWhere((transaction) {
+        switch (_selectedTransactionFilter) {
+          case TransactionFilter.all:
+            return false;
+          case TransactionFilter.income:
+            return transaction.amount < 0;
+          case TransactionFilter.outcome:
+            return transaction.amount > 0;
+        }
+      });
+      displayedTransactions.addAll(transactions);
+    }
+    return displayedTransactions;
+  }
+
+  Widget _createTransactionListWidget() {
+    List<Transaction> displayedTransactions = _computeDisplayedTransactions();
+    return ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return displayedTransactions[index].createListWidget(context, true);
+        },
+        separatorBuilder: (context, index) => Divider(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+        itemCount: displayedTransactions.length);
+  }
+
+  Widget _createTotalsWidget() {
+    return Container(
+      height: 50,
+      color: Theme.of(context).colorScheme.primary,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Text(
+            getAppLocalizations(context)!.totals,
+            style: TextStyle(fontSize: _totalsFontSize),
+          ),
+          Text(
+            "-\$1251.00",
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: _totalsFontSize),
+          ),
+          Text(
+            "+\$1402.41",
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.tertiary,
+                fontSize: _totalsFontSize),
+          ),
+          const Text(
+            "=",
+            style: TextStyle(fontSize: 24),
+          ),
+          Text(
+            "\$4201.42",
+            style: TextStyle(fontSize: _totalsFontSize),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,26 +281,36 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
         scrolledUnderElevation: 0,
       ),
       body: ScrollablePageWidget(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-                getAppLocalizations(context)!
-                    .filteredAccounts(_filteredAccounts.length),
-                style: _labelStyle),
-            const SizedBox(height: 10),
-            _createAccountSelectorWidget(),
-            const SizedBox(height: 10),
-            Text(
-              getAppLocalizations(context)!.date,
-              style: _labelStyle,
-            ),
-            const SizedBox(height: 10),
-            _createDateSelectorWidget()
-          ],
-        ),
-      ),
+          padding: const EdgeInsets.all(10.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  getAppLocalizations(context)!
+                      .filteredAccounts(_filteredAccounts.length),
+                  style: _labelStyle),
+              const SizedBox(height: 10),
+              _createAccountSelectorWidget(),
+              const SizedBox(height: 10),
+              Text(
+                getAppLocalizations(context)!.date,
+                style: _labelStyle,
+              ),
+              const SizedBox(height: 10),
+              _createDateSelectorWidget(),
+              const SizedBox(height: 10),
+              Text(
+                getAppLocalizations(context)!.description,
+                style: _labelStyle,
+              ),
+              _createDescriptionFilterWidget(),
+              const SizedBox(height: 10),
+              _createTransactionTypeFiltersWidget(),
+              _createTransactionListWidget()
+            ],
+          )),
+      bottomNavigationBar: _createTotalsWidget(),
     );
   }
 }

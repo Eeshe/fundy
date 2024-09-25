@@ -125,5 +125,9 @@
   "conversionCalculator": "Calculadora de Conversiones",
   "transactionExplorerButton": "Explorador",
   "transactionExplorerBar": "Explorador de Transacciones",
-  "filteredAccounts": "Cuentas ({COUNT})"
+  "filteredAccounts": "Cuentas ({COUNT})",
+  "descriptionFilterInputHint": "Filtra por descripción",
+  "income": "Ingresos",
+  "outcome": "Egresos",
+  "totals": "Totales"
 }

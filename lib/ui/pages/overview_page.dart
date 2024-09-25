@@ -375,7 +375,7 @@ class OverviewPageState extends State<OverviewPage> {
                     Text(
                       getAppLocalizations(context)!.recentTransactions,
                       style: const TextStyle(
-                        fontSize: 26,
+                        fontSize: 24,
                       ),
                     ),
                     TextButton(
@@ -464,7 +464,6 @@ class OverviewPageState extends State<OverviewPage> {
           _createTopPanelWidget(),
           const SizedBox(height: 10),
           _createPageButtons(),
-          const SizedBox(height: 10),
           _createRecentTransactionsWidget(),
         ],
       ),
