@@ -8,6 +8,7 @@ import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
 import 'package:fundy/utils/date_time_extension.dart';
+import 'package:fundy/utils/double_extension.dart';
 import 'package:provider/provider.dart';
 
 class TransactionExplorerPage extends StatefulWidget {
@@ -22,13 +23,14 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
   final double _totalsFontSize = 18;
 
   final List<Account> _filteredAccounts = [];
+  final TextEditingController _descriptionFilterController =
+      TextEditingController();
 
   DateTime? _startingDate;
   DateTime? _endingDate;
   TransactionFilter _selectedTransactionFilter = TransactionFilter.all;
 
-  final TextEditingController _descriptionFilterController =
-      TextEditingController();
+  final List<Transaction> _displayedTransactions = [];
 
   Widget _createAccountWidget(Account account) {
     return InkWell(
@@ -99,24 +101,23 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
     );
   }
 
-  Widget _createDateButtonWidget(DateTime? date) {
+  Widget _createDateButtonWidget(DateTime? date, Function() onPressed) {
     return ElevatedButton(
-        onPressed: () {
-          // TODO: Ask date
-        },
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
+            padding: EdgeInsets.zero,
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onBackground),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Icon(
               Icons.calendar_month,
               color: Theme.of(context).colorScheme.onBackground,
             ),
-            const SizedBox(width: 10),
             Text(
               date!.formatDayMonthYear(),
               style: const TextStyle(fontSize: 16),
@@ -132,19 +133,56 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _createDateButtonWidget(_startingDate),
-        Icon(
-          Icons.arrow_right_alt,
-          color: Theme.of(context).colorScheme.onBackground,
-          size: 30,
+        Expanded(
+            flex: 2,
+            child: _createDateButtonWidget(_startingDate, () async {
+              DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: _startingDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100));
+              if (pickedDate == null) return;
+              if (!context.mounted) return;
+
+              setState(() {
+                _startingDate =
+                    DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+              });
+            })),
+        Expanded(
+          flex: 1,
+          child: Icon(
+            Icons.arrow_right_alt,
+            color: Theme.of(context).colorScheme.onBackground,
+            size: 30,
+          ),
         ),
-        _createDateButtonWidget(_endingDate)
+        Expanded(
+            flex: 2,
+            child: _createDateButtonWidget(_endingDate, () async {
+              DateTime? pickedDate = await showDatePicker(
+                  context: context,
+                  initialDate: _startingDate,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100));
+              if (pickedDate == null) return;
+              if (!context.mounted) return;
+
+              setState(() {
+                _endingDate =
+                    DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+              });
+            }))
       ],
     );
   }
 
   Widget _createDescriptionFilterWidget() {
     return TextInputWidget(
+        onChanged: (input) {
+          setState(() {});
+          return null;
+        },
         inputController: _descriptionFilterController,
         hintText: getAppLocalizations(context)!.descriptionFilterInputHint);
   }
@@ -202,11 +240,27 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
   }
 
   List<Transaction> _computeDisplayedTransactions() {
-    List<Transaction> displayedTransactions = [];
+    int start = DateTime.now().millisecond;
+    _displayedTransactions.clear();
+    String filteredDescription = _descriptionFilterController.value.text;
     for (Account filteredAccount in _filteredAccounts) {
       //                                                    Create a copy
       List<Transaction> transactions = filteredAccount.transactions.toList();
       transactions.removeWhere((transaction) {
+        // Remove all transactions that don't match the description filter
+        if (filteredDescription.isNotEmpty &&
+            !transaction.description
+                .toLowerCase()
+                .contains(filteredDescription.toLowerCase())) {
+          return true;
+        }
+        // Remove all transactions that don't match the date filter
+        DateTime transactionDate = transaction.date;
+        if (transactionDate.isBefore(_startingDate!) ||
+            transactionDate.isAfter(_endingDate!)) {
+          return true;
+        }
+        // Remove all transactions that don't match the type filter
         switch (_selectedTransactionFilter) {
           case TransactionFilter.all:
             return false;
@@ -216,58 +270,87 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
             return transaction.amount > 0;
         }
       });
-      displayedTransactions.addAll(transactions);
+      _displayedTransactions.addAll(transactions);
     }
-    return displayedTransactions;
+    _displayedTransactions.sort((a, b) => b.date.compareTo(a.date));
+    int end = DateTime.now().millisecond;
+    print("COMPUTING TOOK ${end - start}ms");
+    return _displayedTransactions;
   }
 
   Widget _createTransactionListWidget() {
-    List<Transaction> displayedTransactions = _computeDisplayedTransactions();
-    return ListView.separated(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return displayedTransactions[index].createListWidget(context, true);
-        },
-        separatorBuilder: (context, index) => Divider(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-        itemCount: displayedTransactions.length);
+    return Consumer<AccountProvider>(
+      builder: (context, value, child) {
+        _computeDisplayedTransactions();
+        return ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return _displayedTransactions[index].createIconListWidget(true);
+            },
+            separatorBuilder: (context, index) => Divider(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+            itemCount: _displayedTransactions.length);
+      },
+    );
   }
 
   Widget _createTotalsWidget() {
-    return Container(
-      height: 50,
-      color: Theme.of(context).colorScheme.primary,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Text(
-            getAppLocalizations(context)!.totals,
-            style: TextStyle(fontSize: _totalsFontSize),
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        _computeDisplayedTransactions(); // Should change it later to optimize the app
+        double totalIncome = 0;
+        double totalOutcome = 0;
+        for (Transaction transaction in _displayedTransactions) {
+          Account? account = accountProvider.getById(transaction.accountId);
+          if (account == null) continue;
+
+          if (transaction.amount > 0) {
+            totalIncome += transaction.convertAmount(account.currencyType);
+          } else {
+            totalOutcome += transaction.convertAmount(account.currencyType);
+          }
+        }
+        double total = totalIncome - totalOutcome;
+        return Container(
+          height: 50,
+          color: Theme.of(context).colorScheme.primary,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Text(
+                getAppLocalizations(context)!.totals,
+                style: TextStyle(fontSize: _totalsFontSize),
+              ),
+              Text(
+                "-\$${totalOutcome.format()}",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontSize: _totalsFontSize),
+              ),
+              Text(
+                "+\$${totalIncome.format()}",
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.tertiary,
+                    fontSize: _totalsFontSize),
+              ),
+              const Text(
+                "=",
+                style: TextStyle(fontSize: 24),
+              ),
+              Text(
+                "\$${total.format()}",
+                style: TextStyle(
+                    fontSize: _totalsFontSize,
+                    color: total > 0
+                        ? Theme.of(context).colorScheme.tertiary
+                        : Theme.of(context).colorScheme.error),
+              )
+            ],
           ),
-          Text(
-            "-\$1251.00",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: _totalsFontSize),
-          ),
-          Text(
-            "+\$1402.41",
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.tertiary,
-                fontSize: _totalsFontSize),
-          ),
-          const Text(
-            "=",
-            style: TextStyle(fontSize: 24),
-          ),
-          Text(
-            "\$4201.42",
-            style: TextStyle(fontSize: _totalsFontSize),
-          )
-        ],
-      ),
+        );
+      },
     );
   }
 
