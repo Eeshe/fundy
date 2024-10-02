@@ -43,6 +43,7 @@ class AuthenticationPageState extends State<AuthenticationPage> {
             child: Text(
               getAppLocalizations(context)!.authenticate,
             style: const TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
             ),
           ),
           _createAuthenticateButton()
