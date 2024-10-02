@@ -12,10 +12,8 @@ import 'package:fundy/core/providers/monthly_expense_provider.dart';
 import 'package:fundy/core/services/conversion_service.dart';
 import 'package:fundy/ui/pages/transaction_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
-import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/expandable_fab_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/saving_provider.dart';
@@ -299,10 +297,7 @@ class OverviewPageState extends State<OverviewPage> {
                   children: [
                     Text(
                       getAppLocalizations(context)!.recentTransactions,
-                      style: const TextStyle(
-                        fontSize: 24,
-                      ),
-                    ),
+                        style: const TextStyle(fontSize: 20)),
                     TextButton(
                       onPressed: () =>
                           Navigator.pushNamed(context, "/transaction_explorer"),
@@ -321,7 +316,8 @@ class OverviewPageState extends State<OverviewPage> {
                   child: ListView.separated(
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       itemBuilder: (context, index) {
-                        return _recentTransactions![index].createIconListWidget(false);
+                        return _recentTransactions![index]
+                            .createIconListWidget(_showBalances, false);
                       },
                       separatorBuilder: (context, index) => Divider(
                             color: Theme.of(context).colorScheme.primary,

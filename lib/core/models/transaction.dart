@@ -103,7 +103,7 @@ class Transaction {
       },);
   }
 
-  Widget createIconListWidget(bool convertCurrency) {
+  Widget createIconListWidget(bool showAmount, bool convertCurrency) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {
         Account? account = accountProvider.getById(accountId);
@@ -111,9 +111,13 @@ class Transaction {
 
         CurrencyType currencyType = account.currencyType;
         Color textColor;
+        if (!showAmount) {
+          textColor = Theme.of(context).colorScheme.onBackground;
+        } else {
           textColor = amount >= 0
               ? Theme.of(context).colorScheme.tertiary
               : Theme.of(context).colorScheme.error;
+        }
         return InkWell(
           onTap: () {},
           child: GestureDetector(
@@ -155,9 +159,11 @@ class Transaction {
                 Expanded(
                   flex: 2,
                   child: Text(
-                    convertCurrency
-                        ? formatUsdAmount(currencyType)
-                        : formatAmount(currencyType),
+                    showAmount
+                        ? convertCurrency
+                            ? formatUsdAmount(currencyType)
+                            : formatAmount(currencyType)
+                        : "******",
                     textAlign: TextAlign.end,
                     style: TextStyle(
                       fontSize: 20,

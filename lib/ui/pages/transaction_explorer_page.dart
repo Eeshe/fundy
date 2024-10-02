@@ -6,6 +6,7 @@ import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
+import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
 import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
 import 'package:fundy/utils/date_time_extension.dart';
 import 'package:fundy/utils/double_extension.dart';
@@ -31,6 +32,41 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
   TransactionFilter _selectedTransactionFilter = TransactionFilter.all;
 
   final List<Transaction> _displayedTransactions = [];
+
+  Widget _createAccountsLabelWidget() {
+    return Consumer<AccountProvider>(
+      builder: (context, accountProvider, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+                getAppLocalizations(context)!
+                    .filteredAccounts(_filteredAccounts.length),
+                style: _labelStyle),
+            const SizedBox(width: 10),
+            StyledButtonWidget(
+              text: getAppLocalizations(context)!.all,
+              onPressed: () {
+                setState(() {
+                  _filteredAccounts.clear();
+                  _filteredAccounts.addAll(accountProvider.accounts.toList());
+                });
+              },
+            ),
+            const SizedBox(width: 10),
+            StyledButtonWidget(
+              text: getAppLocalizations(context)!.clear,
+              onPressed: () {
+                setState(() {
+                  _filteredAccounts.clear();
+                });
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
 
   Widget _createAccountWidget(Account account) {
     return InkWell(
@@ -79,6 +115,7 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
       builder: (context, accountProvider, child) {
         List<Account> accounts =
             accountProvider.accounts.toList(); // Create a copy
+        accounts.sort((a, b) => a.id.compareTo(b.id));
         return Row(
           children: [
             Expanded(
@@ -166,11 +203,14 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
                   firstDate: DateTime(2000),
                   lastDate: DateTime(2100));
               if (pickedDate == null) return;
+              if (pickedDate.isBefore(_startingDate!)) {
+                pickedDate = _startingDate!;
+              }
               if (!context.mounted) return;
 
               setState(() {
-                _endingDate =
-                    DateTime(pickedDate.year, pickedDate.month, pickedDate.day);
+                _endingDate = DateTime(pickedDate!.year, pickedDate.month,
+                    pickedDate.day, 23, 59, 59);
               });
             }))
       ],
@@ -240,7 +280,6 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
   }
 
   List<Transaction> _computeDisplayedTransactions() {
-    int start = DateTime.now().millisecond;
     _displayedTransactions.clear();
     String filteredDescription = _descriptionFilterController.value.text;
     for (Account filteredAccount in _filteredAccounts) {
@@ -251,7 +290,8 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
         if (filteredDescription.isNotEmpty &&
             !transaction.description
                 .toLowerCase()
-                .contains(filteredDescription.toLowerCase())) {
+                .trim()
+                .contains(filteredDescription.toLowerCase().trim())) {
           return true;
         }
         // Remove all transactions that don't match the date filter
@@ -273,8 +313,6 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
       _displayedTransactions.addAll(transactions);
     }
     _displayedTransactions.sort((a, b) => b.date.compareTo(a.date));
-    int end = DateTime.now().millisecond;
-    print("COMPUTING TOOK ${end - start}ms");
     return _displayedTransactions;
   }
 
@@ -286,7 +324,8 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, index) {
-              return _displayedTransactions[index].createIconListWidget(true);
+              return _displayedTransactions[index]
+                  .createIconListWidget(true, true);
             },
             separatorBuilder: (context, index) => Divider(
                   color: Theme.of(context).colorScheme.primary,
@@ -358,7 +397,8 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(getAppLocalizations(context)!.transactionExplorerBar),
+        title: FittedBox(
+            child: Text(getAppLocalizations(context)!.transactionExplorerBar)),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
         scrolledUnderElevation: 0,
@@ -369,10 +409,7 @@ class TransactionExplorerState extends State<TransactionExplorerPage> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                  getAppLocalizations(context)!
-                      .filteredAccounts(_filteredAccounts.length),
-                  style: _labelStyle),
+              _createAccountsLabelWidget(),
               const SizedBox(height: 10),
               _createAccountSelectorWidget(),
               const SizedBox(height: 10),
