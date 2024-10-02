@@ -12,10 +12,8 @@ import 'package:fundy/core/providers/monthly_expense_provider.dart';
 import 'package:fundy/core/services/conversion_service.dart';
 import 'package:fundy/ui/pages/transaction_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
-import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/expandable_fab_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/providers/saving_provider.dart';
@@ -257,81 +255,6 @@ class OverviewPageState extends State<OverviewPage> {
     _recentTransactions = transactions;
   }
 
-  Widget _createTransactionWidget(Transaction transaction) {
-    return Consumer<AccountProvider>(
-      builder: (context, accountProvider, child) {
-        Account? account = accountProvider.getById(transaction.accountId);
-        if (account == null) return const SizedBox();
-
-        CurrencyType currencyType = account.currencyType;
-        double amount = transaction.amount;
-        Color textColor;
-        if (!_showBalances) {
-          textColor = Theme.of(context).colorScheme.onBackground;
-        } else {
-          textColor = amount >= 0
-              ? Theme.of(context).colorScheme.tertiary
-              : Theme.of(context).colorScheme.error;
-        }
-        return InkWell(
-          onTap: () {},
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              Navigator.pushNamed(context, '/transaction_form',
-                  arguments: TransactionFormArguments(transaction, account));
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Expanded(
-                    flex: 1,
-                    child: AccountIconWidget(account.iconPath, 50, 50)),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        transaction.description,
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      Text(
-                        account.id,
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                      Text(
-                        DateFormat('dd/MM/yyyy kk:mm').format(transaction.date),
-                        style: const TextStyle(
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    !_showBalances
-                        ? "******"
-                        : transaction.formatAmount(currencyType),
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: textColor,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   Widget _createRecentTransactionsWidget() {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {
@@ -367,18 +290,34 @@ class OverviewPageState extends State<OverviewPage> {
         return Expanded(
           child: Column(
             children: [
-              Text(
-                getAppLocalizations(context)!.recentTransactions,
-                style: const TextStyle(
-                  fontSize: 26,
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      getAppLocalizations(context)!.recentTransactions,
+                        style: const TextStyle(fontSize: 20)),
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.pushNamed(context, "/transaction_explorer"),
+                      child: Text(
+                        getAppLocalizations(context)!.transactionExplorerButton,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    )
+                  ],
                 ),
               ),
               Expanded(
                   child: ListView.separated(
                       padding: const EdgeInsets.only(left: 10, right: 10),
                       itemBuilder: (context, index) {
-                        return _createTransactionWidget(
-                            _recentTransactions![index]);
+                        return _recentTransactions![index]
+                            .createIconListWidget(_showBalances, false);
                       },
                       separatorBuilder: (context, index) => Divider(
                             color: Theme.of(context).colorScheme.primary,
@@ -445,7 +384,6 @@ class OverviewPageState extends State<OverviewPage> {
           _createTopPanelWidget(),
           const SizedBox(height: 10),
           _createPageButtons(),
-          const SizedBox(height: 10),
           _createRecentTransactionsWidget(),
         ],
       ),

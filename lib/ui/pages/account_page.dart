@@ -137,8 +137,7 @@ class AccountPageState extends State<AccountPage> {
                   shrinkWrap: true,
                   padding: const EdgeInsets.all(5),
                   itemBuilder: (context, index) =>
-                      widget.account.transactions[index].createListWidget(
-                          context, widget.account, _convertCurrency),
+                      widget.account.transactions[index].createListWidget(_convertCurrency),
                   separatorBuilder: (context, index) =>
                       Divider(color: Theme.of(context).colorScheme.primary),
                   itemCount: widget.account.transactions.length),

@@ -63,7 +63,7 @@ class AccountListPageState extends State<AccountListPage> {
   Widget _createAccountListWidget() {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {
-        List<Account> accounts = accountProvider.accounts.toList();
+        List<Account> accounts = accountProvider.accounts.toList(); // Create a copy
         if (_filteredCurrency != getAppLocalizations(context)!.all) {
           accounts.removeWhere((element) =>
               element.currencyType.name != _filteredCurrency!.toLowerCase());

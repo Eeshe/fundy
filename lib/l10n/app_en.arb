@@ -122,5 +122,12 @@
   "accentColor": "Accent",
   "positiveColor": "Positive",
   "negativeColor": "Negative",
-  "conversionCalculator": "Conversion Calculator"
+  "conversionCalculator": "Conversion Calculator",
+  "transactionExplorerButton": "Explorer",
+  "transactionExplorerBar": "Transaction Explorer",
+  "filteredAccounts": "Accounts ({COUNT})",
+  "descriptionFilterInputHint": "Filter by transaction description",
+  "income": "Income",
+  "outcome": "Outcome",
+  "totals": "Totals"
 }

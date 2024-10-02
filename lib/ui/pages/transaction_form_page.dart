@@ -9,6 +9,7 @@ import 'package:fundy/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
 import 'package:fundy/ui/shared/widgets/text_input_widget.dart';
+import 'package:fundy/utils/date_time_extension.dart';
 import 'package:fundy/utils/double_extension.dart';
 import 'package:fundy/utils/string_extension.dart';
 import 'package:flutter/material.dart';
@@ -142,7 +143,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
       Row(
         children: [
           Text(
-            DateFormat('dd/MM/yyyy - kk:mm').format(_selectedDate!),
+            _selectedDate!.formatDayMonthYearTime(),
             style: const TextStyle(
               fontSize: 16,
             ),
