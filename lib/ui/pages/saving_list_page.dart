@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:fundy/core/models/saving.dart';
 import 'package:fundy/core/providers/saving_provider.dart';
 import 'package:fundy/ui/pages/saving_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/empty_list_widget.dart';
 import 'package:fundy/ui/shared/widgets/styled_button_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SavingListPage extends StatefulWidget {
@@ -55,8 +55,9 @@ class SavingListPageState extends State<SavingListPage> {
         title: Text(getAppLocalizations(context)!.savings),
             centerTitle: true,
             backgroundColor: Theme.of(context).colorScheme.primary,
-          ),
-          body: Padding(
+        scrolledUnderElevation: 0,
+      ),
+      body: Padding(
               padding: const EdgeInsets.only(left: 10, top: 5, right: 10),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

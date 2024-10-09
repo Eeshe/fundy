@@ -161,6 +161,7 @@ class ExpenseListPageState extends State<ExpenseListPage> {
             title: Text(getAppLocalizations(context)!.monthlyExpenses),
             centerTitle: true,
             backgroundColor: Theme.of(context).colorScheme.primary,
+            scrolledUnderElevation: 0,
           ),
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
