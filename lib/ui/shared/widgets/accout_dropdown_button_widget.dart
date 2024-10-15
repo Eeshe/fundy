@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fundy/core/models/account.dart';
 import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
@@ -22,7 +23,8 @@ class AccountDropdownButtonState extends State<AccountDropdownButtonWidget> {
   Widget build(BuildContext context) {
     return Consumer<AccountProvider>(
       builder: (context, accountProvider, child) {
-        List<Account> accounts = accountProvider.accounts;
+        List<Account> accounts = accountProvider.accounts.toList();
+        accounts.sort((a, b) => a.id.compareTo(b.id));
         return DecoratedBox(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.primary,
