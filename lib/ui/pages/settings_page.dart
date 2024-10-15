@@ -1,9 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:fundy/core/providers/settings_provider.dart';
 import 'package:fundy/ui/pages/color_picker_dialog.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
 import 'package:fundy/utils/string_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -18,9 +18,48 @@ class SettingsPageState extends State<SettingsPage> {
   final TextStyle _subSettingLabel = const TextStyle(fontSize: 24);
   final TextStyle _colorSettingLabel = const TextStyle(fontSize: 20);
 
+  final Map<Locale, String> _supportedLocales = {
+    const Locale('en', 'US'): 'English',
+    const Locale('es', 'ES'): 'Español',
+  };
+
   @override
   void initState() {
     super.initState();
+  }
+
+  Widget _createLocaleRadio(Locale locale) {
+    String localeString = locale.languageCode;
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
+        return Row(
+          children: [
+            Radio(
+              value: localeString,
+              groupValue: settingsProvider.fetchLocale(),
+              onChanged: (value) {
+                settingsProvider.saveLocale(localeString);
+              },
+            ),
+            Text(_supportedLocales[locale]!.capitalize())
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _createLocaleWidgets() {
+    List<Widget> radios = [];
+    _supportedLocales.forEach((key, value) {
+      radios.add(_createLocaleRadio(key));
+    });
+    return [
+      Text(
+        getAppLocalizations(context)!.language,
+        style: _mainSettingLabel,
+      ),
+      ...radios
+    ];
   }
 
   Widget _createAppThemeRadio(ThemeMode themeMode) {
@@ -139,6 +178,7 @@ class SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+            ..._createLocaleWidgets(),
             ..._createAppThemeWidgets(),
             _createColorsWidgets(),
           ],

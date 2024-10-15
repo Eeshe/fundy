@@ -129,5 +129,6 @@
   "descriptionFilterInputHint": "Filter by transaction description",
   "income": "Income",
   "outcome": "Outcome",
-  "totals": "Totals"
+  "totals": "Totals",
+  "language": "Language"
 }

@@ -129,5 +129,6 @@
   "descriptionFilterInputHint": "Filtra por descripción",
   "income": "Ingresos",
   "outcome": "Egresos",
-  "totals": "Totales"
+  "totals": "Totales",
+  "language": "Idioma"
 }

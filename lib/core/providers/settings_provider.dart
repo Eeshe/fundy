@@ -71,4 +71,13 @@ class SettingsProvider extends ChangeNotifier {
   void saveNegativeColor(Color color, ThemeMode themeMode) {
     _setColor("negativeColor", themeMode, color);
   }
+
+  String fetchLocale() {
+    return preferences.getString("locale") ?? "en";
+  }
+
+  void saveLocale(String locale) {
+    preferences.setString("locale", locale);
+    notifyListeners();
+  }
 }
