@@ -114,16 +114,17 @@ class ConversionCalculatorPageState extends State<ConversionCalculatorPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Expanded(
-          flex: 2,
+          flex: 1,
           child: Text(
             currency,
             style: TextStyle(
                 fontSize: 28, color: Theme.of(context).colorScheme.primary),
+            maxLines: 1,
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
-          flex: 5,
+          flex: 4,
           child: TextInputWidget(
             inputController: textEditingController,
             hintText: "0.00",
