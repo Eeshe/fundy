@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fundy/core/services/conversion_service.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
@@ -113,7 +114,7 @@ class ConversionCalculatorPageState extends State<ConversionCalculatorPage> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Expanded(
-          flex: 1,
+          flex: 2,
           child: Text(
             currency,
             style: TextStyle(
@@ -134,6 +135,20 @@ class ConversionCalculatorPageState extends State<ConversionCalculatorPage> {
               });
               return null;
             },
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: IconButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(
+                text: textEditingController.text,
+              ));
+            },
+            icon: Icon(
+              Icons.copy,
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         )
       ],
