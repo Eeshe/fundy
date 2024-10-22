@@ -99,6 +99,7 @@
   "debts": "Deudas",
   "ownDebt": "Propia",
   "otherDebt": "Tercero",
+  "remainingAmount": "{REMAINING_AMOUNT} restantes",
   "fetchingDebts": "Obteniendo tus deudas...",
   "noDebtsFound": "No se encontraron deudas",
   "createDebtInstruction": "Intenta crear una con el botón de arriba",

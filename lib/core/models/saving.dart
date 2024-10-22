@@ -4,6 +4,7 @@ import 'package:fundy/core/models/account.dart';
 import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/core/providers/saving_provider.dart';
 import 'package:fundy/ui/pages/saving_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/account_icon_widget.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/ui/shared/widgets/styled_progress_bar_widget.dart';
@@ -91,6 +92,7 @@ class Saving {
             Text(id, style: labelStyle),
             AccountIconWidget(account.iconPath, 50, 50),
             Text(accountId, style: labelStyle),
+            Text(getAppLocalizations(context)!.remainingAmount("\$${(amount - paidAmount).format()}")),
             _createAdjustableProgressBarWidget(context),
           ],
         ),

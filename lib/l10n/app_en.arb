@@ -99,6 +99,7 @@
   "debts": "Debts",
   "ownDebt": "Own",
   "otherDebt": "Other",
+  "remainingAmount": "{REMAINING_AMOUNT} left",
   "fetchingDebts": "Fetching your debts...",
   "noDebtsFound": "No debts found",
   "createDebtInstruction": "Try creating one with the button above",

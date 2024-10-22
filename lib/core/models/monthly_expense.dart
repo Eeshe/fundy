@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:fundy/core/providers/monthly_expense_provider.dart';
 import 'package:fundy/ui/pages/expense_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
 import 'package:flutter/material.dart';
@@ -78,9 +79,16 @@ class MonthlyExpense {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              id,
-              style: const TextStyle(fontSize: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  id,
+                  style: const TextStyle(fontSize: 24),
+                ),
+                Text(getAppLocalizations(context)!.remainingAmount(
+                    "\$${(amount - paidAmount).format()}"))
+              ],
             ),
             AdjustableProgressBarWidget(
               filledPercentage: paidPercentage,

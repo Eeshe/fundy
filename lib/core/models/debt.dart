@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:fundy/core/models/debt_type.dart';
 import 'package:fundy/core/providers/debt_provider.dart';
 import 'package:fundy/ui/pages/debt_form_page.dart';
+import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
 import 'package:flutter/material.dart';
@@ -75,14 +76,20 @@ class Debt {
               id,
               style: const TextStyle(fontSize: 24),
             ),
-            Text(
-              debtType.localized(context),
-              style: TextStyle(
-                fontSize: 16,
-                color: debtType == DebtType.own
-                    ? Theme.of(context).colorScheme.error
-                    : Theme.of(context).colorScheme.tertiary,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  debtType.localized(context),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: debtType == DebtType.own
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.tertiary,
+                  ),
+                ),
+                Text(getAppLocalizations(context)!.remainingAmount("\$${(amount - paidAmount).format()}"))
+              ],
             ),
             AdjustableProgressBarWidget(
               filledPercentage: paidAmount / amount,
