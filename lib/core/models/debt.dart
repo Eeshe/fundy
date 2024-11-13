@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/models/debt_type.dart';
 import 'package:fundy/core/providers/debt_provider.dart';
 import 'package:fundy/ui/pages/debt_form_page.dart';
@@ -13,20 +14,33 @@ import 'package:provider/provider.dart';
 
 part 'debt.g.dart';
 
+// 1 -> 2: DebtType
+// 2 -> 1: amount
 @HiveType(typeId: 6)
 class Debt {
   @HiveField(0)
   String id;
   @HiveField(1)
-  DebtType debtType;
-  @HiveField(2)
   double amount;
+  @HiveField(2)
+  DebtType debtType;
   @HiveField(3)
   double paidAmount;
 
   Debt(this.id, this.debtType, this.amount, this.paidAmount);
 
-  void increasePaidAmount(double amount) {
+  Contributable1 toContributable() {
+    return Contributable1(id, amount, paidAmount, debtType);
+  }
+
+  void modifyPaidAmount(double amount) {
+    double remainingAmount = calculateRemainingAmount();
+    if (amount > 0) {
+      // Increasing paid amount
+      if (amount > remainingAmount) {
+
+      }
+    }
     paidAmount = max(0, min(this.amount, paidAmount + amount));
   }
 
@@ -104,7 +118,7 @@ class Debt {
                 Provider.of<DebtProvider>(context, listen: false).save(this);
               },
               onTweak: (value) {
-                increasePaidAmount(value);
+                modifyPaidAmount(value);
                 Provider.of<DebtProvider>(context, listen: false).save(this);
               },
             )

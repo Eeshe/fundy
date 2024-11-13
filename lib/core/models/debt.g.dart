@@ -18,8 +18,8 @@ class DebtAdapter extends TypeAdapter<Debt> {
     };
     return Debt(
       fields[0] as String,
-      fields[1] as DebtType,
-      fields[2] as double,
+      fields[2] as DebtType,
+      fields[1] as double,
       fields[3] as double,
     );
   }
@@ -31,9 +31,9 @@ class DebtAdapter extends TypeAdapter<Debt> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.debtType)
-      ..writeByte(2)
       ..write(obj.amount)
+      ..writeByte(2)
+      ..write(obj.debtType)
       ..writeByte(3)
       ..write(obj.paidAmount);
   }

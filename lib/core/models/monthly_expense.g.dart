@@ -19,22 +19,19 @@ class MonthlyExpenseAdapter extends TypeAdapter<MonthlyExpense> {
     return MonthlyExpense(
       fields[0] as String,
       fields[1] as double,
-      fields[2] as DateTime,
-      (fields[3] as Map).cast<String, double>(),
+      (fields[2] as Map).cast<String, double>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, MonthlyExpense obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.amount)
       ..writeByte(2)
-      ..write(obj.paymentDate)
-      ..writeByte(3)
       ..write(obj.paymentRecords);
   }
 

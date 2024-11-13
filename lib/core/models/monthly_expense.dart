@@ -1,17 +1,19 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/providers/monthly_expense_provider.dart';
 import 'package:fundy/ui/pages/expense_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 part 'monthly_expense.g.dart';
 
+// 3 -> 2: Map<String, Double> paymentRecords
 @HiveType(typeId: 3)
 class MonthlyExpense {
   @HiveField(0)
@@ -19,14 +21,16 @@ class MonthlyExpense {
   @HiveField(1)
   double amount;
   @HiveField(2)
-  DateTime paymentDate;
-  @HiveField(3)
   final Map<String, double> paymentRecords;
 
-  MonthlyExpense.create(this.id, this.amount, this.paymentDate)
+  MonthlyExpense.create(this.id, this.amount)
       : paymentRecords = {'${DateTime.now().month}-${DateTime.now().year}': 0};
 
-  MonthlyExpense(this.id, this.amount, this.paymentDate, this.paymentRecords);
+  MonthlyExpense(this.id, this.amount, this.paymentRecords);
+
+  Contributable1 toContributable(DateTime date) {
+    return Contributable1(id, amount, getPaymentRecord(date), null);
+  }
 
   static String createRecordKey(DateTime dateTime) {
     return DateFormat('MMMM-y').format(dateTime);

@@ -60,6 +60,7 @@
   "max": "Max",
   "clear": "Clear",
   "payAll": "Pay All",
+  "monthlyExpense": "Monthly Expense",
   "monthlyExpenses": "Monthly Expenses",
   "newExpense": "New Expense",
   "emptyExpenseName": "Please enter an expense name",
@@ -96,6 +97,7 @@
   "emptySavingAccount": "Please enter a saving account",
   "paidAmountHigherThanSavingAmount": "Paid amount can't be higher than the saving's amount",
   "emptySavingAmount": "Please enter a saving amount",
+  "debt": "Debt",
   "debts": "Debts",
   "ownDebt": "Own",
   "otherDebt": "Other",
@@ -131,5 +133,6 @@
   "income": "Income",
   "outcome": "Outcome",
   "totals": "Totals",
-  "language": "Language"
+  "language": "Language",
+  "contributesTo": "Contributes to..."
 }
