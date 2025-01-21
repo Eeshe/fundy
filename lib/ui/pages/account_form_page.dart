@@ -187,7 +187,7 @@ class _AccountFormPageState extends State<AccountFormPage> {
                   getAppLocalizations(context)!.initialBalance,
                   DateTime.now(),
                   initialBalance,
-                  false));
+                  false, null));
             }
             Provider.of<AccountProvider>(context, listen: false).save(Account(
                 accountName,

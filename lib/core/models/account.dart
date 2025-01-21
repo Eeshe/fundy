@@ -62,8 +62,7 @@ class Account {
   void updateTransaction(
       Transaction oldTransaction, Transaction newTransaction) {
     transactions[transactions.indexOf(oldTransaction)] = newTransaction;
-    double balanceDifference = newTransaction.amount - oldTransaction.amount;
-    increaseBalance(balanceDifference);
+    increaseBalance(newTransaction.amount);
     _sortTransactions();
   }
 

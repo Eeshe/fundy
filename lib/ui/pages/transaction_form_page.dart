@@ -1,14 +1,15 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fundy/core/models/account.dart';
 import 'package:fundy/core/models/currency_type.dart';
 import 'package:fundy/core/models/debt.dart';
-import 'package:fundy/core/models/debt_type.dart';
+import 'package:fundy/core/models/debt_inversion_option.dart';
 import 'package:fundy/core/models/monthly_expense.dart';
 import 'package:fundy/core/models/transaction.dart';
 import 'package:fundy/core/providers/account_provider.dart';
-import 'package:fundy/core/services/conversion_service.dart';
+import 'package:fundy/ui/pages/debt_inversion_dialog.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/accout_dropdown_button_widget.dart';
 import 'package:fundy/ui/shared/widgets/scrollable_page_widget.dart';
@@ -52,7 +53,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   Transaction? _transaction;
   Account? _account;
   DateTime? _selectedDate;
-  Contributable1? _contributable;
+  Contributable? _contributable;
 
   void _initializeInputs() {
     Transaction? transaction = _transaction;
@@ -67,6 +68,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
       _amountInputController.text = transaction.amount.format();
     }
     _selectedDate ??= transaction.date;
+    _contributable ??= transaction.contributable;
   }
 
   List<Widget> _createAccountInputWidgets() {
@@ -230,30 +232,29 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   Widget _createContributionListWidget() {
     return Consumer2<MonthlyExpenseProvider, DebtProvider>(
       builder: (context, monthlyExpenseProvider, debtProvider, child) {
-        List<Contributable1> contributables = [];
-        for (var monthlyExpense in monthlyExpenseProvider.monthlyExpenses) {
-          contributables.add(monthlyExpense.toContributable(_selectedDate!));
-        }
-        for (var debt in debtProvider.debts) {
-          contributables.add(debt.toContributable());
-        }
-        contributables.sort((a, b) => a.id.compareTo(b.id));
+        List<Contributable> contributables = [];
+        contributables.addAll(monthlyExpenseProvider.monthlyExpenses);
+        contributables.addAll(debtProvider.debts);
         return ListView.separated(
           itemCount: contributables.length,
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
-            Contributable1 contributable = contributables[index];
-            return contributable.createListWidget(
-              context,
-              contributable.id == _contributable?.id,
-              () => setState(() {
-                if (_contributable?.id == contributable.id) {
-                  _contributable = null;
-                } else {
-                  _contributable = contributable;
-                }
-              }),
-            );
+            Contributable contributable = contributables[index];
+            return contributable.createContributableListWidget(
+                context, _selectedDate, contributable.id == _contributable?.id,
+                () {
+              if (_transaction != null) return;
+
+              setState(
+                () {
+                  if (_contributable?.id == contributable.id) {
+                    _contributable = null;
+                  } else {
+                    _contributable = contributable;
+                  }
+                },
+              );
+            });
           },
           separatorBuilder: (context, index) => const SizedBox(width: 5),
         );
@@ -268,7 +269,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
         style: _inputLabelStyle,
       ),
       SizedBox(
-        height: 100,
+        height: 120,
         child: _createContributionListWidget(),
       )
     ];
@@ -276,57 +277,39 @@ class TransactionFormPageState extends State<TransactionFormPage> {
 
   void _handleContribution(double amount) {
     if (_contributable == null) return;
-
-    double amountUsd = ConversionService.getInstance()
-        .currencyToUsd(amount, _account!.currencyType.name);
-    if (_contributable!.debtType == null) {
-      MonthlyExpenseProvider monthlyExpenseProvider =
-          Provider.of<MonthlyExpenseProvider>(context, listen: false);
-      MonthlyExpense? monthlyExpense =
-          monthlyExpenseProvider.getById(_contributable!.id);
-      if (monthlyExpense == null) return;
-
-      monthlyExpense.addPayment(_selectedDate!, amountUsd);
-      monthlyExpenseProvider.save(monthlyExpense);
-    } else {
-      DebtProvider debtProvider =
-          Provider.of<DebtProvider>(context, listen: false);
-      Debt? debt = debtProvider.getById(_contributable!.id);
-      if (debt == null) return;
-
-      double remainingAmount = debt.calculateRemainingAmount();
-      double excess = amountUsd.abs() - remainingAmount;
-      DebtType debtType = debt.debtType;
-      if (debtType == DebtType.own) {
-        if (amountUsd > 0) {
-          // User is increasing its own debt, as they are receiving money
-          print("INCREASING USER DEBT");
-        } else {
-          print("DECREASING USER DEBT");
-          // User is reducing its own debt, as they are giving money
-        }
-      } else {
-        if (amountUsd > 0) {
-          // Third party is reducing their debt, as the user is receiving money
-          print("DECREASING THIRD PARTY DEBT");
-        } else {
-          // Third party is increasing their debt, as the user is giving money
-          print("INCREASING THIRD PARTY DEBT");
-        }
+    if (_contributable is MonthlyExpense) {
+      if (amount > 0) {
+        // Contributing to a MonthlyExpense can only be done with negative amounts
+        return;
       }
-      // if (excess == 0) {
-      //   debt.increasePaidAmount(amountUsd);
-      // } else {
-      //   if (excess > 0) {
-      //     // Amount exceeds the remaining amount positively
-      //     // This means the debt is overpaid and the debt type is reversed
-      //     debt.debtType =
-      //         debt.debtType == DebtType.own ? DebtType.other : DebtType.own;
-      //     debt.amount = excess;
-      //     debt.paidAmount = 0;
-      //   }
-      // }
-      // debtProvider.save(debt);
+      (_contributable as MonthlyExpense)
+          .addPayment(_selectedDate!, amount.abs());
+    } else if (_contributable is Debt) {
+      Debt debt = _contributable as Debt;
+      debt.modifyPaidAmount(amount, true);
+    }
+  }
+
+  Future<void> _handleDebtInversionDialog(double transactionAmount) async {
+    Debt debt = _contributable as Debt;
+
+    double excess = debt.computeNewPaidAmount(transactionAmount) - debt.amount;
+    DebtInversionOption? pickedOption = await showDialog<DebtInversionOption>(
+        context: context,
+        builder: (context) => DebtInversionDialog(debt, excess));
+    switch (pickedOption) {
+      case DebtInversionOption.invert:
+        debt.debtType = debt.debtType.getOpposite();
+        debt.paidAmount = 0;
+        debt.amount = excess;
+        Provider.of<DebtProvider>(context, listen: false).save(debt);
+        break;
+      case DebtInversionOption.delete:
+        Provider.of<DebtProvider>(context, listen: false).delete(context, debt);
+        break;
+      case DebtInversionOption.ignore:
+      default:
+        _handleContribution(transactionAmount);
     }
   }
 
@@ -336,20 +319,41 @@ class TransactionFormPageState extends State<TransactionFormPage> {
         Expanded(
           child: StyledButtonWidget(
             text: getAppLocalizations(context)!.save,
-            onPressed: () {
+            onPressed: () async {
               if (!_formKey.currentState!.validate()) return;
               if (_account == null) return;
-
-              String description = _descriptionInputController.text;
               double amount = double.parse(_amountInputController.text);
+              if (_transaction != null) {
+                if (amount == _transaction!.amount) {
+                  // Amount didn't change. Don't save anything.
+                  FocusManager.instance.primaryFocus?.unfocus();
+                  Navigator.pop(context);
+                  return;
+                }
+                // Transaction is being updated. Calculate the amount difference.
+                amount -= _transaction!.amount;
+              }
+              String description = _descriptionInputController.text;
               if (_isMobilePayment &&
                   (_transaction == null || !_transaction!.isMobilePayment)) {
                 amount += _calculateMobilePaymentFee(amount);
               }
-              _handleContribution(amount);
-
-              Transaction transaction = Transaction(_account!.id, description,
-                  _selectedDate!, amount, _isMobilePayment);
+              if (_contributable is Debt) {
+                if ((_contributable as Debt).exceedsTotalAmount(amount)) {
+                  await _handleDebtInversionDialog(amount);
+                } else {
+                  _handleContribution(amount);
+                }
+              } else {
+                _handleContribution(amount);
+              }
+              Transaction transaction = Transaction(
+                  _account!.id,
+                  description,
+                  _selectedDate!,
+                  double.parse(_amountInputController.text),
+                  _isMobilePayment,
+                  _contributable);
               if (_transaction == null) {
                 _account!.addTransaction(transaction);
               } else {
@@ -366,6 +370,17 @@ class TransactionFormPageState extends State<TransactionFormPage> {
     );
   }
 
+  void _handleContributableDeletion(Contributable? contributable) {
+    if (contributable == null) return;
+
+    double amount = _transaction!.amount;
+    if (contributable is MonthlyExpense) {
+      (contributable).removePayment(_transaction!.date, amount);
+    } else if (contributable is Debt) {
+      (contributable).modifyPaidAmount(amount * -1, true);
+    }
+  }
+
   Widget _createDeleteWidget() {
     if (_transaction == null) return const SizedBox();
 
@@ -375,8 +390,21 @@ class TransactionFormPageState extends State<TransactionFormPage> {
             child: StyledButtonWidget(
                 text: getAppLocalizations(context)!.delete,
                 isNegativeButton: true,
-                onPressed: () {
+                onPressed: () async {
                   _account!.deleteTransaction(_transaction!);
+                  print(_transaction!.amount);
+                  double amount = _transaction!.amount * -1;
+                  print(_transaction!.amount);
+                  Contributable? contributable = _transaction!.contributable;
+                  if (contributable is Debt) {
+                    if ((_contributable as Debt).exceedsTotalAmount(amount)) {
+                      await _handleDebtInversionDialog(amount);
+                    } else {
+                      _handleContributableDeletion(contributable);
+                    }
+                  } else {
+                    _handleContributableDeletion(contributable);
+                  }
                   Provider.of<AccountProvider>(context, listen: false)
                       .save(_account!);
                   Navigator.pop(context);
@@ -386,10 +414,16 @@ class TransactionFormPageState extends State<TransactionFormPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+
     _transaction = widget.data._transaction;
     _account ??= widget.data._account;
     _initializeInputs();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(

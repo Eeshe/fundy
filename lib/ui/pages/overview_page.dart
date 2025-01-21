@@ -205,8 +205,8 @@ class OverviewPageState extends State<OverviewPage> {
     );
   }
 
-  Widget _createPageButton(String destination, IconData iconData,
-      String label) {
+  Widget _createPageButton(
+      String destination, IconData iconData, String label) {
     return Column(
       children: [
         SizedBox(
@@ -295,8 +295,7 @@ class OverviewPageState extends State<OverviewPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      getAppLocalizations(context)!.recentTransactions,
+                    Text(getAppLocalizations(context)!.recentTransactions,
                         style: const TextStyle(fontSize: 20)),
                     TextButton(
                       onPressed: () =>

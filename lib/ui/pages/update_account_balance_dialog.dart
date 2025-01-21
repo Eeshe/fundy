@@ -72,7 +72,7 @@ class UpdateBalanceDialogStage extends State<UpdateBalanceDialog> {
             double amount = double.parse(_newBalanceInputController.text) -
                 widget._account.balance;
             widget._account.addTransaction(Transaction(widget._account.id,
-                description, DateTime.now(), amount, false));
+                description, DateTime.now(), amount, false, null));
             Provider.of<AccountProvider>(context, listen: false)
                 .save(widget._account);
             FocusManager.instance.primaryFocus?.unfocus();
