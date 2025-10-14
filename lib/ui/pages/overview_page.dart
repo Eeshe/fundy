@@ -178,9 +178,10 @@ class OverviewPageState extends State<OverviewPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _createDollarRateWidget(
-                getAppLocalizations(context)!.paraleloDollar,
-                conversionService.fetchRate('paralelo')),
+            _createDollarRateWidget(getAppLocalizations(context)!.binanceDollar,
+                conversionService.fetchRate('binance')),
+            _createDollarRateWidget(getAppLocalizations(context)!.euroPrice,
+                conversionService.fetchRate('euro')),
             _createDollarRateWidget(getAppLocalizations(context)!.bcvDollar,
                 conversionService.fetchRate('bcv')),
           ],
