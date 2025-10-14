@@ -1,38 +1,31 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'monthly_expense.dart';
+part of 'contributable.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MonthlyExpenseAdapter extends TypeAdapter<MonthlyExpense> {
+class ContributableAdapter extends TypeAdapter<Contributable> {
   @override
-  final int typeId = 3;
+  final int typeId = 7;
 
   @override
-  MonthlyExpense read(BinaryReader reader) {
+  Contributable read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    if (fields.length == 4) {
-    // Data has pre-contributable structure, fix it
-    fields[2] = fields[3];
-    }
-    return MonthlyExpense(
+    return Contributable(
       fields[0] as String,
       fields[1] as double,
-      (fields[2] as Map).cast<String, double>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, MonthlyExpense obj) {
+  void write(BinaryWriter writer, Contributable obj) {
     writer
-      ..writeByte(3)
       ..writeByte(2)
-      ..write(obj.paymentRecords)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -45,7 +38,7 @@ class MonthlyExpenseAdapter extends TypeAdapter<MonthlyExpense> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MonthlyExpenseAdapter &&
+      other is ContributableAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

@@ -1,37 +1,52 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/models/debt_type.dart';
 import 'package:fundy/core/providers/debt_provider.dart';
 import 'package:fundy/ui/pages/debt_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:provider/provider.dart';
 
 part 'debt.g.dart';
 
+// 1 -> 2: DebtType
+// 2 -> 1: amount
 @HiveType(typeId: 6)
-class Debt {
-  @HiveField(0)
-  String id;
-  @HiveField(1)
-  DebtType debtType;
+class Debt extends Contributable {
   @HiveField(2)
-  double amount;
+  DebtType debtType;
   @HiveField(3)
   double paidAmount;
 
-  Debt(this.id, this.debtType, this.amount, this.paidAmount);
+  Debt(String id, this.debtType, double amount, this.paidAmount)
+      : super(id, amount);
 
-  void increasePaidAmount(double amount) {
-    paidAmount = max(0, min(this.amount, paidAmount + amount));
+  double computeNewPaidAmount(double contributedAmount) {
+    if (debtType == DebtType.own) {
+      contributedAmount *= -1;
+    }
+    return paidAmount + contributedAmount;
   }
 
-  bool _isPaid() {
-    return paidAmount >= amount;
+  void modifyPaidAmount(double amount, bool expandAmountIfExceeded) {
+    if (!expandAmountIfExceeded) {
+      paidAmount = max(0, min(this.amount, paidAmount + amount));
+    } else {
+      paidAmount = computeNewPaidAmount(amount);
+      if (paidAmount < 0) {
+        this.amount += paidAmount.abs();
+      }
+      paidAmount = max(0, min(this.amount, paidAmount));
+    }
+  }
+
+  bool exceedsTotalAmount(double amount) {
+    return computeNewPaidAmount(amount) > this.amount;
   }
 
   void _setPaid() {
@@ -88,7 +103,8 @@ class Debt {
                         : Theme.of(context).colorScheme.tertiary,
                   ),
                 ),
-                Text(getAppLocalizations(context)!.remainingAmount("\$${(amount - paidAmount).format()}"))
+                Text(getAppLocalizations(context)!
+                    .remainingAmount("\$${(amount - paidAmount).format()}"))
               ],
             ),
             AdjustableProgressBarWidget(
@@ -104,7 +120,7 @@ class Debt {
                 Provider.of<DebtProvider>(context, listen: false).save(this);
               },
               onTweak: (value) {
-                increasePaidAmount(value);
+                modifyPaidAmount(value, false);
                 Provider.of<DebtProvider>(context, listen: false).save(this);
               },
             )

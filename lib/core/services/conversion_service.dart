@@ -31,7 +31,7 @@ class ConversionService {
     });
   }
 
-  Future<Map<String, double>> _fetchBsConversions() async {
+  Future<List<dynamic>> _fetchAlCambioPrices() async {
     final url = Uri.parse('https://api.alcambio.app/graphql');
     final headers = {
       'Content-Type': 'application/json',
@@ -42,17 +42,31 @@ class ConversionService {
       "query":
           "query getCountryConversions(\$countryCode: String!) {\n  getCountryConversions(payload: {countryCode: \$countryCode}) {\n    _id\n    baseCurrency {\n      code\n      decimalDigits\n      name\n      rounding\n      symbol\n      symbolNative\n      __typename\n    }\n    country {\n      code\n      dial_code\n      flag\n      name\n      __typename\n    }\n    conversionRates {\n      baseValue\n      official\n      principal\n      rateCurrency {\n        code\n        decimalDigits\n        name\n        rounding\n        symbol\n        symbolNative\n        __typename\n      }\n      rateValue\n      type\n      __typename\n    }\n    dateBcvFees\n    dateParalelo\n    dateBcv\n    createdAt\n    __typename\n  }\n}"
     });
-    final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode != 200) return <String, double>{};
+    http.Response response = await http.post(url, headers: headers, body: body);
+    if (response.statusCode != 200) return [];
 
     final responseBytes = response.bodyBytes;
     final json = jsonDecode(utf8.decode(responseBytes));
-    final conversionRates =
-        json['data']['getCountryConversions']['conversionRates'];
+    return json['data']['getCountryConversions']['conversionRates'];
+  }
 
+  Future<double> _fetchBinancePrice() async {
+    final Uri uri = Uri.parse("https://ve.dolarapi.com/v1/dolares/paralelo");
+    http.Response response = await http.get(uri);
+    if (response.statusCode != 200) return 0;
+
+    final json = jsonDecode(utf8.decode(response.bodyBytes));
+
+    return json['promedio'];
+  }
+
+  Future<Map<String, double>> _fetchBsConversions() async {
+    List<dynamic> alCambioPrices = await _fetchAlCambioPrices();
+    double binancePrice = await _fetchBinancePrice();
     return {
-      'paralelo': 1 / conversionRates[0]['baseValue'],
-      'bcv': 1 / conversionRates[1]['baseValue']
+      'binance': 1 / binancePrice,
+      'euro': 1 / alCambioPrices[3]['baseValue'],
+      'bcv': 1 / alCambioPrices[1]['baseValue']
     };
   }
 
@@ -85,7 +99,7 @@ class ConversionService {
         conversions[key] = value;
       });
     } catch (e) {
-      print("COULDN'T FETCH CONVERSIONS FROM THE INTERNET");
+      print("COULDN'T FETCH CONVERSIONS FROM THE INTERNET. ${e.toString()}");
     }
   }
 

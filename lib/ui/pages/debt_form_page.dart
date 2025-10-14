@@ -65,12 +65,12 @@ class DebtFormState extends State<DebtFormPage> {
     return [
       Text(getAppLocalizations(context)!.description, style: _inputLabelStyle),
       TextInputWidget(
-          inputController: _idInputController,
-          hintText: getAppLocalizations(context)!.debtDescriptionHint,
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return getAppLocalizations(context)!.emptyDebtDescription;
-            }
+        inputController: _idInputController,
+        hintText: getAppLocalizations(context)!.debtDescriptionHint,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return getAppLocalizations(context)!.emptyDebtDescription;
+          }
           if (_debt == null || _debt != null && _debt!.id != value) {
             if (Provider.of<DebtProvider>(context, listen: false)
                     .getById(value) !=
@@ -210,7 +210,8 @@ class DebtFormState extends State<DebtFormPage> {
           text: getAppLocalizations(context)!.delete,
           isNegativeButton: true,
           onPressed: () {
-            Provider.of<DebtProvider>(context, listen: false).delete(_debt!);
+            Provider.of<DebtProvider>(context, listen: false)
+                .delete(context, _debt!);
             Navigator.pop(context);
           }),
     );

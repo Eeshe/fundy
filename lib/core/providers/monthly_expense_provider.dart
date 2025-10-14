@@ -1,8 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/models/monthly_expense.dart';
+import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/core/services/encryption_service.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 
 class MonthlyExpenseProvider extends ChangeNotifier {
   List<MonthlyExpense> _monthlyExpenses = [];
@@ -45,13 +48,26 @@ class MonthlyExpenseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> delete(MonthlyExpense expense) async {
+  Future<void> delete(BuildContext context, MonthlyExpense expense) async {
     final Box<MonthlyExpense> box = await _openBox();
     final index = await _findIndex(expense);
     if (index == -1) return;
 
     await box.deleteAt(index);
     _monthlyExpenses.remove(expense);
+
+    // Delete any transaction contribution referrencing the Debt
+    for (var account
+        in Provider.of<AccountProvider>(context, listen: false).accounts) {
+      for (var transaction in account.transactions) {
+        Contributable? contributable = transaction.contributable;
+        if (contributable == null) continue;
+        if (contributable is! MonthlyExpense) continue;
+        if (contributable.id != expense.id) continue;
+
+        transaction.contributable = null;
+      }
+    }
     notifyListeners();
   }
 

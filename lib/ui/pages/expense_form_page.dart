@@ -140,10 +140,9 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
             return getAppLocalizations(context)!.nonNumberAmount;
           }
           double expenseAmount;
-            String expenseAmountString = _amountInputController.text;
-            if (expenseAmountString.isEmpty ||
-                !expenseAmountString.isNumeric()) {
-              return getAppLocalizations(context)!.invalidExpenseAmount;
+          String expenseAmountString = _amountInputController.text;
+          if (expenseAmountString.isEmpty || !expenseAmountString.isNumeric()) {
+            return getAppLocalizations(context)!.invalidExpenseAmount;
           }
           expenseAmount = double.parse(expenseAmountString);
           double paidAmount = value!.isEmpty ? 0 : double.parse(value);
@@ -198,8 +197,8 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
             Map<String, double> paymentRecords = {
               MonthlyExpense.createRecordKey(_selectedDate!): paidAmount
             };
-            Provider.of<MonthlyExpenseProvider>(context, listen: false).save(
-                MonthlyExpense(id, amount, DateTime.now(), paymentRecords));
+            Provider.of<MonthlyExpenseProvider>(context, listen: false)
+                .save(MonthlyExpense(id, amount, paymentRecords));
           }
           FocusManager.instance.primaryFocus?.unfocus();
           Navigator.pop(context);
@@ -218,7 +217,7 @@ class ExpenseFormPageState extends State<ExpenseFormPage> {
         isNegativeButton: true,
         onPressed: () {
           Provider.of<MonthlyExpenseProvider>(context, listen: false)
-              .delete(_monthlyExpense!);
+              .delete(context, _monthlyExpense!);
           Navigator.pop(context);
         },
       ),

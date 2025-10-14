@@ -23,4 +23,13 @@ enum DebtType {
         return getAppLocalizations(context)!.otherDebt;
     }
   }
+
+  DebtType getOpposite() {
+    switch (this) {
+      case DebtType.own:
+        return DebtType.other;
+      default:
+        return DebtType.own;
+    }
+  }
 }

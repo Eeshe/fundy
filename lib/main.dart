@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/models/currency_type.dart';
 import 'package:fundy/core/models/debt.dart';
 import 'package:fundy/core/models/debt_type.dart';

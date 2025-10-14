@@ -187,7 +187,7 @@ class ExchangeFormPageState extends State<ExchangeFormPage> {
                       _startingAccount!.id, _finalAccount!.id),
                       DateTime.now(),
                   -startingAmount,
-                  false));
+                  false, null));
               Provider.of<AccountProvider>(context, listen: false)
                   .save(_startingAccount!);
               _finalAccount!.addTransaction(Transaction(
@@ -196,7 +196,7 @@ class ExchangeFormPageState extends State<ExchangeFormPage> {
                           _startingAccount!.id, _finalAccount!.id),
                       DateTime.now(),
                   finalAmount,
-                  false));
+                  false, null));
               Provider.of<AccountProvider>(context, listen: false)
                   .save(_finalAccount!);
 

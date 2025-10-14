@@ -1,0 +1,4 @@
+enum DebtDeletionOption {
+  ignore,
+  delete;
+}

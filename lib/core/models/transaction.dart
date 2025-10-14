@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fundy/core/models/account.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/models/currency_type.dart';
 import 'package:fundy/core/providers/account_provider.dart';
 import 'package:fundy/core/services/conversion_service.dart';
@@ -24,9 +25,11 @@ class Transaction {
   double amount;
   @HiveField(4)
   bool isMobilePayment;
+  @HiveField(5)
+  Contributable? contributable;
 
   Transaction(this.accountId, this.description, this.date, this.amount,
-      this.isMobilePayment);
+      this.isMobilePayment, this.contributable);
 
   String formatAmount(CurrencyType currencyType) {
     return "${amount > 0 ? '+' : '-'}${currencyType.symbol}${amount.abs().format()}";

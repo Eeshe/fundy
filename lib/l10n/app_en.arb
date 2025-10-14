@@ -3,7 +3,8 @@
   "bruteBalance": "Brute Balance",
   "netBalance": "Net Balance",
   "usableBalance": "Usable Balance",
-  "paraleloDollar": "Paralelo Dollar",
+  "binanceDollar": "Binance Dollar",
+  "euroPrice": "BCV Euro",
   "bcvDollar": "BCV Dollar",
   "accounts": "Accounts",
   "expenses": "Expenses",
@@ -60,6 +61,7 @@
   "max": "Max",
   "clear": "Clear",
   "payAll": "Pay All",
+  "monthlyExpense": "Monthly Expense",
   "monthlyExpenses": "Monthly Expenses",
   "newExpense": "New Expense",
   "emptyExpenseName": "Please enter an expense name",
@@ -96,6 +98,7 @@
   "emptySavingAccount": "Please enter a saving account",
   "paidAmountHigherThanSavingAmount": "Paid amount can't be higher than the saving's amount",
   "emptySavingAmount": "Please enter a saving amount",
+  "debt": "Debt",
   "debts": "Debts",
   "ownDebt": "Own",
   "otherDebt": "Other",
@@ -131,5 +134,15 @@
   "income": "Income",
   "outcome": "Outcome",
   "totals": "Totals",
-  "language": "Language"
+  "language": "Language",
+  "contributesTo": "Contributes to...",
+  "debtInversionDialog": "This transaction would exceed debt {DEBT}. What do you want to do?",
+  "debtInversionDialogInvertToOwn": "Invert\nYou will owe ${NEW_DEBT_AMOUNT}",
+  "debtInversionDialogInvertToOther": "Invert\nYou will be owed ${NEW_DEBT_AMOUNT}",
+  "debtInversionDialogIgnore": "Ignorar\nThe debt will stay at $0.00.",
+  "debtInversionDialogDelete": "Delete\nThe debt will be deleted.",
+  "debtDeletionDialog": "Deleting this transaction would leave the debt at $0. What do you want to do?",
+  "debtDeletionDialogIgnore": "Ignore\nThe debt won't be affected.",
+  "debtDeletionDialogDelete": "Delete\nThe debt will be deleted."
+
 }

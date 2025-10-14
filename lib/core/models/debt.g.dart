@@ -16,10 +16,16 @@ class DebtAdapter extends TypeAdapter<Debt> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
+    if (fields[1].runtimeType == DebtType) {
+    // Data has pre-contributable structure
+    DebtType debtType = fields[1];
+    fields[1] = fields[2];
+    fields[2] = debtType;
+    }
     return Debt(
       fields[0] as String,
-      fields[1] as DebtType,
-      fields[2] as double,
+      fields[2] as DebtType,
+      fields[1] as double,
       fields[3] as double,
     );
   }
@@ -28,14 +34,14 @@ class DebtAdapter extends TypeAdapter<Debt> {
   void write(BinaryWriter writer, Debt obj) {
     writer
       ..writeByte(4)
+      ..writeByte(2)
+      ..write(obj.debtType)
+      ..writeByte(3)
+      ..write(obj.paidAmount)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.debtType)
-      ..writeByte(2)
-      ..write(obj.amount)
-      ..writeByte(3)
-      ..write(obj.paidAmount);
+      ..write(obj.amount);
   }
 
   @override

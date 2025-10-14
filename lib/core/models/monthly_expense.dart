@@ -1,32 +1,30 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
+import 'package:fundy/core/models/contributable.dart';
 import 'package:fundy/core/providers/monthly_expense_provider.dart';
 import 'package:fundy/ui/pages/expense_form_page.dart';
 import 'package:fundy/ui/shared/localization.dart';
 import 'package:fundy/ui/shared/widgets/adjustable_progress_bar_widget.dart';
 import 'package:fundy/utils/double_extension.dart';
-import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 part 'monthly_expense.g.dart';
 
+// 3 -> 2: Map<String, Double> paymentRecords
 @HiveType(typeId: 3)
-class MonthlyExpense {
-  @HiveField(0)
-  String id;
-  @HiveField(1)
-  double amount;
+class MonthlyExpense extends Contributable {
   @HiveField(2)
-  DateTime paymentDate;
-  @HiveField(3)
   final Map<String, double> paymentRecords;
 
-  MonthlyExpense.create(this.id, this.amount, this.paymentDate)
-      : paymentRecords = {'${DateTime.now().month}-${DateTime.now().year}': 0};
+  MonthlyExpense.create(String id, double amount)
+      : paymentRecords = {'${DateTime.now().month}-${DateTime.now().year}': 0},
+        super(id, amount);
 
-  MonthlyExpense(this.id, this.amount, this.paymentDate, this.paymentRecords);
+  MonthlyExpense(String id, double amount, this.paymentRecords)
+      : super(id, amount);
 
   static String createRecordKey(DateTime dateTime) {
     return DateFormat('MMMM-y').format(dateTime);
@@ -65,6 +63,12 @@ class MonthlyExpense {
         min(this.amount, max(0, currentRecord));
   }
 
+  void removePayment(DateTime date, double amount) {
+    double currentRecord = getPaymentRecord(date);
+    currentRecord -= amount;
+    paymentRecords.remove(createRecordKey(date));
+  }
+
   Widget createListWidget(BuildContext context, DateTime date) {
     double paidAmount = getPaymentRecord(date);
     double paidPercentage = paidAmount / amount;
@@ -86,8 +90,8 @@ class MonthlyExpense {
                   id,
                   style: const TextStyle(fontSize: 24),
                 ),
-                Text(getAppLocalizations(context)!.remainingAmount(
-                    "\$${(amount - paidAmount).format()}"))
+                Text(getAppLocalizations(context)!
+                    .remainingAmount("\$${(amount - paidAmount).format()}"))
               ],
             ),
             AdjustableProgressBarWidget(
@@ -116,3 +120,4 @@ class MonthlyExpense {
     );
   }
 }
+
