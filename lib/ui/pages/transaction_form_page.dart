@@ -281,11 +281,14 @@ class TransactionFormPageState extends State<TransactionFormPage> {
         // Contributing to a MonthlyExpense can only be done with negative amounts
         return;
       }
-      (_contributable as MonthlyExpense)
-          .addPayment(_selectedDate!, amount.abs());
+      MonthlyExpense monthlyExpense = _contributable as MonthlyExpense;
+      monthlyExpense.addPayment(_selectedDate!, amount.abs());
+      Provider.of<MonthlyExpenseProvider>(context, listen: false)
+          .save(monthlyExpense);
     } else if (_contributable is Debt) {
       Debt debt = _contributable as Debt;
       debt.modifyPaidAmount(amount, true);
+      Provider.of<DebtProvider>(context, listen: false).save(debt);
     }
   }
 
@@ -333,14 +336,9 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 amount -= _transaction!.amount;
               }
               String description = _descriptionInputController.text;
-              print("_isMobilePayment: $_isMobilePayment");
-              print("_transaction == null: ${_transaction == null}");
               if (_isMobilePayment &&
                   (_transaction == null || !_transaction!.isMobilePayment)) {
-                print("CALCULATING MOBILE PAYMENT FEE");
-                print("PRE: $amount");
                 amount += _calculateMobilePaymentFee(amount);
-                print("POST: $amount");
               }
               if (_contributable is Debt) {
                 if ((_contributable as Debt).exceedsTotalAmount(amount)) {
@@ -397,9 +395,7 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 isNegativeButton: true,
                 onPressed: () async {
                   _account!.deleteTransaction(_transaction!);
-                  print(_transaction!.amount);
                   double amount = _transaction!.amount * -1;
-                  print(_transaction!.amount);
                   Contributable? contributable = _transaction!.contributable;
                   if (contributable is Debt) {
                     if ((_contributable as Debt).exceedsTotalAmount(amount)) {
