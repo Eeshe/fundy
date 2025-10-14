@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -334,9 +333,14 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 amount -= _transaction!.amount;
               }
               String description = _descriptionInputController.text;
+              print("_isMobilePayment: $_isMobilePayment");
+              print("_transaction == null: ${_transaction == null}");
               if (_isMobilePayment &&
                   (_transaction == null || !_transaction!.isMobilePayment)) {
+                print("CALCULATING MOBILE PAYMENT FEE");
+                print("PRE: $amount");
                 amount += _calculateMobilePaymentFee(amount);
+                print("POST: $amount");
               }
               if (_contributable is Debt) {
                 if ((_contributable as Debt).exceedsTotalAmount(amount)) {
@@ -348,12 +352,13 @@ class TransactionFormPageState extends State<TransactionFormPage> {
                 _handleContribution(amount);
               }
               Transaction transaction = Transaction(
-                  _account!.id,
-                  description,
-                  _selectedDate!,
-                  double.parse(_amountInputController.text),
-                  _isMobilePayment,
-                  _contributable);
+                _account!.id,
+                description,
+                _selectedDate!,
+                amount,
+                _isMobilePayment,
+                _contributable,
+              );
               if (_transaction == null) {
                 _account!.addTransaction(transaction);
               } else {
