@@ -15,7 +15,7 @@ class ConversionCalculatorPage extends StatefulWidget {
 }
 
 class ConversionCalculatorPageState extends State<ConversionCalculatorPage> {
-  final List<String> _rates = ["BCV", "Paralelo"];
+  final List<String> _rates = ["BCV", "Euro", "Binance"];
   final TextEditingController _usdController = TextEditingController();
   final TextEditingController _bsController = TextEditingController();
   final FocusNode _usdFocusNode = FocusNode();
